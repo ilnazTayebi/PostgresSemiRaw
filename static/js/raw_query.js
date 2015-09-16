@@ -37,7 +37,7 @@ $(document).ready(function(){
     var options = { mode: 'view' };
     var jsonEditor = new JSONEditor(container, options);
 
-    //Post query using items from the UI
+    //function to be used when a new query changes in the editor
     function post_query(){
         // if something is still ongoing returns
         if(ongoing == true) return;
@@ -124,6 +124,8 @@ function get_dropbox_options(selection){
         options.filename = selection[n].name;
         var extension =selection[n].name.split('.').pop();
         options.name = selection[n].name.split('.')[0];
+        //cleans the not permited characters 
+        options.name = options.name.replace(/[ \.~-]/g,'_')
         switch(extension){
             case 'json':
                 options.type = 'json';
@@ -151,8 +153,7 @@ function add_from_dropbox(){
             document.getElementById("register_button").onclick = function(){
                 for(n in options){
                     var f = options[n];
-                    var id = f.filename.replace('.', '_');
-                    console.log(id);
+
                     f.name = $("#"+inputs[n].name).val();
                     f.type = $("#"+inputs[n].type).val();
                     register_file(f, {
@@ -190,9 +191,7 @@ function add_files_to_dialog(files){
     var inputs = [];
     for( n in files){
         var f = files[n];
-        var id = f.filename.replace('.', '_')
-                        .replace('~','')
-                        .replace(' ','_');
+        var id = f.filename.replace(/[ \.~-]/g,'_');
         var i = {name : 'n_'+id, type : 't_'+id};
         inputs.push(i);
         console.log('adding file', f);
@@ -320,23 +319,6 @@ function http_json_request(method, url, data, callbacks){
     request.send(JSON.stringify(data));
 }
 
-// Ajax is not working for all browsers with the redirects so this did not work
-//function to register a file
-// arg: options the javascrip object to send in the body
-// arg: callbacks, callbacks from when the post finishes, (see jquery ajax post)
-//     success: the sucess callback function, prototype:  function(data)
-//     error, the error callback function, prototype:  function(XMLHttpRequest, status, errorThrown) 
-//function register_file(options, callbacks){
-//    $.ajax({
-//        type: "POST",
-//        url: '/register-file',
-//        data: options, 
-//        dataType: 'json',
-//        success: callbacks.success,
-//        error : callbacks.error
-//    });
-//}
-
 //Will get the schemas and update the UI
 function list_schemas(){
     get_schema_list( "User", {
@@ -369,8 +351,8 @@ function list_schemas(){
                 if (items.length == 3 && items[0] == "s"){
                     // We will not insert these items for the moment
                     // then tries to find the parent
-//                    var parent = get_parent(items[1]);
-//                    parent.nodes.push(node);
+                    //var parent = get_parent(items[1]);
+                    //parent.nodes.push(node);
                 }
                 else if (! node_exists(node.text)){
                     tree.push(node);
