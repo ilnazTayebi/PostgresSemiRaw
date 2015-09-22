@@ -348,7 +348,8 @@ function list_schemas(){
          
                 var node = {text : data.schemas[n] };
                 var items = node.text.split("_");
-                if (items.length == 3 && items[0] == "s"){
+                //TODO: check for a better way to find out if it is an internal extent 
+                if (items.length >= 3 && items[0] == "s"){
                     // We will not insert these items for the moment
                     // then tries to find the parent
                     //var parent = get_parent(items[1]);
