@@ -98,8 +98,19 @@ var draw_functions  = {
         d = dataToHierarchy(draw_data.data);
         draw_bubblechart(d, graph_div);
     },
-    graph_3d : function(){
-        draw_data.last_draw = "graph_3d";
+    surface_3d : function(){
+        draw_data.last_draw = "surface_3d";
+        var t = dataToTable(draw_data.data);
+        var options = { 
+            style: "surface",
+            width: ""+graph_div.offsetWidth -10+ "px",
+            height: ""+graph_div.offsetHeight -10+ "px"
+        };
+        var chart = new links.Graph3d(graph_div);
+        chart.draw(t, options);
+    },
+    bars_3d : function(){
+        draw_data.last_draw = "bars_3d";
         var t = dataToTable(draw_data.data);
         var options = { 
             style: "bar",
@@ -109,9 +120,6 @@ var draw_functions  = {
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
     },
-    image: function(){
-        
-    }
 }
 
 // There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
@@ -157,4 +165,5 @@ document.getElementById('draw_circle_pack').onclick =  draw_functions['circle_pa
 document.getElementById('draw_treemap').onclick =  draw_functions['treemap'];
 document.getElementById('draw_bubblechart').onclick =  draw_functions['bubble_chart'];
 
-document.getElementById('draw_3d').onclick =  draw_functions['graph_3d'];
+document.getElementById('draw_3dsurface').onclick =  draw_functions['surface_3d'];
+document.getElementById('draw_3dbars').onclick =  draw_functions['bars_3d'];
