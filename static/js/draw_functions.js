@@ -1,13 +1,16 @@
 
 //Function to draw a 2d heatmap matrix as seen in
 //http://bl.ocks.org/mbostock/3074470
-function draw_heatmap(heatmap, div){
+function draw_heatmap(data, div){
+
+    div.innerHTML = '<div id="heatmap" ></div>';
 
   var width = div.offsetWidth ,
     height = div.offsetHeight ;
 
-  var dx = heatmap[0].length,
-      dy = heatmap.length;
+  console.log("dimentions", width, height)
+  var dx = data[0].length,
+      dy = data.length;
 
   // Fix the aspect ratio.
   // var ka = dy / dx, kb = height / width;
@@ -27,11 +30,11 @@ function draw_heatmap(heatmap, div){
       .range(["#0a0", "#6c0", "#ee0", "#eb4", "#eb9", "#fff"]);
 */
 
-    var vmax= heatmap.reduce( function(max, arr){
+    var vmax= data.reduce( function(max, arr){
       return Math.max( max,  Math.max.apply( Math, arr ))
     }, -Infinity);
 
-    var vmin = heatmap.reduce( function(max, arr){
+    var vmin = data.reduce( function(max, arr){
       return Math.min( max,  Math.min.apply( Math, arr ))
     }, +Infinity);
 
@@ -50,14 +53,14 @@ function draw_heatmap(heatmap, div){
       .scale(y)
       .orient("right");
 
-  d3.select("body").append("canvas")
+  d3.select("#heatmap").append("canvas")
       .attr("width", dx)
       .attr("height", dy)
       .style("width", width + "px")
       .style("height", height + "px")
       .call(drawImage);
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("#heatmap").append("svg")
       .attr("width", width)
       .attr("height", height);
 
@@ -79,7 +82,7 @@ function draw_heatmap(heatmap, div){
 
     for (var y = 0, p = -1; y < dy; ++y) {
       for (var x = 0; x < dx; ++x) {
-        var c = d3.rgb(color(heatmap[y][x]));
+        var c = d3.rgb(color(data[y][x]));
         image.data[++p] = c.r;
         image.data[++p] = c.g;
         image.data[++p] = c.b;

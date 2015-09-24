@@ -138,4 +138,27 @@ Bubble chart settings
   font-size: 10px;
 }
 
+/******************************************
+Heatmap settings
+*******************************************/
+
+#heatmap svg,
+canvas {
+  position: absolute;
+}
+
+#heatmap .axis text {
+  font: 10px sans-serif;
+}
+
+#heatmap .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#heatmap .axis path {
+  display: none;
+}
 

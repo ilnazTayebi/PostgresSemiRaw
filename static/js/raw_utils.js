@@ -64,7 +64,7 @@ function arrayToTable(data){
 			//case "array":
 		case "undefined":
 			console.log("could not draw empty array " , data)
-				break;
+			break;
 			// if it is not an array or object supposes it is a builtin type and just adds rows like that
 		default:
 			table.addColumn( getRowType(data[0]) , getType(data[0]));
@@ -75,6 +75,30 @@ function arrayToTable(data){
 	}
 	return table;
 }
+
+
+//function that transforms data to a matrix (for heatmap)
+function dataToMatrix(data){
+    var matrix = [];
+    
+    var type = getType(data[0]);
+	switch(type){
+		case "object":
+            throw("Object array to matrix not implemented")
+			break;
+		case "array":
+		    return data;
+		case "undefined":
+			console.log("could not draw empty array " , data)
+			break;
+			// if it is not an array or object supposes it is a builtin type and just adds rows like that
+		default:
+		    throw ("Array of type: " + type + ", cannot be converted to matrix");
+	}
+	
+	return matrix;
+}
+
 
 //creates a visualization table from the data
 function dataToTable(data){    

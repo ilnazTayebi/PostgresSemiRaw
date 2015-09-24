@@ -120,7 +120,14 @@ var draw_functions  = {
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
     },
+    heatmap : function(){
+        draw_data.last_draw = "heatmap";
+        d = dataToMatrix(draw_data.data);
+        draw_heatmap(d, graph_div);
+    }
 }
+
+
 
 // There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
 //like this it will only draw when the graph tab is selected
@@ -167,3 +174,5 @@ document.getElementById('draw_bubblechart').onclick =  draw_functions['bubble_ch
 
 document.getElementById('draw_3dsurface').onclick =  draw_functions['surface_3d'];
 document.getElementById('draw_3dbars').onclick =  draw_functions['bars_3d'];
+document.getElementById('draw_heatmap').onclick =  draw_functions['heatmap'];
+
