@@ -1,74 +1,129 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-    <title>Graph 3D demo</title>
+body {
+  position: relative;
+}
 
-    <style>
-        body {font: 10pt arial;}
-    </style>
+svg,
+canvas {
+  position: absolute;
+}
 
-    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="js/graph3d-min.js"></script>
+.axis text {
+  font: 10px sans-serif;
+}
 
-    <script type="text/javascript">
-        var data = null;
-        var graph = null;
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
-        google.load("visualization", "1");
+.axis path {
+  display: none;
+}
 
-        // Set callback to run when API is loaded
-        google.setOnLoadCallback(drawVisualization);
-
-        function custom(x, y) {
-            return (Math.sin(x/50) * Math.cos(y/50) * 50 + 50);
-        }
-
-        // Called when the Visualization API is loaded.
-        function drawVisualization() {
-            // Create and populate a data table.
-            data = new google.visualization.DataTable();
-            data.addColumn('number', 'x');
-            data.addColumn('number', 'y');
-            data.addColumn('number', 'z');
-
-            
-            // create some nice looking data with sin/cos
-            var steps = 50;  // number of datapoints will be steps*steps
-            var axisMax = 314;
-            var axisStep = axisMax / steps;
-            for (var x = 0; x < axisMax; x+=axisStep) {
-                for (var y = 0; y < axisMax; y+=axisStep) {
-                    var value = custom(x,y);
-                    data.addRow([x, y, value]);
-                }
-            }
-
-            // specify options
-            var options = {
-/*                width:  "600px",
-                height: "600px",*/
-                style: "surface",
-/*                showPerspective: true,
-                showGrid: true,
-                showShadow: false,
-                keepAspectRatio: true,
-                verticalRatio: 0.5*/
-            };
-            div.offsetWidth + 'px;height:'+div.offsetHeight
-            // Instantiate our graph object.
-            graph = new links.Graph3d(document.getElementById('mygraph'));
-
-            // Draw our graph with the created data and options
-            graph.draw(data, options);
-        }
-    </script>
-</head>
-
+</style>
 <body>
-<div id="mygraph"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
 
-<div id="info"></div>
-</body>
-</html>
 
+var width = 960,
+    height = 500;
+d3.json("heatmap.json", function(error, heatmap) {
+  if (error) throw error;
+
+  var dx = heatmap[0].length,
+      dy = heatmap.length;
+
+  // Fix the aspect ratio.
+  // var ka = dy / dx, kb = height / width;
+  // if (ka < kb) height = width * ka;
+  // else width = height / ka;
+
+  var x = d3.scale.linear()
+      .domain([0, dx])
+      .range([0, width]);
+
+  var y = d3.scale.linear()
+      .domain([0, dy])
+      .range([height, 0]);
+
+/*  var color = d3.scale.linear()
+      .domain([95, 115, 135, 155, 175, 195])
+      .range(["#0a0", "#6c0", "#ee0", "#eb4", "#eb9", "#fff"]);
+*/
+
+    var vmax= heatmap.reduce( function(max, arr){
+      return Math.max( max,  Math.max.apply( Math, arr ))
+    }, -Infinity);
+
+    var vmin = heatmap.reduce( function(max, arr){
+      return Math.min( max,  Math.min.apply( Math, arr ))
+    }, +Infinity);
+
+  console.log("max/min", vmax, vmin);
+  var color = d3.scale.linear()
+      .domain([vmin, vmax])
+      .range(["#fff" ,"#004"]);
+
+
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("top")
+      .ticks(20);
+
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("right");
+
+  d3.select("body").append("canvas")
+      .attr("width", dx)
+      .attr("height", dy)
+      .style("width", width + "px")
+      .style("height", height + "px")
+      .call(drawImage);
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .call(removeZero);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .call(removeZero);
+
+  // Compute the pixel colors; scaled by CSS.
+  function drawImage(canvas) {
+    var context = canvas.node().getContext("2d"),
+        image = context.createImageData(dx, dy);
+
+    for (var y = 0, p = -1; y < dy; ++y) {
+      for (var x = 0; x < dx; ++x) {
+        var c = d3.rgb(color(heatmap[y][x]));
+        image.data[++p] = c.r;
+        image.data[++p] = c.g;
+        image.data[++p] = c.b;
+        image.data[++p] = 255;
+      }
+    }
+
+    context.putImageData(image, 0, 0);
+  }
+
+  function removeZero(axis) {
+    axis.selectAll("g").filter(function(d) { return !d; }).remove();
+  }
+});
+
+</script>
