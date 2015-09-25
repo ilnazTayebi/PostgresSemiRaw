@@ -309,7 +309,7 @@ function getChildren(data,root, defaultName){
 
 //converts n data to a hierarchy that can be drawn using a sunburst, a tree view etc..
 function dataToHierarchy(data){
-    console.log("start", data);
+
     var root= {name: "root", children:[]};
     getChildren(data, root);
     console.log(root);

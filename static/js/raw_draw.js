@@ -16,7 +16,9 @@ var draw_functions  = {
 	    //graph_div.empty();
 	    var t = dataToTable(draw_data.data);
 	    var visualization = new google.visualization.Table(graph_div);
-	    visualization.draw(t);
+	    visualization.draw(t,
+            {showRowNumber: true, width: '70%', height: '100%'}
+        );
     },
     columnChart : function(){ 
         draw_data.last_draw = "columnChart";
