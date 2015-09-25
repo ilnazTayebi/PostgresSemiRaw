@@ -100,7 +100,7 @@ var draw_functions  = {
     },
     surface_3d : function(){
         draw_data.last_draw = "surface_3d";
-        var t = dataToTable(draw_data.data);
+        var t = dataToPointTable(draw_data.data);
         var options = { 
             style: "surface",
             width: ""+graph_div.offsetWidth -10+ "px",
@@ -111,7 +111,7 @@ var draw_functions  = {
     },
     bars_3d : function(){
         draw_data.last_draw = "bars_3d";
-        var t = dataToTable(draw_data.data);
+        var t = dataToPointTable(draw_data.data);
         var options = { 
             style: "bar",
             width: ""+graph_div.offsetWidth -10+ "px",
@@ -126,7 +126,6 @@ var draw_functions  = {
         draw_heatmap(d, graph_div);
     }
 }
-
 
 
 // There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
@@ -175,4 +174,3 @@ document.getElementById('draw_bubblechart').onclick =  draw_functions['bubble_ch
 document.getElementById('draw_3dsurface').onclick =  draw_functions['surface_3d'];
 document.getElementById('draw_3dbars').onclick =  draw_functions['bars_3d'];
 document.getElementById('draw_heatmap').onclick =  draw_functions['heatmap'];
-

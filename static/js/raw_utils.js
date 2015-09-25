@@ -55,9 +55,9 @@ function arrayToTable(data){
 				var row = [];
 				for(var name in data[i]){
 					row.push(getObjValue(data[i][name]))
-				}            
+				}
 				table.addRow(row);
-			}   
+			}
 
 			break;
 			//TODO: find way of drawing 2d Arrays (check the min of the lenghts and stringify the rest)
@@ -68,37 +68,64 @@ function arrayToTable(data){
 			// if it is not an array or object supposes it is a builtin type and just adds rows like that
 		default:
 			table.addColumn( getRowType(data[0]) , getType(data[0]));
-			for(var i= 0;i < data.length;i++){        
-				var row = [getObjValue(data[i])];	                    
+			for(var i= 0;i < data.length;i++){
+				var row = [getObjValue(data[i])];
 				table.addRow(row);
-			} 	
+			}
 	}
 	return table;
 }
 
+function dataToPointTable(data){
+
+    var type = getType(data[0]);
+    switch(type){
+        case "object":
+            return arrayToTable(data);
+        case "array":
+            console.log("matrix to points");
+            var table = new google.visualization.DataTable();
+            table.addColumn( "number", "x");
+            table.addColumn( "number", "y");
+            table.addColumn( "number", "z");
+            
+            for (x in data){
+                for (y in data[x]){
+                    var z = parseFloat(data[x][y]);
+                    table.addRow([x,y,z]);
+                }
+            }
+            return table;
+        case "undefined":
+            console.log("could not draw undefined " , data);
+            throw ("could not draw undefined ");
+            break;
+            // if it is not an array or object supposes it is a builtin type and just adds rows like that
+        default:
+            throw ("Array of type: " + type + ", cannot be converted to matrix");
+    }
+    return matrix;
+}
 
 //function that transforms data to a matrix (for heatmap)
 function dataToMatrix(data){
     var matrix = [];
-    
     var type = getType(data[0]);
-	switch(type){
-		case "object":
+    switch(type){
+        case "object":
             throw("Object array to matrix not implemented")
-			break;
-		case "array":
-		    return data;
-		case "undefined":
-			console.log("could not draw empty array " , data)
-			break;
-			// if it is not an array or object supposes it is a builtin type and just adds rows like that
-		default:
-		    throw ("Array of type: " + type + ", cannot be converted to matrix");
-	}
-	
-	return matrix;
+            break;
+        case "array":
+            return data;
+        case "undefined":
+            console.log("could not draw empty array " , data)
+            break;
+            // if it is not an array or object supposes it is a builtin type and just adds rows like that
+        default:
+            throw ("Array of type: " + type + ", cannot be converted to matrix");
+    }
+    return matrix;
 }
-
 
 //creates a visualization table from the data
 function dataToTable(data){    
@@ -137,7 +164,6 @@ function transverse(obj , name) {
 
    return undefined;
 }
-
 
 //finds object in the tree and inserts it if it is not found
 function getObjNode(name, root){
