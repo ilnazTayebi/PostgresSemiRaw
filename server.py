@@ -28,5 +28,5 @@ if __name__ == '__main__':
 
     worker_url = args.worker_url
 
-    print worker_url
+    print "Worker node: " + worker_url
     app.run(host='0.0.0.0')
