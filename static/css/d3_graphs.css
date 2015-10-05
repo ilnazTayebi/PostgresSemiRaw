@@ -162,3 +162,28 @@ canvas {
   display: none;
 }
 
+/******************************************
+Query errors on JC editor
+*******************************************/
+
+.queryError {
+    position:absolute;
+    /*border: 1px solid rgba(221, 240, 255, 0.30);*/
+    /*background:rgba(200,30,30,0.3);*/
+}
+
+.queryError::before{
+    position:absolute;
+    /*background:rgba(200,200,200,0.3);*/
+    content: '^^^^^^^^';
+    top: +80%;
+    color : red;
+    font-size: 60%;
+}
+
+.errorHighlight{
+  position:absolute;
+  z-index:20;
+  background-color:#F4B9B7;
+}
+

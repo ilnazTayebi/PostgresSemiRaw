@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Response, send_from_directory, redire
 from argparse import ArgumentParser, FileType
 
 import socket
-locahost_ip = socket.gethostbyname(socket.gethostname())
+localhost_ip = socket.gethostbyname(socket.gethostname())
 
 app = Flask(__name__, static_url_path='/static')
 worker_url = None
@@ -22,7 +22,7 @@ def schemas():
 if __name__ == '__main__':
     argp = ArgumentParser(description="Frontend")
     argp.add_argument("--worker-url", "-w",
-                      default="http://%s:5001" % locahost_ip,
+                      default="http://%s:54321" % localhost_ip,
                       help="worker node url")
     args = argp.parse_args()
 

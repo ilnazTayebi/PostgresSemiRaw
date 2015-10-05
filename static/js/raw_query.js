@@ -1,4 +1,7 @@
+//dropbox credentials
 var credentials = undefined;
+var markers = [];
+var queryResults = undefined;
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
@@ -25,6 +28,7 @@ $(document).ready(function(){
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
+    document.getElementById('download_results').onclick = downloadResults ;
 
     var editor = ace.edit("editor");
     var lastQuery = "";
@@ -32,6 +36,9 @@ $(document).ready(function(){
 
     editor.setTheme("ace/theme/ambiance");
     editor.getSession().setMode("ace/mode/sql");
+    //Syntax checker in ace uses same setAnnotations api, and clears old anotations.
+    // check http://stackoverflow.com/questions/25903709/ace-editors-setannotations-wont-stay-permanent
+    editor.session.setOption("useWorker", false);
 
     var container = document.getElementById("values");
     var options = { mode: 'view' };
@@ -48,6 +55,7 @@ $(document).ready(function(){
         console.log("sending query", query);
         send_query( query, {
                 success: function(data){
+                    queryResults = data.output;
                     ongoing = false;
                     setIndicatorLabel("Ready")
                     jsonEditor.set(data.output);
@@ -59,17 +67,31 @@ $(document).ready(function(){
                     if(editor.getValue() != lastQuery){
                         post_query();
                     }
+                    else{
+                        removeAllErrors(editor);
+                    }
                 },
                 error : function(request, status, error) {
                     
                     console.log("request", request);
-
+                    console.log("Error", error);
+                    console.log("status", status);
                     ongoing = false;
                     setIndicatorLabel("Error");
 
                     //if the query changed in the mean time resend
                     if(editor.getValue() != lastQuery){
                         post_query();
+                    }
+                    else{
+                        removeAllErrors(editor);
+                        error = JSON.parse(error);
+                        if (status == 400) {
+                            handleQueryError(request, error, editor)
+                        }
+                        else{
+                            append_error( "Internal error, exceptio type: " + error.exceptionType);
+                        }
                     }
                 }
            }
@@ -80,8 +102,93 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
-
 });
+
+// function to download result from a query 
+function downloadResults(){ 
+    var ident = 2;
+    //TODO: check if there are limits in the size of data for encodeURIComponent
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(queryResults, null, ident));
+    var dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute("href",     dataStr     );
+    dlAnchorElem.setAttribute("download", "data.json");
+    dlAnchorElem.click();
+}
+
+//Will handle query errors (status 400 from scala server)
+// and update the UI elements (ace editor etc)
+function handleQueryError(request, error, editor){
+    console.log("Got status 400");
+
+    var errors = [];
+    console.log("Error type", error.errorType);
+    switch (error.errorType){
+        case "SemanticErrors":
+            var errorList = error.error.errors;
+            for (var n in errorList){
+                var marker = {
+                    errorType : error.errorType,
+                    line : errorList[n].position.line,
+                    column : errorList[n].position.column,
+                    source : errorList[n].position.source,
+                    message : errorList[n].prettyMessage
+                }
+                errors.push(marker);
+            }
+            break;
+        case "ParserError":
+            var marker = {
+                errorType : error.errorType,
+                line : error.error.position.line,
+                column : error.error.position.column,
+                source : error.error.position.source,
+                message : error.error.prettyMessage
+            }
+            errors.push(marker);
+            break;
+        default:
+            throw ("Unknown Error error type " + error.errorType);
+    }
+    addErrorMarkers(editor, errors);
+}
+
+// will add a list of markers and annotations for errors in ACE editor
+function addErrorMarkers(editor, errors){
+    
+    var annotations = [];
+    for (var n in errors){
+        var Range = ace.require('ace/range').Range;
+        var e = errors[n];
+        console.log("Adding error", e);
+        var range = new Range(e.line -1, e.column-1, e.line-1,  e.column );
+        
+        //check "ace_selected_word" instead of "text"
+        var m1 = editor.session.addMarker(range, "queryError", "text");
+        markers.push(m1);
+        //var m2 = editor.session.addMarker(range, "errorHighlight", "fullLine");
+        //markers.push(m2);
+
+        var  a =  {
+            row: e.line -1,
+            column: 0,
+            text: e.message,
+            type: "error" // also warning and information
+        }
+
+        annotations.push(a)
+    }
+
+    editor.session.setAnnotations( annotations );
+}
+
+// removes all errors and markers added by addErrorMarkers
+function removeAllErrors(editor){
+    for (n in markers){
+        editor.session.removeMarker(markers[n]);
+    }
+    //checked tha API and could not find remove annotation function
+    editor.session.setAnnotations( [] );
+}
 
 // sets the label on the top of the query
 function setIndicatorLabel(label){

@@ -1,50 +1,93 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
-body {
-  position: relative;
+#editor {
+    /** Setting height is also important, otherwise editor wont showup**/
+    height: 300px;
 }
 
-svg,
-canvas {
-  position: absolute;
+#editor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+  .foo{
+    position:absolute;
+    background:rgba(100,200,100,0.5);
+    z-index:20
+  }
+
+.queryError {
+    position:absolute;
+    /*border: 1px solid rgba(221, 240, 255, 0.30);*/
+    /*background:rgba(200,30,30,0.3);*/
 }
 
-.axis text {
-  font: 10px sans-serif;
+.queryError::before{
+    position:absolute;
+    /*background:rgba(200,200,200,0.3);*/
+    content: '^^^^^^^^';
+    top: +80%;
+    color : red;
+    font-size: 60%;
 }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.axis path {
-  display: none;
+.errorHighlight{
+  position:absolute;
+  z-index:20;
+  background-color:#F4B9B7;
 }
 
 </style>
 <body>
+
+<div id="editor">select p.city as city,
+        (select * from partition A) as patients
+    from patients p
+    group by city : p.city
+
+</div>
+
+
+<div class="container" id="graph" style="height: 600px; width: 600px;"></div>
+
+<!-- Ace editor -->
+<script src="js/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace-builds/src-min-noconflict/theme-ambiance.js"></script>
+<script src="js/ace-builds/src-min-noconflict/mode-sql.js"></script>
+
 <script src="js/d3.v3.min.js"></script>
 <script type="text/javascript" src="js/draw_functions.js"></script>
-<div class="container" id="graph" style="height: 600px; width: 600px;"></div>
+
 <script>
 
-
-var width = 960,
-    height = 500;
-d3.json("mri.json", function(error, data) {
-    var heatmap = [];
-    
-    for (var n in data){
-        heatmap.push(data[n].x);
+    function addErrorMarker(editor, error){
+        console.log("Adding error marker ", error);
+        var Range = ace.require('ace/range').Range;
+        var range = new Range(error.line, error.column, error.line,  error.column +1);
+        
+        //check "ace_selected_word" instead of "text"
+        editor.session.addMarker(range, "queryError", "text");
+        //editor.session.addMarker(range, "errorHighlight", "fullLine");
     }
-    if (error) throw error;
-    var graph_div = document.getElementById('graph');
-    draw_heatmap(heatmap, graph_div);
-});
+
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/ambiance");
+    //editor.getSession().setMode("ace/mode/javascript");
+    editor.getSession().setMode("ace/mode/sql");
+
+    addErrorMarker(editor, {column : 5, line : 0});
+
+    editor.getSession().setAnnotations([{
+      row: 0,
+      column: 0,
+      text: "Strange error",
+      type: "error" // also warning and information
+    }]);
 
 </script>
+
+
