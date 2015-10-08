@@ -373,33 +373,50 @@ function objToCSV(obj){
     return out;
 }
 
-function objToHtmlTable(obj){
-    var out = '<html xmlns:o="urn:schemas-microsoft-com:office:office" \
-xmlns:x="urn:schemas-microsoft-com:office:excel" \
-xmlns="http://www.w3.org/TR/REC-html40">\n \
-<head> \
-<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>W3C Example Table</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--> \n\
-</head>\n<body>\n<table>\n';
+function objToHtmlTable(obj, doc){
+    if ( doc == undefined ) doc = true;
+    var out = '<table>\n';
     
     var matrix = objToMatrix(obj);
     if (matrix.length < 1) {
         out +='</table>';
         return out;
     }
-    out += '<thead valign="top">\n<tr>';
+    out += '\t<thead ><tr>';
     header = matrix[0];
     for (var n in header){
         out += '<th>' + header[n] + '</th>';
     }
-    out += '</tr>\n</thead>\n';
+    out += '</tr></thead>\n';
+
     for (var n=1; n <  matrix.length ; n++){
-        out += '<tr>'
+        out += '\t<tr>'
         for (var i in matrix[n]){
             out += '<td>'+matrix[n][i]+'</td>';
         }
         out += '</tr>\n';
     }
 
-    out += "</body>\n</table>\n</html>";
-    return out;
+    out += "</table>";
+    
+    if (doc){
+        var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">\n'+
+                    '<head>\n'+
+                    '\t<!--[if gte mso 9]><xml>\n'+
+                    '\t\t<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>\n'+
+                    '\t\t\t<x:Name>Query Results</x:Name>\n'+
+                    '\t\t\t<x:WorksheetOptions>\n'+
+                    '\t\t\t\t<x:DisplayGridlines/>\n'+
+                    '\t\t\t</x:WorksheetOptions>\n'+
+                    '\t\t</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook>\n'+
+                    '\t</xml><![endif]-->\n'+
+                    '</head>\n'+
+                    '<body>\n';
+        var termination = "\n</body>\n</html>";
+        return header + out + termination;
+    }
+    else{
+        return out;
+    }
+    
 }

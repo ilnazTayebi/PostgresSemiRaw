@@ -28,6 +28,7 @@ $(document).ready(function(){
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
+
     //download results
     document.getElementById('download_results').onclick = function(){
         //downloadJsonObj(queryResults, "data.json");
@@ -41,10 +42,11 @@ $(document).ready(function(){
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
-            downloadObj( queryResults, "results.xls", "excel");
+            downloadObj( queryResults, "download", "excel");
             $("#download_dialog").modal('hide');
         };
-    } ;
+    };
+
     //save to dropbox
     document.getElementById('save_to_dropbox').onclick = function(){
         //downloadJsonObj(queryResults, "data.json");
@@ -61,7 +63,7 @@ $(document).ready(function(){
             saveObjToDropbox( client, queryResults, "results.xls", "excel");
             $("#download_dialog").modal('hide');
         };
-    } ;
+    };
 
 
     var editor = ace.edit("editor");
@@ -132,8 +134,24 @@ $(document).ready(function(){
         );
         lastQuery = query;
     }
-    editor.getSession().on('change', function(e) { post_query(); }); 
+    
+    
+    editor.getSession().on('change', function(e) { 
+        if (document.getElementById("auto_query").checked){
+            post_query(); 
+        }
+    });
+    document.getElementById('execute_btn').onclick =  post_query;
 
+    document.getElementById('auto_query').onchange = function(){
+        var btn = document.getElementById('execute_btn');
+        if (document.getElementById("auto_query").checked){
+            btn.style.visibility = 'hidden';
+        }
+        else{
+            btn.style.visibility = 'visible';
+        }
+    }
     // starts listing the schemas
     list_schemas();
 });
@@ -157,7 +175,8 @@ function formatResults(obj, format){
         case "csv":
             return objToCSV(obj);
         case "excel":
-            return objToHtmlTable(obj);
+            // no header for the time being
+            return objToHtmlTable(obj, true);
     }
 }
 
@@ -175,21 +194,21 @@ function downloadObj(obj, filename, format){
 // and update the UI elements (ace editor etc)
 function handleQueryError(request, error, editor){
     console.log("Got status 400");
-
-    var errors = [];
+    // will store all error markers here 
+    var e = [];
     console.log("Error type", error.errorType);
     switch (error.errorType){
         case "SemanticErrors":
             var errorList = error.error.errors;
             for (var n in errorList){
                 var marker = {
-                    errorType : error.errorType,
+                    errorType : errorList[n].errorType,
                     line : errorList[n].position.line,
                     column : errorList[n].position.column,
                     source : errorList[n].position.source,
                     message : errorList[n].prettyMessage
                 }
-                errors.push(marker);
+                e.push(marker);
             }
             break;
         case "ParserError":
@@ -200,26 +219,31 @@ function handleQueryError(request, error, editor){
                 source : error.error.position.source,
                 message : error.error.prettyMessage
             }
-            errors.push(marker);
+            e.push(marker);
             break;
         default:
             throw ("Unknown Error error type " + error.errorType);
     }
-    addErrorMarkers(editor, errors);
+    addErrorMarkers(editor, e);
 }
 
 
 
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
-    
+
     var annotations = [];
     for (var n in errors){
+        // this is because there is some sort of bug in the error reporting
+        // so UnexpectedType start in (0,0) and everythign else starts at (1,1)
+        if (errors[n].errorType == "UnexpectedType"){
+            errors[n].line += 1;
+            errors[n].column += 1;
+        }
         var Range = ace.require('ace/range').Range;
         var e = errors[n];
         console.log("Adding error", e);
-        var range = new Range(e.line -1, e.column-1, e.line-1,  e.column );
-        
+        var range = new Range(e.line -1 , e.column-1, e.line-1,  e.column);
         //check "ace_selected_word" instead of "text"
         var m1 = editor.session.addMarker(range, "queryError", "text");
         markers.push(m1);
