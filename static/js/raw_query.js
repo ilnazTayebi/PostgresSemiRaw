@@ -28,7 +28,41 @@ $(document).ready(function(){
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
-    document.getElementById('download_results').onclick = downloadResults ;
+    //download results
+    document.getElementById('download_results').onclick = function(){
+        //downloadJsonObj(queryResults, "data.json");
+        $("#download_dialog").modal('show');
+        document.getElementById('download_json').onclick = function () {
+            downloadObj( queryResults, "results.json", "json");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_csv').onclick = function () {
+            downloadObj( queryResults, "results.csv", "csv");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_excel').onclick = function () {
+            downloadObj( queryResults, "results.xls", "excel");
+            $("#download_dialog").modal('hide');
+        };
+    } ;
+    //save to dropbox
+    document.getElementById('save_to_dropbox').onclick = function(){
+        //downloadJsonObj(queryResults, "data.json");
+        $("#download_dialog").modal('show');
+        document.getElementById('download_json').onclick = function () {
+            saveObjToDropbox( client , queryResults, "results.json", "json");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_csv').onclick = function () {
+            saveObjToDropbox( client , queryResults, "results.csv", "csv");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_excel').onclick = function () {
+            saveObjToDropbox( client, queryResults, "results.xls", "excel");
+            $("#download_dialog").modal('hide');
+        };
+    } ;
+
 
     var editor = ace.edit("editor");
     var lastQuery = "";
@@ -90,7 +124,7 @@ $(document).ready(function(){
                             handleQueryError(request, error, editor)
                         }
                         else{
-                            append_error( "Internal error, exceptio type: " + error.exceptionType);
+                            append_error( "Internal error, exception type: " + error.exceptionType);
                         }
                     }
                 }
@@ -104,15 +138,37 @@ $(document).ready(function(){
     list_schemas();
 });
 
+function saveObjToDropbox(client, obj, filename, format){
+    client.writeFile(filename, formatResults( obj, format) , function (error) {
+        if (error) {
+            append_error('Could not save ' + filename  + ' , erro:' + error);
+        } else {
+            append_alert('File ' + filename  + ' saved in your dropbox');
+        }
+    });
+}
+
+// transforms an obj to json, csv or html-table (excel)
+function formatResults(obj, format){
+    switch (format){
+        case "json":
+            var ident = 2;
+            return JSON.stringify(obj, null, ident);
+        case "csv":
+            return objToCSV(obj);
+        case "excel":
+            return objToHtmlTable(obj);
+    }
+}
+
 // function to download result from a query 
-function downloadResults(){ 
-    var ident = 2;
+function downloadObj(obj, filename, format){ 
     //TODO: check if there are limits in the size of data for encodeURIComponent
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(queryResults, null, ident));
-    var dlAnchorElem = document.getElementById('downloadAnchorElem');
-    dlAnchorElem.setAttribute("href",     dataStr     );
-    dlAnchorElem.setAttribute("download", "data.json");
-    dlAnchorElem.click();
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
+    var dlElem = document.getElementById('downloadAnchorElem');
+    dlElem.setAttribute("href", dataStr);
+    dlElem.setAttribute("download", filename);
+    dlElem.click();
 }
 
 //Will handle query errors (status 400 from scala server)
@@ -151,6 +207,8 @@ function handleQueryError(request, error, editor){
     }
     addErrorMarkers(editor, errors);
 }
+
+
 
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
