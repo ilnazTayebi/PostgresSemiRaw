@@ -67,6 +67,10 @@ $(document).ready(function(){
 
 
     var editor = ace.edit("editor");
+
+    // init demo stuff, pointing it to the editor
+    demo_init(editor);
+
     var lastQuery = "";
     var ongoing = false;
 
@@ -152,6 +156,7 @@ $(document).ready(function(){
             btn.style.visibility = 'visible';
         }
     }
+
     // starts listing the schemas
     list_schemas();
 });
