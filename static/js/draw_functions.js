@@ -41,7 +41,7 @@ function draw_heatmap(data, div, options){
     var domain = [vmin, vmax];
     var colors = ["#002", "#fff"]
     
-    if(options.colors){
+    if(options && options.colors){
         colors = options.colors
         domain = [vmin];
         
