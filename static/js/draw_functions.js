@@ -46,11 +46,13 @@ function draw_heatmap(data, div, options){
         domain = [vmin];
         
         for (var i = 1 ; i < colors.length ; i ++){
-            domain.push(i*(vmax-vmin)/(colors.length-1));
+            domain.push(vmin + i*(vmax-vmin)/(colors.length-1));
         }
+
     }
-    
-    console.log("max/min", vmax, vmin);
+    console.log("colors" ,colors);
+    console.log("domain" , domain);
+    console.log("min/max", vmin, vmax);
     var color = d3.scale.linear()
       .domain(domain)
       .range(colors);
