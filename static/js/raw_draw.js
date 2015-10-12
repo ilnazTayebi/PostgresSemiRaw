@@ -125,7 +125,9 @@ var draw_functions  = {
     heatmap : function(){
         draw_data.last_draw = "heatmap";
         d = dataToMatrix(draw_data.data);
-        draw_heatmap(d, graph_div);
+        //["#f00", "#f80", "#ff0", "#fff", "#002"]
+        //["#002","#fff" ,"#ff0", "#fa0", "#f00"]
+        draw_heatmap(d, graph_div, {colors : ["#004", "#fff","#f00"] });
     }
 }
 

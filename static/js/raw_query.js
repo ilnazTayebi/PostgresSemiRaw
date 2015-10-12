@@ -256,7 +256,7 @@ function send_query(query, callbacks){
     http_json_request('POST', '/query' , data , callbacks)
 }
 
-//TODO: make the post connect json instead of url encoded 
+//registers file for querying 
 function register_file(options, callbacks){
     // adds the token to the data to send
     options.token = credentials.token;
@@ -367,6 +367,3 @@ function list_schemas(){
         }
      });
 }
-
-
-

@@ -1,7 +1,7 @@
 
 //Function to draw a 2d heatmap matrix as seen in
 //http://bl.ocks.org/mbostock/3074470
-function draw_heatmap(data, div){
+function draw_heatmap(data, div, options){
 
     div.innerHTML = '<div id="heatmap" ></div>';
 
@@ -38,45 +38,57 @@ function draw_heatmap(data, div){
       return Math.min( max,  Math.min.apply( Math, arr ))
     }, +Infinity);
 
-  console.log("max/min", vmax, vmin);
-  var color = d3.scale.linear()
-      .domain([vmin, vmax])
-      .range(["#fff" ,"#004"]);
+    var domain = [vmin, vmax];
+    var colors = ["#002", "#fff"]
+    
+    if(options.colors){
+        colors = options.colors
+        domain = [vmin];
+        
+        for (var i = 1 ; i < colors.length ; i ++){
+            domain.push(i*(vmax-vmin)/(colors.length-1));
+        }
+    }
+    
+    console.log("max/min", vmax, vmin);
+    var color = d3.scale.linear()
+      .domain(domain)
+      .range(colors);
 
 
-  var xAxis = d3.svg.axis()
+    var xAxis = d3.svg.axis()
       .scale(x)
       .orient("top")
       .ticks(20);
 
-  var yAxis = d3.svg.axis()
+    var yAxis = d3.svg.axis()
       .scale(y)
       .orient("right");
 
-  d3.select("#heatmap").append("canvas")
+    d3.select("#heatmap").append("canvas")
       .attr("width", dx)
       .attr("height", dy)
       .style("width", width + "px")
       .style("height", height + "px")
       .call(drawImage);
 
-  var svg = d3.select("#heatmap").append("svg")
+    var svg = d3.select("#heatmap").append("svg")
       .attr("width", width)
       .attr("height", height);
 
-  svg.append("g")
+    svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
       .call(removeZero);
 
-  svg.append("g")
+    svg.append("g")
       .attr("class", "y axis")
       .call(yAxis)
       .call(removeZero);
 
-  // Compute the pixel colors; scaled by CSS.
-  function drawImage(canvas) {
+    // Compute the pixel colors; scaled by CSS.
+    function drawImage(canvas) {
     var context = canvas.node().getContext("2d"),
         image = context.createImageData(dx, dy);
 
@@ -91,11 +103,11 @@ function draw_heatmap(data, div){
     }
 
     context.putImageData(image, 0, 0);
-  }
+    }
 
-  function removeZero(axis) {
-    axis.selectAll("g").filter(function(d) { return !d; }).remove();
-  }
+    function removeZero(axis) {
+        axis.selectAll("g").filter(function(d) { return !d; }).remove();
+    }
 }
 
 // Function to draw a sunburst sequence as seen in 
