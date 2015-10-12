@@ -315,3 +315,134 @@ function dataToHierarchy(data){
     console.log(root);
     return root;
 }
+
+
+function getCsvValue(obj){
+    	switch(getType(obj)){
+		case "number":
+		case "date":
+			return obj;
+		case "string":
+			return obj;
+		default:
+			return '"' + objToString(obj) + '"';
+	}
+}
+
+function arrayToMatrix(data){
+	var out = [];
+    
+	switch(getType(data[0])){
+		case "object":
+		    var header = [];
+			for (var name in data[0]){
+				header.push(name);
+			}
+            out.push(header);
+			for(var i= 0;i < data.length;i++){        
+				var row = [];
+				for(var name in data[i]){
+					row.push(getCsvValue(data[i][name]))
+				}            
+				out.push(row);
+			}   
+
+			break;
+			//TODO: find way of drawing 2d Arrays (check the min of the lenghts and stringify the rest)
+			//case "array":
+		case "undefined":
+			console.log("could not draw empty array " , data)
+			break;
+			// if it is not an array or object supposes it is a builtin type and just adds rows like that
+		default:
+			out.push( [ getType(data[0]) ] );
+			for(var i= 0;i < data.length;i++){        
+				out.push( [ getCsvValue(data[i]) ] );	                    
+			} 
+	}
+	return out;
+}
+
+function objToMatrix(obj){
+    var out= [];
+
+    switch( getType(obj) ){
+        case "array":
+            return arrayToMatrix(obj);
+        case 'object':
+            out.push([]);
+            for(var name in obj){
+                out[0].push(name);
+            }
+            out.push([]);
+            for(var name in obj){
+                out[1].push( getCsvValue(obj[name]) );
+            }
+            return out;
+        case "undefined":
+            console.log("ERROR: data is undefined, visualization table is empty")
+            return out;
+        default:
+            out[0] = [getType(obj)]; 
+            out[1]= [getCsvValue(obj)];
+            return out;
+    }
+}
+
+function objToCSV(obj){
+    var separator = ',';
+    var out = "";
+    var matrix = objToMatrix(obj);
+    for (var n in matrix){
+        out += matrix[n].join(separator) + "\n";
+    }
+    return out;
+}
+
+function objToHtmlTable(obj, doc){
+    if ( doc == undefined ) doc = true;
+    var out = '<table>\n';
+    
+    var matrix = objToMatrix(obj);
+    if (matrix.length < 1) {
+        out +='</table>';
+        return out;
+    }
+    out += '\t<thead ><tr>';
+    header = matrix[0];
+    for (var n in header){
+        out += '<th>' + header[n] + '</th>';
+    }
+    out += '</tr></thead>\n';
+
+    for (var n=1; n <  matrix.length ; n++){
+        out += '\t<tr>'
+        for (var i in matrix[n]){
+            out += '<td>'+matrix[n][i]+'</td>';
+        }
+        out += '</tr>\n';
+    }
+
+    out += "</table>";
+    
+    if (doc){
+        var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">\n'+
+                    '<head>\n'+
+                    '\t<!--[if gte mso 9]><xml>\n'+
+                    '\t\t<x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>\n'+
+                    '\t\t\t<x:Name>Query Results</x:Name>\n'+
+                    '\t\t\t<x:WorksheetOptions>\n'+
+                    '\t\t\t\t<x:DisplayGridlines/>\n'+
+                    '\t\t\t</x:WorksheetOptions>\n'+
+                    '\t\t</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook>\n'+
+                    '\t</xml><![endif]-->\n'+
+                    '</head>\n'+
+                    '<body>\n';
+        var termination = "\n</body>\n</html>";
+        return header + out + termination;
+    }
+    else{
+        return out;
+    }
+    
+}

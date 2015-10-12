@@ -1,4 +1,7 @@
+//dropbox credentials
 var credentials = undefined;
+var markers = [];
+var queryResults = undefined;
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
@@ -26,12 +29,56 @@ $(document).ready(function(){
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
+    //download results
+    document.getElementById('download_results').onclick = function(){
+        //downloadJsonObj(queryResults, "data.json");
+        $("#download_dialog").modal('show');
+        document.getElementById('download_json').onclick = function () {
+            downloadObj( queryResults, "results.json", "json");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_csv').onclick = function () {
+            downloadObj( queryResults, "results.csv", "csv");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_excel').onclick = function () {
+            downloadObj( queryResults, "download", "excel");
+            $("#download_dialog").modal('hide');
+        };
+    };
+
+    //save to dropbox
+    document.getElementById('save_to_dropbox').onclick = function(){
+        //downloadJsonObj(queryResults, "data.json");
+        $("#download_dialog").modal('show');
+        document.getElementById('download_json').onclick = function () {
+            saveObjToDropbox( client , queryResults, "results.json", "json");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_csv').onclick = function () {
+            saveObjToDropbox( client , queryResults, "results.csv", "csv");
+            $("#download_dialog").modal('hide');
+        };
+        document.getElementById('download_excel').onclick = function () {
+            saveObjToDropbox( client, queryResults, "results.xls", "excel");
+            $("#download_dialog").modal('hide');
+        };
+    };
+
+
     var editor = ace.edit("editor");
+
+    // init demo stuff, pointing it to the editor
+    demo_init(editor);
+
     var lastQuery = "";
     var ongoing = false;
 
     editor.setTheme("ace/theme/ambiance");
     editor.getSession().setMode("ace/mode/sql");
+    //Syntax checker in ace uses same setAnnotations api, and clears old anotations.
+    // check http://stackoverflow.com/questions/25903709/ace-editors-setannotations-wont-stay-permanent
+    editor.session.setOption("useWorker", false);
 
     var container = document.getElementById("values");
     var options = { mode: 'view' };
@@ -48,6 +95,7 @@ $(document).ready(function(){
         console.log("sending query", query);
         send_query( query, {
                 success: function(data){
+                    queryResults = data.output;
                     ongoing = false;
                     setIndicatorLabel("Ready")
                     jsonEditor.set(data.output);
@@ -59,11 +107,15 @@ $(document).ready(function(){
                     if(editor.getValue() != lastQuery){
                         post_query();
                     }
+                    else{
+                        removeAllErrors(editor);
+                    }
                 },
                 error : function(request, status, error) {
                     
                     console.log("request", request);
-
+                    console.log("Error", error);
+                    console.log("status", status);
                     ongoing = false;
                     setIndicatorLabel("Error");
 
@@ -71,17 +123,159 @@ $(document).ready(function(){
                     if(editor.getValue() != lastQuery){
                         post_query();
                     }
+                    else{
+                        removeAllErrors(editor);
+                        error = JSON.parse(error);
+                        if (status == 400) {
+                            handleQueryError(request, error, editor)
+                        }
+                        else{
+                            append_error( "Internal error, exception type: " + error.exceptionType);
+                        }
+                    }
                 }
            }
         );
         lastQuery = query;
     }
-    editor.getSession().on('change', function(e) { post_query(); }); 
+    
+    
+    editor.getSession().on('change', function(e) { 
+        if (document.getElementById("auto_query").checked){
+            post_query(); 
+        }
+    });
+    document.getElementById('execute_btn').onclick =  post_query;
+
+    document.getElementById('auto_query').onchange = function(){
+        var btn = document.getElementById('execute_btn');
+        if (document.getElementById("auto_query").checked){
+            btn.style.visibility = 'hidden';
+        }
+        else{
+            btn.style.visibility = 'visible';
+        }
+    }
 
     // starts listing the schemas
     list_schemas();
-
 });
+
+function saveObjToDropbox(client, obj, filename, format){
+    client.writeFile(filename, formatResults( obj, format) , function (error) {
+        if (error) {
+            append_error('Could not save ' + filename  + ' , erro:' + error);
+        } else {
+            append_alert('File ' + filename  + ' saved in your dropbox');
+        }
+    });
+}
+
+// transforms an obj to json, csv or html-table (excel)
+function formatResults(obj, format){
+    switch (format){
+        case "json":
+            var ident = 2;
+            return JSON.stringify(obj, null, ident);
+        case "csv":
+            return objToCSV(obj);
+        case "excel":
+            // no header for the time being
+            return objToHtmlTable(obj, true);
+    }
+}
+
+// function to download result from a query 
+function downloadObj(obj, filename, format){ 
+    //TODO: check if there are limits in the size of data for encodeURIComponent
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
+    var dlElem = document.getElementById('downloadAnchorElem');
+    dlElem.setAttribute("href", dataStr);
+    dlElem.setAttribute("download", filename);
+    dlElem.click();
+}
+
+//Will handle query errors (status 400 from scala server)
+// and update the UI elements (ace editor etc)
+function handleQueryError(request, error, editor){
+    console.log("Got status 400");
+    // will store all error markers here 
+    var e = [];
+    console.log("Error type", error.errorType);
+    switch (error.errorType){
+        case "SemanticErrors":
+            var errorList = error.error.errors;
+            for (var n in errorList){
+                var marker = {
+                    errorType : errorList[n].errorType,
+                    line : errorList[n].position.line,
+                    column : errorList[n].position.column,
+                    source : errorList[n].position.source,
+                    message : errorList[n].prettyMessage
+                }
+                e.push(marker);
+            }
+            break;
+        case "ParserError":
+            var marker = {
+                errorType : error.errorType,
+                line : error.error.position.line,
+                column : error.error.position.column,
+                source : error.error.position.source,
+                message : error.error.prettyMessage
+            }
+            e.push(marker);
+            break;
+        default:
+            throw ("Unknown Error error type " + error.errorType);
+    }
+    addErrorMarkers(editor, e);
+}
+
+
+
+// will add a list of markers and annotations for errors in ACE editor
+function addErrorMarkers(editor, errors){
+
+    var annotations = [];
+    for (var n in errors){
+        // this is because there is some sort of bug in the error reporting
+        // so UnexpectedType start in (0,0) and everythign else starts at (1,1)
+        if (errors[n].errorType == "UnexpectedType"){
+            errors[n].line += 1;
+            errors[n].column += 1;
+        }
+        var Range = ace.require('ace/range').Range;
+        var e = errors[n];
+        console.log("Adding error", e);
+        var range = new Range(e.line -1 , e.column-1, e.line-1,  e.column);
+        //check "ace_selected_word" instead of "text"
+        var m1 = editor.session.addMarker(range, "queryError", "text");
+        markers.push(m1);
+        //var m2 = editor.session.addMarker(range, "errorHighlight", "fullLine");
+        //markers.push(m2);
+
+        var  a =  {
+            row: e.line -1,
+            column: 0,
+            text: e.message,
+            type: "error" // also warning and information
+        }
+
+        annotations.push(a)
+    }
+
+    editor.session.setAnnotations( annotations );
+}
+
+// removes all errors and markers added by addErrorMarkers
+function removeAllErrors(editor){
+    for (n in markers){
+        editor.session.removeMarker(markers[n]);
+    }
+    //checked tha API and could not find remove annotation function
+    editor.session.setAnnotations( [] );
+}
 
 // sets the label on the top of the query
 function setIndicatorLabel(label){
