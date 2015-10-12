@@ -128,7 +128,7 @@ var draw_functions  = {
         //["#f00", "#f80", "#ff0", "#fff", "#002"]
         //["#002","#fff" ,"#ff0", "#fa0", "#f00"]
         //["#0a0", "#6c0", "#ee0", "#eb4", "#eb9", "#fff"]
-        draw_heatmap(d, graph_div);
+        draw_heatmap(d, graph_div, {colors :["#002","#dd8","#f80" ,"#f00"]});
     }
 }
 
