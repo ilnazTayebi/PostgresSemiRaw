@@ -75,7 +75,7 @@ $(document).ready(function(){
     var ongoing = false;
 
     editor.setTheme("ace/theme/ambiance");
-    editor.getSession().setMode("ace/mode/sql");
+    editor.getSession().setMode("ace/mode/qrawl");
     //Syntax checker in ace uses same setAnnotations api, and clears old anotations.
     // check http://stackoverflow.com/questions/25903709/ace-editors-setannotations-wont-stay-permanent
     editor.session.setOption("useWorker", false);
