@@ -22,7 +22,7 @@
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
 		<style type="text/css" media="screen">
             #editor {
-	            height: 700px;
+	            /*height: 660px;*/
 	            font-size: 18px;
             }
 
@@ -46,17 +46,19 @@
                 display:block;
                 line-height:normal;
                 text-align:left;
-                margin-top:5px;
-                margin-bottom:5px;
+                margin-top:10px;
+                margin-bottom:10px;
+                padding-left:10px;
+                padding-right:10px;
             }
 
 			#values {
-				height: 660px;
+				height: 700px;
 				font-size: 18px;
 			}
 
 			#graph_tab{
-				height: 660px;
+				height: 700px;
 				font-size: 18px;        
 			}
 			.navbar-brand,
@@ -178,17 +180,18 @@
                                 <button class="btn btn-info btn-xs"  style="float:right;" id="execute_btn">execute</button>
 							</h3>
 						</div>
-						<div id="demoBox">
-                            <div id="demoComments"></div>
-                            <div id="demoNavigation">
-                            <p>
-                                <span id="prev" class="label label-success">prev</span> 
-                                <span id="next" class="label label-success">next</span> 
-                            </p>
-                            </div>
-                        </div>
 						<div class="panel-body">
-							<div id="editor">Write your query here...</div>
+				            <div id="demoBox" class="row" >
+                                <div id="demoComments"  class="col-lg-12"></div>
+                                <div id="demoNavigation" class="col-lg-12">
+                                <p>
+                                    <span id="prev" class="label label-success">prev</span> 
+                                    <span id="next" class="label label-success">next</span> 
+                                </p>
+                                </div>
+                                <div id="editor" class="col-lg-12" style="height: 600px;">Write your query here...</div>
+                            </div>
+                            
 						</div>
 					</div>
 				</div>
