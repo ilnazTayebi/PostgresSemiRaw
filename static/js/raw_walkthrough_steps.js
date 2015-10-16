@@ -1,11 +1,11 @@
 var steps = [
     {
-        "doc": "This is the demo mode.\nWe're going to walk through a number of queries to illustrate\nthe syntax of Qrawl and show its capabilities. The code is going to be\ninserted in the editor below, feel free to edit it yourself to try things\nout. Let's start with a regular SQL like select statement (click next)", 
+        "doc": "<p>This is the demo mode.\nWe're going to walk through a number of queries to illustrate\nthe syntax of Qrawl and show its capabilities. The code is going to be\ninserted in the editor below, feel free to edit it yourself to try things\nout. Let's start with a regular SQL like select statement (click next)</p>", 
         "edits": [], 
         "expected": ""
     }, 
     {
-        "doc": "This is listing the various fields of the records stored in the\npeople table. Since people are described by their year of birth, name\nand job, we'd like to perform now a couple of regular SQL aggregations.", 
+        "doc": "<p>This is listing the various fields of the records stored in the\npeople table. Since people are described by their year of birth, name\nand job, we'd like to perform now a couple of regular SQL aggregations.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -16,7 +16,7 @@ var steps = [
         "expected": "select * from people"
     }, 
     {
-        "doc": "Here we group people by year and count the number of people in each\ngroup.", 
+        "doc": "<p>Here we group people by year and count the number of people in each\ngroup.\n</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -42,7 +42,7 @@ var steps = [
         "expected": "select year, count(*)\nfrom people\ngroup by year"
     }, 
     {
-        "doc": "Here we group people by job and report the maximum year of each\ngroup. All this is regular SQL. In Qrawl however, it is possible to\nprocess the grouped data as a collection, without explicitly performing\na numeric aggregation on it.", 
+        "doc": "<p>Here we group people by job and report the maximum year of each\ngroup. All this is regular SQL. In Qrawl however, it is possible to\nprocess the grouped data as a collection, without explicitly performing\na numeric aggregation on it.\n</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -68,7 +68,7 @@ var steps = [
         "expected": "select job, count(*)\nfrom people\ngroup by job"
     }, 
     {
-        "doc": "By removing the aggregator, we have now the actual collection of\npeople matching the job nested in each row.", 
+        "doc": "<p>By removing the aggregator, we have now the actual collection of\npeople matching the job nested in each row.\n</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -84,7 +84,7 @@ var steps = [
         "expected": "select job, *\nfrom people\ngroup by job"
     }, 
     {
-        "doc": "In Qrawl, this statement permits to split a collection in groups.", 
+        "doc": "<p>In Qrawl, this statement permits to split a collection in groups.\n</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -95,7 +95,7 @@ var steps = [
         "expected": "select *\nfrom people\ngroup by job"
     }, 
     {
-        "doc": "If willing to operate on that collection, one should use the keyword\npartition in a from. The keyword partition refers to the group of people\nwhich matched the job. From there on, one can perform arbitrary queries\non the subset, including splitting it in groups.", 
+        "doc": "<p>If willing to operate on that collection, one should use the keyword\n<code>partition</code> in a from. The keyword partition refers to the group of people\nwhich matched the job. From there on, one can perform arbitrary queries\non the subset, including splitting it in groups.\n</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -111,7 +111,7 @@ var steps = [
         "expected": "select job, select year\n            from partition\nfrom people\ngroup by job"
     }, 
     {
-        "doc": "If willing to operate on that collection, one should use the keyword\npartition in a from. The keyword partition refers to the group of people\nwhich matched the job.", 
+        "doc": "<p>If willing to operate on that collection, one should use the keyword\npartition in a from. The keyword partition refers to the group of people\nwhich matched the job.\n</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -127,7 +127,7 @@ var steps = [
         "expected": "select job, select year, *\n            from partition // partition = the people with that job\n            group by year  // '*' is the subset of people having that year\nfrom people\ngroup by job"
     }, 
     {
-        "doc": "Here we do a couple more aggregations.", 
+        "doc": "<p>Here we do a couple more aggregations.\n</p>", 
         "edits": [
             {
                 "action": "insert", 
