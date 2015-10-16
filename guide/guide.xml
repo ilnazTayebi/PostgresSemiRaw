@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guide>
+<step>
+<doc>This is the demo mode.
+We're going to walk through a number of queries to illustrate
+the syntax of Qrawl and show its capabilities. The code is going to be
+inserted in the editor below, feel free to edit it yourself to try things
+out. Let's start with a regular SQL like select statement (click next)</doc>
+</step>
+<step>
+<doc>This is listing the various fields of the records stored in the
+people table. Since people are described by their year of birth, name
+and job, we'd like to perform now a couple of regular SQL aggregations.</doc>
+<query>
+select * from people
+</query>
+</step>
+
+<step>
+<doc>Here we group people by year and count the number of people in each
+group.
+</doc>
+<query>
+select year, count(*)
+from people
+group by year
+</query>
+</step>
+
+<step>
+<doc>Here we group people by job and report the maximum year of each
+group. All this is regular SQL. In Qrawl however, it is possible to
+process the grouped data as a collection, without explicitly performing
+a numeric aggregation on it.
+</doc>
+<query>
+select job, count(*)
+from people
+group by job
+</query>
+</step>
+
+<step>
+<doc>By removing the aggregator, we have now the actual collection of
+people matching the job nested in each row.
+</doc>
+<query>
+select job, *
+from people
+group by job
+</query>
+</step>
+
+<step>
+<doc>In Qrawl, this statement permits to split a collection in groups.
+</doc>
+<query>
+select *
+from people
+group by job
+</query>
+</step>
+
+<step>
+<doc>If willing to operate on that collection, one should use the keyword
+partition in a from. The keyword partition refers to the group of people
+which matched the job. From there on, one can perform arbitrary queries
+on the subset, including splitting it in groups.
+</doc>
+<query>
+select job, select year
+            from partition
+from people
+group by job
+</query>
+</step>
+
+<step>
+<doc>If willing to operate on that collection, one should use the keyword
+partition in a from. The keyword partition refers to the group of people
+which matched the job.
+</doc>
+<query>
+select job, select year, *
+            from partition // partition = the people with that job
+            group by year  // '*' is the subset of people having that year
+from people
+group by job
+</query>
+</step>
+
+<step>
+<doc>Here we do a couple more aggregations.
+</doc>
+<query>
+select job, select year, (select name from partition) as names,
+                   count(*) as size
+            from partition group by year,
+            count(*) as all // the 'count' of people with that job
+from people
+group by job
+</query>
+</step>
+
+</guide>
