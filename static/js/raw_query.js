@@ -67,9 +67,7 @@ $(document).ready(function(){
 
 
     var editor = ace.edit("editor");
-
-    // init demo stuff, pointing it to the editor
-    demo_init(editor);
+    editor.$blockScrolling = Infinity;
 
     var lastQuery = "";
     var ongoing = false;
@@ -140,22 +138,36 @@ $(document).ready(function(){
     }
     
     
-    editor.getSession().on('change', function(e) { 
-        if (document.getElementById("auto_query").checked){
-            post_query(); 
-        }
-    });
-    document.getElementById('execute_btn').onclick =  post_query;
-
-    document.getElementById('auto_query').onchange = function(){
+    function editor_set_autoexecute(b) {
         var btn = document.getElementById('execute_btn');
-        if (document.getElementById("auto_query").checked){
+        if (b) {
             btn.style.visibility = 'hidden';
-        }
-        else{
+            editor.getSession().on('change', function(e) { 
+                if (document.getElementById("auto_query").checked){
+                    post_query(); 
+                }
+            });
+        } else {
+            editor.getSession().on('change', function(e) {});
             btn.style.visibility = 'visible';
         }
     }
+
+    editor_set_autoexecute(true);
+
+    document.getElementById('execute_btn').onclick =  post_query;
+
+    document.getElementById('auto_query').onchange = function(){
+        if (document.getElementById("auto_query").checked){
+            editor_set_autoexecute(true);
+        }
+        else{
+            editor_set_autoexecute(false);
+        }
+    }
+
+    // init demo stuff, pointing it to the editor
+    demo_init(editor, post_query, editor_set_autoexecute);
 
     // starts listing the schemas
     list_schemas();

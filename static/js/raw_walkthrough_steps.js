@@ -9,11 +9,11 @@ var steps = [
         "edits": [
             {
                 "action": "insert", 
-                "what": "select * from people", 
+                "what": "select * from authors", 
                 "where": 0
             }
         ], 
-        "expected": "select * from people"
+        "expected": "select * from authors"
     }, 
     {
         "doc": "<p>Here we group people by year and count the number of people in each\ngroup.\n</p>", 
@@ -36,40 +36,60 @@ var steps = [
             {
                 "action": "insert", 
                 "what": "\ngroup by year", 
-                "where": 33
+                "where": 34
             }
         ], 
-        "expected": "select year, count(*)\nfrom people\ngroup by year"
+        "expected": "select year, count(*)\nfrom authors\ngroup by year"
     }, 
     {
         "doc": "<p>Here we group people by job and report the maximum year of each\ngroup. All this is regular SQL. In Qrawl however, it is possible to\nprocess the grouped data as a collection, without explicitly performing\na numeric aggregation on it.\n</p>", 
         "edits": [
             {
                 "action": "suppr", 
-                "what": 4, 
+                "what": 1, 
                 "where": 7
             }, 
             {
                 "action": "insert", 
-                "what": "job", 
+                "what": "titl", 
                 "where": 7
             }, 
             {
                 "action": "suppr", 
-                "what": 4, 
-                "where": 42
+                "what": 2, 
+                "where": 12
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 45
             }, 
             {
                 "action": "insert", 
-                "what": "job", 
-                "where": 42
+                "what": "titl", 
+                "where": 45
+            }, 
+            {
+                "action": "suppr", 
+                "what": 2, 
+                "where": 50
             }
         ], 
-        "expected": "select job, count(*)\nfrom people\ngroup by job"
+        "expected": "select title, count(*)\nfrom authors\ngroup by title"
     }, 
     {
         "doc": "<p>By removing the aggregator, we have now the actual collection of\npeople matching the job nested in each row.\n</p>", 
         "edits": [
+            {
+                "action": "suppr", 
+                "what": 5, 
+                "where": 7
+            }, 
+            {
+                "action": "insert", 
+                "what": "job", 
+                "where": 7
+            }, 
             {
                 "action": "suppr", 
                 "what": 6, 
@@ -79,6 +99,36 @@ var steps = [
                 "action": "suppr", 
                 "what": 1, 
                 "where": 13
+            }, 
+            {
+                "action": "suppr", 
+                "what": 4, 
+                "where": 19
+            }, 
+            {
+                "action": "insert", 
+                "what": "pe", 
+                "where": 19
+            }, 
+            {
+                "action": "suppr", 
+                "what": 2, 
+                "where": 22
+            }, 
+            {
+                "action": "insert", 
+                "what": "ple", 
+                "where": 22
+            }, 
+            {
+                "action": "suppr", 
+                "what": 5, 
+                "where": 35
+            }, 
+            {
+                "action": "insert", 
+                "what": "job", 
+                "where": 35
             }
         ], 
         "expected": "select job, *\nfrom people\ngroup by job"

@@ -12,7 +12,7 @@ out. Let's start with a regular SQL like select statement (click next)&lt;/p&gt;
 people table. Since people are described by their year of birth, name
 and job, we'd like to perform now a couple of regular SQL aggregations.&lt;/p&gt;</doc>
 <query>
-select * from people
+select * from authors
 </query>
 </step>
 
@@ -22,7 +22,7 @@ group.
 &lt;/p&gt;</doc>
 <query>
 select year, count(*)
-from people
+from authors
 group by year
 </query>
 </step>
@@ -34,9 +34,9 @@ process the grouped data as a collection, without explicitly performing
 a numeric aggregation on it.
 &lt;/p&gt;</doc>
 <query>
-select job, count(*)
-from people
-group by job
+select title, count(*)
+from authors
+group by title
 </query>
 </step>
 

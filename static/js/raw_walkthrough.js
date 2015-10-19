@@ -7,23 +7,30 @@ var auto_query = null;
 var comments;
 var idx;
 var animation_ongoing = null;
+var post_query = null;
+var editor_set_autoexecute
 
-function demo_init(aceEditor) {
+function demo_init(aceEditor, call, editor_reset) {
     editor = aceEditor;
     $('#prev').click(demo_prev);
     $('#next').click(demo_next);
+    post_query = call;
+    editor_set_autoexecute = editor_reset;
     demo_stop();
 }
 
 function demo_start() {
     // save auto_query setting for later
+    console.log("demo_start");
     auto_query = $("#auto_query").attr('checked');
     $("#auto_query").prop('checked', false);
+    editor_set_autoexecute(false);
     $('#demo_mode').addClass("active");
 //    $('#demoBox').css('height', '150px');
 //    $('#demoBox').css('line-height', '150px');
 //    $('#editor').css('height', '550px');
     $('#demoNavigation').css('visibility', 'visible');
+    $('#demo_mode').off("click");
     $('#demo_mode').click(demo_stop);
     comments = $("#demoComments");
     demo_editor_reset("");
@@ -33,13 +40,16 @@ function demo_start() {
 
 function demo_stop() {
     // reset auto query
+    console.log("demo_stop");
     if (auto_query) {
         $("#auto_query").prop('checked', auto_query);
+        editor_set_autoexecute(auto_query);
     }
+    $('#demo_mode').off("click");
     $('#demo_mode').click(demo_start);
-    $('#demoBox').height(0);
+    $('#demoBox').css('height', 0);
     $('#demoComments').empty();
-    $('#editor').height(700);
+    //$('#editor').height(700);
     $('#demo_mode').removeClass("active");
     $('#demoNavigation').css('visibility', 'hidden');
 }
@@ -53,17 +63,18 @@ function demo_editor_reset(content) {
 }
 
 function demo_next() {
-    editor.focus();
     // disable animation if it is going on
     if (animation_ongoing) {
         todos = [];
         return;
     }
+    editor.focus();
     // reset the editor with the current step query
     if (idx == -1 || !steps[idx].expected)
         demo_editor_reset("");
-    else
+    else {
         demo_editor_reset(steps[idx].expected);
+    }
     // start animation of next query
     idx++;
     if (steps[idx].edits) {
@@ -74,6 +85,21 @@ function demo_next() {
 }
 
 function demo_prev() {
+    // disable animation if it is going on
+    if (animation_ongoing) {
+        todos = [];
+        return;
+    }
+    editor.focus();
+    if (idx > 0) idx--;
+    // reset the editor with the current step query
+    if (idx == -1 || !steps[idx].expected)
+        demo_editor_reset("");
+    else {
+        demo_editor_reset(steps[idx].expected);
+        post_query();
+    }
+    demo_comments(steps[idx].doc);
 }
 
 
@@ -141,6 +167,7 @@ function animate(edits) {
             // typing finished, update screen in case there was
             // a mess and print comments.
             demo_editor_reset(steps[idx].expected);
+            post_query();
             demo_comments(steps[idx].doc);
             animation_ongoing = false;
         }
@@ -162,9 +189,7 @@ function editor_cursor_pos(index) {
 
 function demo_comments(content) {
   $("#demoComments").fadeOut(function () {
-    //$("#demoComments").text( content).fadeIn(600);
-    console.log("adding content", content);
-    $("#demoComments").html(  content ).fadeIn(600);
+    $("#demoComments").html(content).fadeIn(600);
   });
 }
 
