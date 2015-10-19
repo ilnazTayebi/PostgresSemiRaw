@@ -84,12 +84,19 @@ $(document).ready(function(){
 
     //function to be used when a new query changes in the editor
     function post_query(){
+
+        var query = editor.getValue();
+
+        // skip if empty (otherwise it fails with an error)
+        if (query == "") {
+            return;
+        }
+
         // if something is still ongoing returns
         if(ongoing == true) return;
         ongoing = true;
         setIndicatorLabel("Running...");
 
-        var query = editor.getValue();
         console.log("sending query", query);
         send_query( query, {
                 success: function(data){
