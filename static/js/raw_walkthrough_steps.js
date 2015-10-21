@@ -286,19 +286,90 @@ var steps = [
         "expected": "{\n    M := max(select year from authors);\n    select * from authors where year = M\n}"
     }, 
     {
-        "doc": "<p>A slightly more complicated example. The program returns a record with\ntwo inner collections.</p>", 
+        "doc": "<p>A slightly more complicated example which would be a little hard\nto type in one single query. This returns a record with two collections\nof people.</p>\n<p>Let's have a look to functions now.</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": "m := min(select year from authors);\n    (juniors: select * from authors where year = m, seniors: ", 
+                "what": "m := min(select year from authors);\n    juniors := ", 
                 "where": 46
             }, 
             {
                 "action": "insert", 
-                "what": ")", 
-                "where": 179
+                "what": "; // max\n    seniors := select * from authors where year = m; // min\n    (juniors, seniors)", 
+                "where": 133
             }
         ], 
-        "expected": "{\n    M := max(select year from authors);\n    m := min(select year from authors);\n    (juniors: select * from authors where year = m, seniors: select * from authors where year = M)\n}"
+        "expected": "{\n    M := max(select year from authors);\n    m := min(select year from authors);\n    juniors := select * from authors where year = M; // max\n    seniors := select * from authors where year = m; // min\n    (juniors, seniors)\n}"
+    }, 
+    {
+        "doc": "<p>Here we implement a helper function to compute some category\nfrom the authors titles.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 6
+            }, 
+            {
+                "action": "insert", 
+                "what": "category", 
+                "where": 6
+            }, 
+            {
+                "action": "insert", 
+                "what": "\\x -> if x.title = \"PhD\" then \"short-ter", 
+                "where": 18
+            }, 
+            {
+                "action": "insert", 
+                "what": "\" else \"st", 
+                "where": 59
+            }, 
+            {
+                "action": "suppr", 
+                "what": 2, 
+                "where": 70
+            }, 
+            {
+                "action": "insert", 
+                "what": "ff\";\n    ", 
+                "where": 70
+            }, 
+            {
+                "action": "insert", 
+                "what": "x.name, categor", 
+                "where": 86
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 102
+            }, 
+            {
+                "action": "insert", 
+                "what": "(x) ", 
+                "where": 102
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 107
+            }, 
+            {
+                "action": "insert", 
+                "what": "s cat", 
+                "where": 107
+            }, 
+            {
+                "action": "insert", 
+                "what": " x in", 
+                "where": 117
+            }, 
+            {
+                "action": "suppr", 
+                "what": 185, 
+                "where": 130
+            }
+        ], 
+        "expected": "{\n    category := \\x -> if x.title = \"PhD\" then \"short-term\" else \"staff\";\n    select x.name, category(x) as cat from x in authors\n}"
     }
 ];
