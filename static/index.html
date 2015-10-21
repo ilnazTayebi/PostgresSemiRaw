@@ -23,7 +23,7 @@
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
 		<style type="text/css" media="screen">
             #editor {
-	            /*height: 660px;*/
+	            height: 600px;
 	            font-size: 18px;
             }
 
@@ -39,6 +39,7 @@
                 display:inline-block;
                 line-height:normal;
                 text-align:left;
+	            font-size: 18px;
             }
 
             #demoNavigation {
@@ -54,7 +55,7 @@
             }
 
 			#values {
-				height: 700px;
+				height: 540px;
 				font-size: 18px;
 			}
 
@@ -171,6 +172,18 @@
 			</div>
 		</div>
 		<div class="container-fluid">
+            
+				    <div id="demoBox" class="row">
+						<div class="panel-body" style="height:120px">
+                                <div id="demoComments"  class="col-lg-12" style="height:80%"></div>
+                                <div id="demoNavigation" class="col-lg-12" style="height:20%">
+                                    <p>
+                                        <span id="prev" class="label label-success">prev</span> 
+                                        <span id="next" class="label label-success">next</span> 
+                                    </p>
+                                </div>
+						</div>
+                    </div>
 			<div class="row">
 				<div class="col-lg-6">
 					<div class="panel panel-default">
@@ -181,19 +194,10 @@
                                 <button class="btn btn-info btn-xs"  style="float:right;" id="execute_btn">execute</button>
 							</h3>
 						</div>
-						<div class="panel-body">
-				            <div id="demoBox" class="row" >
-                                <div id="demoComments"  class="col-lg-12"></div>
-                                <div id="demoNavigation" class="col-lg-12">
-                                <p>
-                                    <span id="prev" class="label label-success">prev</span> 
-                                    <span id="next" class="label label-success">next</span> 
-                                </p>
-                                </div>
-                                <div id="editor" class="col-lg-12" style="height: 600px;">Write your query here...</div>
-                            </div>
-                            
-						</div>
+
+                        <div class="panel-body">
+                             <div id="editor" class="col-lg-12" style="height:600px">Write your query here...</div>
+                        </div>
 					</div>
 				</div>
 				<div class="col-lg-6">
@@ -260,12 +264,13 @@
 					</div>
 				</div>
 			</div>
-			<div class="navbar navbar-default navbar-fixed-bottom">
+            <div class="col-lg-12 panel-body" id="alerts"></div>
+<!--
 				<div class="container">
 					<p class="navbar-text pull-left"></p>
 					<a class="navbar-btn btn-danger btn pull-right">Click to Subscribe for more info...</a>
 				</div>
-			</div>
+-->
 			<!-- Modal Panel after dropbox selection-->
 			<div class="modal fade" id="register_dialog" role="dialog">
 				<div class="modal-dialog">
@@ -303,7 +308,6 @@
 					</div>
 				</div>
 			</div>
-			<div id="alerts" class="col-lg-12"></div>
 			<!--This is just so to download query results -->
 			<a id="downloadAnchorElem" style="display:none"></a>
 			<!--Slide menu -->
