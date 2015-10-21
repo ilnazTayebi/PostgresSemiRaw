@@ -4,13 +4,14 @@ import xml.dom.minidom
 import logging
 from difflib import SequenceMatcher
 from json import dumps
+from markdown import Markdown
 
 logging.basicConfig(level=logging.DEBUG)
-
+md = Markdown()
 matcher = SequenceMatcher()
 
 def make_step(doc, query, q0):
-    doc = str(doc.strip())
+    doc = md.convert(str(doc.strip()))
     query = str(query.strip())
     q0 = q0.strip()
     matcher.set_seqs(q0, query)
