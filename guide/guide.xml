@@ -173,6 +173,70 @@ from the authors titles.
 </step>
 
 
+<step>
+<doc>This is failing query #1</doc>
+<query>{
+    M := max(select year from authors);
+    m := min(select year from authors);
+    (juniors: select * from authors where year = m, seniors: select * from authors where year = M)
+}
+</query>
+</step>
+
+<step>
+<doc>This is failing query #2</doc>
+<query>{
+    category := \a -> if a.title = "PhD" then "short-term" else "staff"
+    select category(a), * from a in authors group by category(a)
+}
+</query>
+</step>
+
+<step>
+<doc>This is failing query #3</doc>
+<query>
+{
+    Y := list(1983, 1978, 1990);
+    select * from authors where year in Y
+}
+</query>
+</step>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
