@@ -440,7 +440,7 @@ function add_files_to_dialog(files){
 
 //function to append success message to the alert pane
 function append_alert(msg){
-    $('<div class="col-lg-3 alert alert-success alert-dismissable">'+
+    $('<div class="col-lg-2 alert alert-success alert-dismissable">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
@@ -453,7 +453,7 @@ function append_alert(msg){
 
 //function to append error message to the alert pane
 function append_error(msg){
-    $('<div class="alert alert-danger">'+
+    $('<div class="col-lg-3 alert alert-danger">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
@@ -595,4 +595,5 @@ function load_dataset(what) {
         "authors": {"url": "https://www.dropbox.com/s/vvuvydjqb8rdhhr/authors.json?dl=1", "name": "authors"}
     };
     add_from_url(datasets[what].url, datasets[what].name, "json");
+    append_alert('Loading ' + datasets[what].name);
 }
