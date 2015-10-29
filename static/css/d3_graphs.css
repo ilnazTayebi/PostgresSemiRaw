@@ -174,13 +174,26 @@ Query errors on JC editor
 
 .queryError::before{
     position:absolute;
-    /*background:rgba(200,200,200,0.3);*/
-    content: '^^^^^^^^';
-    text-decoration: underline;
+    content: '^^^^^^';
     top: +80%;
     color : red;
     font-size: 60%;
 }
+
+.lineError {
+    position:absolute;
+    /*border: 1px solid rgba(221, 240, 255, 0.30);*/
+    /*background:rgba(200,30,30,0.3);*/
+}
+
+.lineError::before{
+    position:absolute;
+    content: '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^';
+    top: +80%;
+    color : red;
+    font-size: 60%;
+}
+
 /*the error highlight options for text do not work somehow*/
 .errorHighlight{
   position:absolute;

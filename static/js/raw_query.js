@@ -247,44 +247,76 @@ function handleQueryError(request, error, editor){
     addErrorMarkers(editor, e);
 }
 
-function addSguiglylines(editor, marker){
-    
-}
-
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
 
     var annotations = [];
     for (var n in errors){
-        var Range = ace.require('ace/range').Range;
         for(i in errors[n].positions){
-            var e = errors[n].positions[i];
-            // this is because some errors start and end in the same 
-            // is this a bug?
-            if (e.begin.line == e.end.line && e.begin.column == e.end.column){
-                e.end.line += 1;
-            }
-            var range = new Range(e.begin.line-1, e.begin.column-1,
-                                     e.end.line-1, e.end.column-1);
-            //check "ace_selected_word" instead of "text"
-            console.log("range", range);
-            var m1 = editor.session.addMarker(range, "queryError", "text");
-            markers.push(m1);
-            var m2 = editor.session.addMarker(range, "errorHighlight", "text");
-            markers.push(m2);
-
-            var  a =  {
-                row: e.begin.line-1,
-                column: 0,
-                text: errors[n].message,
-                type: "error" // also warning and information
-            }
-
-            annotations.push(a)
+            var pos =errors[n].positions[i];
+            addSguiglylines(editor, pos, errors[n].message, annotations)
         }
     }
 
     editor.session.setAnnotations( annotations );
+}
+
+// adds a squigly lines, from a position nad a message,
+// this is hacky, I tried to check in Ace editor but could not find, 
+// TODO: check if there is a better way of doing this
+function addSguiglylines(editor, pos, msg, annotations){
+
+    var addmarker= function(p, type){
+        if(pos.begin.line == p.end.line && 
+                pos.begin.column == p.end.column){
+            pos.end.column ++;
+        }
+        var Range = ace.require('ace/range').Range;
+        var range = new Range(p.begin.line-1, p.begin.column-1,
+                                p.end.line -1, p.end.column-1);
+
+        var m1 = editor.session.addMarker(range, type, "text");
+        markers.push(m1);
+        var  a =  {
+            row: pos.begin.line-1,
+            column: 0,
+            text: msg,
+            type: "error" // also warning and information
+        }
+        annotations.push(a);
+    };
+
+    var mark = function(line, start, end){
+        if(end==start) end++;
+        for (var n = start ; n < end ; n+=3){
+            addmarker({
+                    begin:{line : line, column : n},
+                    end:{line : line, column : n+1}
+                },
+                "queryError"
+            );
+        }
+    };
+    
+    if (pos.begin.line == pos.end.line){
+        mark(pos.begin.line, pos.begin.column, pos.end.column);
+    }
+    else{
+        var lines = editor.getValue().split('\n');
+        // first line marks till the end
+        var text = lines[pos.begin.line];
+        mark(pos.begin.line, pos.begin.column, text.length);
+        for(var n = pos.begin.line ; n < pos.end.line-1 ; n++){
+            addmarker({
+                    begin:{line : n, column : 1},
+                    end:{line : n, column : 2}
+                },
+                "lineError"
+            );
+        }
+        mark(pos.end.line, 0, pos.end.column);
+    }
+    addmarker(pos,  "errorHighlight");
 }
 
 // removes all errors and markers added by addErrorMarkers
