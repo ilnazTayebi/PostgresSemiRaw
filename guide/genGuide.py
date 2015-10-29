@@ -11,11 +11,14 @@ logging.basicConfig(level=logging.DEBUG)
 md = Markdown()
 matcher = SequenceMatcher()
 
+def tokenize(x):
+    return x
+
 def make_step(doc, query, q0):
     doc = md.convert(str(doc.strip()))
     query = str(query.strip())
     q0 = q0.strip()
-    matcher.set_seqs(q0, query)
+    matcher.set_seqs(tokenize(q0), tokenize(query))
     opcodes = matcher.get_opcodes()
     actions = []
     offset = 0
@@ -23,16 +26,20 @@ def make_step(doc, query, q0):
         if opcode == "equal":
             continue
         elif opcode == "insert":
-            actions.append({"action":"insert", "where": i1+offset, "what": query[j1:j2]})
-            offset += (j2-j1)
+            toput = query[j1:j2]
+            actions.append({"action":"insert", "where": i1+offset, "what": toput})
+            offset += len(toput)
         elif opcode == "delete":
-            actions.append({"action":"suppr", "where": i1+offset, "what": i2-i1})
-            offset -= (i2-i1)
+            n = i2 - i1
+            actions.append({"action":"suppr", "where": i1+offset, "what": n})
+            offset -= n
         elif opcode == "replace":
-            actions.append({"action":"suppr", "where": i1+offset, "what": i2-i1})
-            actions.append({"action":"insert", "where": i1+offset, "what": query[j1:j2]})
-            offset -= (i2-i1)
-            offset += (j2-j1)
+            n = i2 - i1
+            toput = query[j1:j2]
+            actions.append({"action":"suppr", "where": i1+offset, "what": n})
+            actions.append({"action":"insert", "where": i1+offset, "what": toput})
+            offset -= n
+            offset += len(toput)
     return {"doc": doc, "edits": actions, "expected": query}
             
         
