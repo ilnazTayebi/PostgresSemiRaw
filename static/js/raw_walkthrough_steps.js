@@ -1,175 +1,375 @@
 var steps = [
     {
-        "doc": "<p>This is the demo mode.\nWe're going to walk through a number of queries to illustrate\nthe syntax of Qrawl and show its capabilities. The code is going to be\ninserted in the editor below, feel free to edit it yourself to try things\nout. Let's start with a regular SQL like select statement (click next)</p>", 
+        "doc": "<p>The user interface is about to run in demo mode. This means we're going to walk\nthrough a number of QRAWL queries which illustrate the capabilities of the language.\nIn order to effectively have the demo <em>execute</em> the queries, these two datasets\nbelow should be loaded (if you haven't loaded them already, please do so).\nOnce you see the notification both datasets were uploaded, click next.</p>\n<ul>\n<li>publications.json (<a href=\"javascript:load_dataset(&quot;publications&quot;)\">load</a>)</li>\n<li>authors.json (<a href=\"javascript:load_dataset(&quot;authors&quot;)\">load</a>)</li>\n</ul>", 
         "edits": [], 
         "expected": ""
     }, 
     {
-        "doc": "<p>This is listing the various fields of the records stored in the\npeople table. Since people are described by their year of birth, name\nand job, we'd like to perform now a couple of regular SQL aggregations.</p>", 
+        "doc": "<p>The query below should execute successfully and return 50 rows shown\non the right side of the screen. Have a quick look to the authors table.\nRows are plain records with three fields: name, title and year.</p>\n<p>If this doesn't work, then go back to the previous step and ensure both\ndatasets are loaded.</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": "select * from people", 
+                "what": "select * from authors", 
                 "where": 0
             }
         ], 
-        "expected": "select * from people"
+        "expected": "select * from authors"
     }, 
     {
-        "doc": "<p>Here we group people by year and count the number of people in each\ngroup.\n</p>", 
+        "doc": "<p>The query below should return a single number (1000, the number\nof publications). We're all set, click next to start querying the\ndata.</p>\n<p>If this doesn't work, go back and load publications.</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": "year, count(", 
-                "where": 7
+                "what": "count(publication", 
+                "where": 0
             }, 
             {
                 "action": "suppr", 
-                "what": 1, 
-                "where": 20
+                "what": 20, 
+                "where": 18
             }, 
             {
                 "action": "insert", 
-                "what": ")\n", 
-                "where": 20
-            }, 
-            {
-                "action": "insert", 
-                "what": "\ngroup by year", 
-                "where": 33
+                "what": ")", 
+                "where": 18
             }
         ], 
-        "expected": "select year, count(*)\nfrom people\ngroup by year"
+        "expected": "count(publications)"
     }, 
     {
-        "doc": "<p>Here we group people by job and report the maximum year of each\ngroup. All this is regular SQL. In Qrawl however, it is possible to\nprocess the grouped data as a collection, without explicitly performing\na numeric aggregation on it.\n</p>", 
+        "doc": "<p>QRAWL is intended to be compatible with SQL. The query below is returning\nthe authors which are professors.</p>", 
         "edits": [
             {
-                "action": "suppr", 
-                "what": 4, 
-                "where": 7
+                "action": "insert", 
+                "what": "sele", 
+                "where": 0
             }, 
             {
                 "action": "insert", 
-                "what": "job", 
-                "where": 7
-            }, 
-            {
-                "action": "suppr", 
-                "what": 4, 
-                "where": 42
+                "what": "t * fr", 
+                "where": 5
             }, 
             {
                 "action": "insert", 
-                "what": "job", 
-                "where": 42
-            }
-        ], 
-        "expected": "select job, count(*)\nfrom people\ngroup by job"
-    }, 
-    {
-        "doc": "<p>By removing the aggregator, we have now the actual collection of\npeople matching the job nested in each row.\n</p>", 
-        "edits": [
-            {
-                "action": "suppr", 
-                "what": 6, 
+                "what": "m a", 
                 "where": 12
             }, 
             {
                 "action": "suppr", 
                 "what": 1, 
-                "where": 13
-            }
-        ], 
-        "expected": "select job, *\nfrom people\ngroup by job"
-    }, 
-    {
-        "doc": "<p>In Qrawl, this statement permits to split a collection in groups.\n</p>", 
-        "edits": [
+                "where": 16
+            }, 
             {
                 "action": "suppr", 
-                "what": 5, 
-                "where": 6
-            }
-        ], 
-        "expected": "select *\nfrom people\ngroup by job"
-    }, 
-    {
-        "doc": "<p>If willing to operate on that collection, one should use the keyword\n<code>partition</code> in a from. The keyword partition refers to the group of people\nwhich matched the job. From there on, one can perform arbitrary queries\non the subset, including splitting it in groups.\n</p>", 
-        "edits": [
+                "what": 8, 
+                "where": 17
+            }, 
+            {
+                "action": "insert", 
+                "what": "hors where ", 
+                "where": 17
+            }, 
+            {
+                "action": "insert", 
+                "what": "tle = \"pr", 
+                "where": 30
+            }, 
             {
                 "action": "suppr", 
                 "what": 1, 
+                "where": 40
+            }, 
+            {
+                "action": "insert", 
+                "what": "fe", 
+                "where": 40
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 43
+            }, 
+            {
+                "action": "insert", 
+                "what": "sor\"", 
+                "where": 43
+            }
+        ], 
+        "expected": "select * from authors where title = \"professor\""
+    }, 
+    {
+        "doc": "<p>Typical SQL aggregation are supported. Here we report the number of\nauthor in each possible job title.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "distinct title, count(", 
                 "where": 7
             }, 
             {
                 "action": "insert", 
-                "what": "job, select year\n            from partition", 
-                "where": 7
+                "what": ")", 
+                "where": 30
+            }, 
+            {
+                "action": "suppr", 
+                "what": 3, 
+                "where": 45
+            }, 
+            {
+                "action": "insert", 
+                "what": "g", 
+                "where": 45
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 47
+            }, 
+            {
+                "action": "insert", 
+                "what": "oup by", 
+                "where": 47
+            }, 
+            {
+                "action": "suppr", 
+                "what": 14, 
+                "where": 59
             }
         ], 
-        "expected": "select job, select year\n            from partition\nfrom people\ngroup by job"
+        "expected": "select distinct title, count(*) from authors group by title"
     }, 
     {
-        "doc": "<p>If willing to operate on that collection, one should use the keyword\npartition in a from. The keyword partition refers to the group of people\nwhich matched the job.\n</p>", 
+        "doc": "<p>In QRAWL, the star sign is in fact an alias to <em>the subset of authors having a certain title</em>, and the\ncount operator runs on that collection and returns the number of elements it contains. This means\nthe star sign can be handled as a collection itself. Click next to see.</p>", 
+        "edits": [], 
+        "expected": "select distinct title, count(*) from authors group by title"
+    }, 
+    {
+        "doc": "<p>Here we removed the aggregation function (count), so that the query returns\nrows which contain a <em>nested list</em> of authors (the ones with the corresponding title).\nLet's do some more processing on that group collection.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 6, 
+                "where": 23
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 24
+            }
+        ], 
+        "expected": "select distinct title, * from authors group by title"
+    }, 
+    {
+        "doc": "<p>We extract the years of the related authors.</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": ", *", 
+                "what": "(select year from ", 
                 "where": 23
             }, 
             {
                 "action": "insert", 
-                "what": " // partition = the people with that job\n            group by year  // '*' is the subset of people having that year", 
-                "where": 53
+                "what": ")", 
+                "where": 42
             }
         ], 
-        "expected": "select job, select year, *\n            from partition // partition = the people with that job\n            group by year  // '*' is the subset of people having that year\nfrom people\ngroup by job"
+        "expected": "select distinct title, (select year from *) from authors group by title"
     }, 
     {
-        "doc": "<p>Here we do a couple more aggregations.\n</p>", 
+        "doc": "<p>We think using the star sign in a <em>from</em> is not very readable (but it works).\nWe prefer to use the <em>partition</em> keyword instead. For now one can consider the\n<em>partition</em> keyword as an alias to the star sign for the grouped queries (there is a difference\nbetween the star and partition but we'll see later, in the examples we run now, they\nare the same). Let's use partition (click next).</p>", 
+        "edits": [], 
+        "expected": "select distinct title, (select year from *) from authors group by title"
+    }, 
+    {
+        "doc": "<p>It is more readable. Let's keep doing more queries.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 41
+            }, 
+            {
+                "action": "insert", 
+                "what": "partition", 
+                "where": 41
+            }
+        ], 
+        "expected": "select distinct title, (select year from partition) from authors group by title"
+    }, 
+    {
+        "doc": "<p>We do an inner group by on the grouped data. That query returns four rows\n(one per title) and each row contains a field <em>years</em> being a list of years\nassociated to the number of authors born that year (and having already been filtered on their\ntitle).</p>\n<p>But we can also extract the authors themselves instead of counting them (click next).</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": "(select name from partition) as names,\n                   count(", 
-                "where": 25
-            }, 
-            {
-                "action": "suppr", 
-                "what": 27, 
-                "where": 90
+                "what": "distinct ", 
+                "where": 31
             }, 
             {
                 "action": "insert", 
-                "what": ") as size\n            from partition group by year,\n            count(*) as all", 
-                "where": 90
+                "what": ",", 
+                "where": 44
             }, 
             {
                 "action": "suppr", 
-                "what": 12, 
-                "where": 173
+                "what": 2, 
+                "where": 46
             }, 
             {
                 "action": "insert", 
-                "what": "'count' of ", 
-                "where": 177
+                "what": "c", 
+                "where": 46
             }, 
             {
                 "action": "suppr", 
-                "what": 12, 
-                "where": 209
+                "what": 2, 
+                "where": 48
             }, 
             {
                 "action": "insert", 
-                "what": "from people\n", 
-                "where": 209
+                "what": "unt(", 
+                "where": 48
+            }, 
+            {
+                "action": "insert", 
+                "what": "partition group by year) \nfrom ", 
+                "where": 68
             }, 
             {
                 "action": "suppr", 
-                "what": 75, 
-                "where": 230
+                "what": 1, 
+                "where": 106
+            }, 
+            {
+                "action": "insert", 
+                "what": "\n", 
+                "where": 106
             }
         ], 
-        "expected": "select job, select year, (select name from partition) as names,\n                   count(*) as size\n            from partition group by year,\n            count(*) as all // the 'count' of people with that job\nfrom people\ngroup by job"
+        "expected": "select distinct title, (select distinct year, count(partition) from partition group by year) \nfrom authors\ngroup by title"
+    }, 
+    {
+        "doc": "<p>Now we find the original author rows in the inner list. As expected, the authors\nfound in the inner nested list are all of the corresponding title and year.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 6, 
+                "where": 46
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 55
+            }
+        ], 
+        "expected": "select distinct title, (select distinct year, partition from partition group by year) \nfrom authors\ngroup by title"
+    }, 
+    {
+        "doc": "<p>This is it for nested queries. Now let's review the programming capabilities\nof QRAWL.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 114, 
+                "where": 0
+            }
+        ], 
+        "expected": ""
+    }, 
+    {
+        "doc": "<p>QRAWL supports variable assignments to simplify the edition of queries.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "{\n    M := max(select year from authors);\n    select * from authors where year = M\n}", 
+                "where": 0
+            }
+        ], 
+        "expected": "{\n    M := max(select year from authors);\n    select * from authors where year = M\n}"
+    }, 
+    {
+        "doc": "<p>A slightly more complicated example which would be a little hard\nto type in one single query. This returns a record with two collections\nof people.</p>\n<p>Let's have a look to functions now.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "m := min(select year from authors);\n    juniors := ", 
+                "where": 46
+            }, 
+            {
+                "action": "insert", 
+                "what": "; // max\n    seniors := select * from authors where year = m; // min\n    (juniors, seniors)", 
+                "where": 133
+            }
+        ], 
+        "expected": "{\n    M := max(select year from authors);\n    m := min(select year from authors);\n    juniors := select * from authors where year = M; // max\n    seniors := select * from authors where year = m; // min\n    (juniors, seniors)\n}"
+    }, 
+    {
+        "doc": "<p>Here we implement a helper function to compute some category\nfrom the authors titles.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 6
+            }, 
+            {
+                "action": "insert", 
+                "what": "category", 
+                "where": 6
+            }, 
+            {
+                "action": "insert", 
+                "what": "\\x -> if x.title = \"PhD\" then \"short-ter", 
+                "where": 18
+            }, 
+            {
+                "action": "insert", 
+                "what": "\" else \"st", 
+                "where": 59
+            }, 
+            {
+                "action": "suppr", 
+                "what": 2, 
+                "where": 70
+            }, 
+            {
+                "action": "insert", 
+                "what": "ff\";\n    ", 
+                "where": 70
+            }, 
+            {
+                "action": "insert", 
+                "what": "x.name, categor", 
+                "where": 86
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 102
+            }, 
+            {
+                "action": "insert", 
+                "what": "(x) ", 
+                "where": 102
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 107
+            }, 
+            {
+                "action": "insert", 
+                "what": "s cat", 
+                "where": 107
+            }, 
+            {
+                "action": "insert", 
+                "what": " x in", 
+                "where": 117
+            }, 
+            {
+                "action": "suppr", 
+                "what": 185, 
+                "where": 130
+            }
+        ], 
+        "expected": "{\n    category := \\x -> if x.title = \"PhD\" then \"short-term\" else \"staff\";\n    select x.name, category(x) as cat from x in authors\n}"
     }
 ];

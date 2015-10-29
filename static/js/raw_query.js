@@ -67,9 +67,7 @@ $(document).ready(function(){
 
 
     var editor = ace.edit("editor");
-
-    // init demo stuff, pointing it to the editor
-    demo_init(editor);
+    editor.$blockScrolling = Infinity;
 
     var lastQuery = "";
     var ongoing = false;
@@ -86,12 +84,19 @@ $(document).ready(function(){
 
     //function to be used when a new query changes in the editor
     function post_query(){
+
+        var query = editor.getValue();
+
+        // skip if empty (otherwise it fails with an error)
+        if (query == "") {
+            return;
+        }
+
         // if something is still ongoing returns
         if(ongoing == true) return;
         ongoing = true;
         setIndicatorLabel("Running...");
 
-        var query = editor.getValue();
         console.log("sending query", query);
         send_query( query, {
                 success: function(data){
@@ -140,22 +145,36 @@ $(document).ready(function(){
     }
     
     
-    editor.getSession().on('change', function(e) { 
-        if (document.getElementById("auto_query").checked){
-            post_query(); 
-        }
-    });
-    document.getElementById('execute_btn').onclick =  post_query;
-
-    document.getElementById('auto_query').onchange = function(){
+    function editor_set_autoexecute(b) {
         var btn = document.getElementById('execute_btn');
-        if (document.getElementById("auto_query").checked){
+        if (b) {
             btn.style.visibility = 'hidden';
-        }
-        else{
+            editor.getSession().on('change', function(e) { 
+                if (document.getElementById("auto_query").checked){
+                    post_query(); 
+                }
+            });
+        } else {
+            editor.getSession().on('change', function(e) {});
             btn.style.visibility = 'visible';
         }
     }
+
+    editor_set_autoexecute(true);
+
+    document.getElementById('execute_btn').onclick =  post_query;
+
+    document.getElementById('auto_query').onchange = function(){
+        if (document.getElementById("auto_query").checked){
+            editor_set_autoexecute(true);
+        }
+        else{
+            editor_set_autoexecute(false);
+        }
+    }
+
+    // init demo stuff, pointing it to the editor
+    demo_init(editor, post_query, editor_set_autoexecute);
 
     // starts listing the schemas
     list_schemas();
@@ -336,6 +355,19 @@ function get_dropbox_options(selection){
     return option_list;
 }
 
+var upload_alerts = {
+        success: function(data) {
+           console.log(data);
+           append_alert('File ' + data.name  + ' registered');
+            // list the schemas again 
+           list_schemas();
+        },
+        error : function(request, status, error) {
+            var response = JSON.parse(request.responseText);
+            append_error("Error registering file '" + response.name + "' : "+ response.output);
+        }
+     }
+
 // will start the dropbox chooser and register files from dropbox
 function add_from_dropbox(){
     var options = {
@@ -350,18 +382,7 @@ function add_from_dropbox(){
 
                     f.name = $("#"+inputs[n].name).val();
                     f.type = $("#"+inputs[n].type).val();
-                    register_file(f, {
-                        success: function(data) {
-                           console.log(data);
-                           append_alert('File ' + data.name  + ' registered');
-                            // list the schemas again 
-                           list_schemas();
-                        },
-                        error : function(request, status, error) {
-                            var response = JSON.parse(request.responseText);
-                            append_error("Error registering file '" + response.name + "' : "+ response.output);
-                        }
-                     });
+                    register_file(f, upload_alerts);
                     //closes the dialog
                     $("#register_dialog").modal('hide');
                }
@@ -374,6 +395,12 @@ function add_from_dropbox(){
     };
 
     Dropbox.choose(options);
+}
+
+// adds a dataset from a URL
+function add_from_url(url, name, type) {
+    var f = { "name": name, "filename": name + "." + type, "url": url, "type": type, "protocol": "url" };
+    register_file(f, upload_alerts);
 }
 
 //will add items to select name and file type for the files selected in the dialog
@@ -413,7 +440,7 @@ function add_files_to_dialog(files){
 
 //function to append success message to the alert pane
 function append_alert(msg){
-    $('<div class="alert alert-success alert-dismissable">'+
+    $('<div class="col-lg-2 alert alert-success alert-dismissable">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
@@ -421,12 +448,12 @@ function append_alert(msg){
             msg + 
          '</div>').appendTo("#alerts");
 
-    $('.alert').fadeOut(5000);
+    $('.alert').stop().fadeOut(5000);
 }
 
 //function to append error message to the alert pane
 function append_error(msg){
-    $('<div class="alert alert-danger">'+
+    $('<div class="col-lg-3 alert alert-danger">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
@@ -560,4 +587,13 @@ function list_schemas(){
             append_error(response.responseText);
         }
      });
+}
+
+function load_dataset(what) {
+    var datasets = {
+        "publications": {"url": "https://www.dropbox.com/s/77youjyiz9u0eh9/publications.json?dl=1", "name":"publications"},
+        "authors": {"url": "https://www.dropbox.com/s/vvuvydjqb8rdhhr/authors.json?dl=1", "name": "authors"}
+    };
+    add_from_url(datasets[what].url, datasets[what].name, "json");
+    append_alert('Loading ' + datasets[what].name);
 }

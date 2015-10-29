@@ -4,13 +4,15 @@ import xml.dom.minidom
 import logging
 from difflib import SequenceMatcher
 from json import dumps
+from markdown import Markdown
+from xml.dom.minidom import getDOMImplementation
 
 logging.basicConfig(level=logging.DEBUG)
-
+md = Markdown()
 matcher = SequenceMatcher()
 
 def make_step(doc, query, q0):
-    doc = str(doc.strip())
+    doc = md.convert(str(doc.strip()))
     query = str(query.strip())
     q0 = q0.strip()
     matcher.set_seqs(q0, query)
@@ -40,11 +42,14 @@ if __name__ == "__main__":
     argp = ArgumentParser(description="generate a qrawl guide")
     argp.add_argument("xmlFile")
 
+    argp.add_argument("--xmltest", action="store_true", help="generate Nuno's XML test file instead of javascript stuff")
+
     args = argp.parse_args()
     
     guide = xml.dom.minidom.parse(args.xmlFile)
 
     steps = []
+    queries = []
 
     for g in guide.getElementsByTagName("guide"):
         initialQ = ""
@@ -57,7 +62,29 @@ if __name__ == "__main__":
                 nextQ = ""
             else:
                 nextQ = query[0].firstChild.wholeText
+            # queries to be exported to test (we skip empty strings)
+            if nextQ.strip() != '':
+                queries.append(nextQ)
+            desc = doc[0].firstChild.wholeText
+            # we skip entries about failing queries (they are there for test purpose)
+            if desc.find("failing query #") != -1:
+                continue
             steps.append(make_step(doc[0].firstChild.wholeText, nextQ, initialQ))
             initialQ = nextQ
 
-    print "var steps =", dumps(steps, sort_keys=True, indent=4) + ";"
+    if args.xmltest:
+        impl = getDOMImplementation()
+        newdoc = impl.createDocument(None, "queries", None)
+        xmlTests = newdoc.documentElement
+        xmlTests.setAttribute("dataset", "publications")
+        for query in queries:
+                t = newdoc.createElement("query")
+                c = newdoc.createElement("qrawl")
+                c.appendChild(newdoc.createCDATASection(query))
+                t.appendChild(c)
+                xmlTests.appendChild(t)
+        print xmlTests.toprettyxml(indent="   ", newl="\n")
+
+ 
+    else:
+        print "var steps =", dumps(steps, sort_keys=True, indent=4) + ";"
