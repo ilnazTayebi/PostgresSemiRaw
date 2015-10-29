@@ -22,6 +22,9 @@ function demo_init(aceEditor, call, editor_reset) {
 function demo_start() {
     // save auto_query setting for later
     console.log("demo_start");
+    // bootstrap hidden
+    $("#demoBox").removeClass("hidden");
+
     auto_query = $("#auto_query").attr('checked');
     $("#auto_query").prop('checked', false);
     editor_set_autoexecute(false);
@@ -41,6 +44,7 @@ function demo_start() {
 function demo_stop() {
     // reset auto query
     console.log("demo_stop");
+    $("#demoBox").removeClass("hidden");
     if (auto_query) {
         $("#auto_query").prop('checked', auto_query);
         editor_set_autoexecute(auto_query);
@@ -52,6 +56,7 @@ function demo_stop() {
     //$('#editor').height(700);
     $('#demo_mode').removeClass("active");
     $('#demoNavigation').css('visibility', 'hidden');
+    $("#demoBox").addClass("hidden");
 }
 
 
