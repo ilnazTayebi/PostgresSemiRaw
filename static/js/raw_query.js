@@ -100,14 +100,14 @@ $(document).ready(function(){
                     setIndicatorLabel("Ready")
                     jsonEditor.set(data.output);
 
-                    // here refreshes the graphs
-                    redraw_graph( data.output);
                     //jsonEditor.expandAll();
                     //if the query changed in the mean time resend
                     if(editor.getValue() != lastQuery){
                         post_query();
                     }
                     else{
+                        // here refreshes the graphs
+                        redraw_graph( data.output);
                         removeAllErrors(editor);
                     }
                 },
@@ -208,10 +208,8 @@ function handleQueryError(request, error, editor){
             for (var n in errorList){
                 var marker = {
                     errorType : errorList[n].errorType,
-                    line : errorList[n].position.line,
-                    column : errorList[n].position.column,
-                    source : errorList[n].position.source,
-                    message : errorList[n].prettyMessage
+                    positions :errorList[n].positions ,
+                    message : errorList[n].message
                 }
                 e.push(marker);
             }
@@ -219,10 +217,8 @@ function handleQueryError(request, error, editor){
         case "ParserError":
             var marker = {
                 errorType : error.errorType,
-                line : error.error.position.line,
-                column : error.error.position.column,
-                source : error.error.position.source,
-                message : error.error.prettyMessage
+                positions : [error.error.position],
+                message : error.error.message
             }
             e.push(marker);
             break;
@@ -232,37 +228,41 @@ function handleQueryError(request, error, editor){
     addErrorMarkers(editor, e);
 }
 
-
+function addSguiglylines(editor, marker){
+    
+}
 
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
 
     var annotations = [];
     for (var n in errors){
-        // this is because there is some sort of bug in the error reporting
-        // so UnexpectedType start in (0,0) and everythign else starts at (1,1)
-        if (errors[n].errorType == "UnexpectedType"){
-            errors[n].line += 1;
-            errors[n].column += 1;
-        }
         var Range = ace.require('ace/range').Range;
-        var e = errors[n];
-        console.log("Adding error", e);
-        var range = new Range(e.line -1 , e.column-1, e.line-1,  e.column);
-        //check "ace_selected_word" instead of "text"
-        var m1 = editor.session.addMarker(range, "queryError", "text");
-        markers.push(m1);
-        //var m2 = editor.session.addMarker(range, "errorHighlight", "fullLine");
-        //markers.push(m2);
+        for(i in errors[n].positions){
+            var e = errors[n].positions[i];
+            // this is because some errors start and end in the same 
+            // is this a bug?
+            if (e.begin.line == e.end.line && e.begin.column == e.end.column){
+                e.end.line += 1;
+            }
+            var range = new Range(e.begin.line-1, e.begin.column-1,
+                                     e.end.line-1, e.end.column-1);
+            //check "ace_selected_word" instead of "text"
+            console.log("range", range);
+            var m1 = editor.session.addMarker(range, "queryError", "text");
+            markers.push(m1);
+            var m2 = editor.session.addMarker(range, "errorHighlight", "text");
+            markers.push(m2);
 
-        var  a =  {
-            row: e.line -1,
-            column: 0,
-            text: e.message,
-            type: "error" // also warning and information
+            var  a =  {
+                row: e.begin.line-1,
+                column: 0,
+                text: errors[n].message,
+                type: "error" // also warning and information
+            }
+
+            annotations.push(a)
         }
-
-        annotations.push(a)
     }
 
     editor.session.setAnnotations( annotations );
