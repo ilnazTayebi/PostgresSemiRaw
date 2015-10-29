@@ -155,11 +155,16 @@ function animate(edits) {
             if (todo["action"] == "insert") {
                 editor_bytes.splice(todo["where"], 0, todo["what"]);
                 index = todo["where"]+1;
+                sleep = 75;
+                if (todo["what"] == '\n') {
+                    sleep = 600;
+                }
             } else if (todo["action"] == "suppr") {
                 editor_bytes.splice(todo["where"], 1);
                 index = todo["where"];
+                sleep = 40;
             } else if (todo["action"] == "pause") {
-                sleep = 300;
+                sleep = 600;
             }
             // print on the editor and move cursor to 'index'
             editor.setValue(editor_bytes.join(""), index);

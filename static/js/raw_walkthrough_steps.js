@@ -19,19 +19,14 @@ var steps = [
         "doc": "<p>The query below should return a single number (1000, the number\nof publications). We're all set, click next to start querying the\ndata.</p>\n<p>If this doesn't work, go back and load publications.</p>", 
         "edits": [
             {
-                "action": "insert", 
-                "what": "count(publication", 
+                "action": "suppr", 
+                "what": 21, 
                 "where": 0
             }, 
             {
-                "action": "suppr", 
-                "what": 20, 
-                "where": 18
-            }, 
-            {
                 "action": "insert", 
-                "what": ")", 
-                "where": 18
+                "what": "count(publications)", 
+                "where": 0
             }
         ], 
         "expected": "count(publications)"
@@ -40,59 +35,14 @@ var steps = [
         "doc": "<p>QRAWL is intended to be compatible with SQL. The query below is returning\nthe authors which are professors.</p>", 
         "edits": [
             {
-                "action": "insert", 
-                "what": "sele", 
+                "action": "suppr", 
+                "what": 19, 
                 "where": 0
             }, 
             {
                 "action": "insert", 
-                "what": "t * fr", 
-                "where": 5
-            }, 
-            {
-                "action": "insert", 
-                "what": "m a", 
-                "where": 12
-            }, 
-            {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 16
-            }, 
-            {
-                "action": "suppr", 
-                "what": 8, 
-                "where": 17
-            }, 
-            {
-                "action": "insert", 
-                "what": "hors where ", 
-                "where": 17
-            }, 
-            {
-                "action": "insert", 
-                "what": "tle = \"pr", 
-                "where": 30
-            }, 
-            {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 40
-            }, 
-            {
-                "action": "insert", 
-                "what": "fe", 
-                "where": 40
-            }, 
-            {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 43
-            }, 
-            {
-                "action": "insert", 
-                "what": "sor\"", 
-                "where": 43
+                "what": "select * from authors where title = \"professor\"", 
+                "where": 0
             }
         ], 
         "expected": "select * from authors where title = \"professor\""
@@ -112,23 +62,13 @@ var steps = [
             }, 
             {
                 "action": "suppr", 
-                "what": 3, 
+                "what": 5, 
                 "where": 45
             }, 
             {
                 "action": "insert", 
-                "what": "g", 
+                "what": "group by", 
                 "where": 45
-            }, 
-            {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 47
-            }, 
-            {
-                "action": "insert", 
-                "what": "oup by", 
-                "where": 47
             }, 
             {
                 "action": "suppr", 
@@ -211,38 +151,28 @@ var steps = [
             }, 
             {
                 "action": "suppr", 
-                "what": 2, 
+                "what": 5, 
                 "where": 46
             }, 
             {
                 "action": "insert", 
-                "what": "c", 
+                "what": "count(", 
                 "where": 46
             }, 
             {
                 "action": "suppr", 
-                "what": 2, 
-                "where": 48
-            }, 
-            {
-                "action": "insert", 
-                "what": "unt(", 
-                "where": 48
-            }, 
-            {
-                "action": "insert", 
-                "what": "partition group by year) \nfrom ", 
+                "what": 7, 
                 "where": 68
             }, 
             {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 106
+                "action": "insert", 
+                "what": "partition", 
+                "where": 68
             }, 
             {
                 "action": "insert", 
-                "what": "\n", 
-                "where": 106
+                "what": "year) \nfrom authors\ngroup by ", 
+                "where": 87
             }
         ], 
         "expected": "select distinct title, (select distinct year, count(partition) from partition group by year) \nfrom authors\ngroup by title"
@@ -315,58 +245,48 @@ var steps = [
                 "where": 6
             }, 
             {
-                "action": "insert", 
-                "what": "\\x -> if x.title = \"PhD\" then \"short-ter", 
+                "action": "suppr", 
+                "what": 4, 
                 "where": 18
             }, 
             {
                 "action": "insert", 
-                "what": "\" else \"st", 
-                "where": 59
+                "what": "\\x -> if x.title = \"PhD\" then \"short-term\" else \"staff\";\n    ", 
+                "where": 18
             }, 
             {
                 "action": "suppr", 
-                "what": 2, 
-                "where": 70
+                "what": 4, 
+                "where": 86
             }, 
             {
                 "action": "insert", 
-                "what": "ff\";\n    ", 
-                "where": 70
-            }, 
-            {
-                "action": "insert", 
-                "what": "x.name, categor", 
+                "what": "x.name, category(x) as cat", 
                 "where": 86
             }, 
             {
                 "action": "suppr", 
-                "what": 1, 
-                "where": 102
+                "what": 15, 
+                "where": 118
             }, 
             {
                 "action": "insert", 
-                "what": "(x) ", 
-                "where": 102
+                "what": "x", 
+                "where": 118
             }, 
             {
                 "action": "suppr", 
-                "what": 1, 
-                "where": 107
+                "what": 23, 
+                "where": 120
             }, 
             {
                 "action": "insert", 
-                "what": "s cat", 
-                "where": 107
-            }, 
-            {
-                "action": "insert", 
-                "what": " x in", 
-                "where": 117
+                "what": "in", 
+                "where": 120
             }, 
             {
                 "action": "suppr", 
-                "what": 185, 
+                "what": 145, 
                 "where": 130
             }
         ], 

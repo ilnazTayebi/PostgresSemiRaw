@@ -6,19 +6,24 @@ from difflib import SequenceMatcher
 from json import dumps
 from markdown import Markdown
 from xml.dom.minidom import getDOMImplementation
+import re
 
 logging.basicConfig(level=logging.DEBUG)
 md = Markdown()
 matcher = SequenceMatcher()
 
 def tokenize(x):
-    return x
+    reg = re.compile("""(\w+|\d*\.\d+|\d+|"[^"]*"|\s+|.)""")
+    return [m.group(0) for m in reg.finditer(x)]
+        
 
 def make_step(doc, query, q0):
     doc = md.convert(str(doc.strip()))
     query = str(query.strip())
     q0 = q0.strip()
-    matcher.set_seqs(tokenize(q0), tokenize(query))
+    tokens1 = tokenize(q0)
+    tokens2 = tokenize(query)
+    matcher.set_seqs(tokens1, tokens2)
     opcodes = matcher.get_opcodes()
     actions = []
     offset = 0
@@ -26,18 +31,21 @@ def make_step(doc, query, q0):
         if opcode == "equal":
             continue
         elif opcode == "insert":
-            toput = query[j1:j2]
-            actions.append({"action":"insert", "where": i1+offset, "what": toput})
+            pos = len("".join(tokens1[:i1]))
+            toput = "".join(tokens2[j1:j2])
+            actions.append({"action":"insert", "where": pos+offset, "what": toput})
             offset += len(toput)
         elif opcode == "delete":
-            n = i2 - i1
-            actions.append({"action":"suppr", "where": i1+offset, "what": n})
+            pos = len("".join(tokens1[:i1]))
+            n = len("".join(tokens1[i1:i2]))
+            actions.append({"action":"suppr", "where": pos+offset, "what": n})
             offset -= n
         elif opcode == "replace":
-            n = i2 - i1
-            toput = query[j1:j2]
-            actions.append({"action":"suppr", "where": i1+offset, "what": n})
-            actions.append({"action":"insert", "where": i1+offset, "what": toput})
+            pos = len("".join(tokens1[:i1]))
+            n = len("".join(tokens1[i1:i2]))
+            toput = "".join(tokens2[j1:j2])
+            actions.append({"action":"suppr", "where": pos+offset, "what": n})
+            actions.append({"action":"insert", "where": pos+offset, "what": toput})
             offset -= n
             offset += len(toput)
     return {"doc": doc, "edits": actions, "expected": query}
