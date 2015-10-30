@@ -135,7 +135,7 @@ $(document).ready(function(){
                             handleQueryError(request, error, editor)
                         }
                         else{
-                            append_error( "Internal error, exception type: " + error.exceptionType);
+                            //append_error( "Internal error, exception type: " + error.exceptionType);
                         }
                     }
                 }
@@ -413,11 +413,11 @@ function add_from_dropbox(){
                 for(n in options){
                     var f = options[n];
                     f.name = $("#"+inputs[n].name).val();
-                    if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
+                    //if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
             
                     /* checks if the name is ok*/
                     f.type = $("#"+inputs[n].type).val();
-                    if (f.type == null) ok = false;
+                    //if (f.type == null) ok = false;
                     files.push(f)
                 }
 
@@ -488,18 +488,18 @@ function add_files_to_dialog(files){
             }
         }
 
-        $("#"+i.name).change (function(){
-            var text = $( this ).text();
-            
-            var error = ! /[_a-zA-Z]\w*/.test(text);
-            setStatus(this, error);
-        });
+//        $("#"+i.name).change (function(){
+//            var text = $( this ).text();
+//            
+//            var error = ! /[_a-zA-Z]\w*/.test(text);
+//            setStatus(this, error);
+//        });
 
-        $("#"+i.type).change (function(){
-            var text = $( this ).text();
-            var error = text == null;
-            setStatus(this, error);
-        });
+//        $("#"+i.type).change (function(){
+//            var text = $( this ).text();
+//            var error = text == null;
+//            setStatus(this, error);
+//        });
 
         $("#"+i.name).val(f.name);
         $("#"+i.type).val(f.type);
@@ -515,7 +515,7 @@ function add_files_to_dialog(files){
 
 //function to append success message to the alert pane
 function append_alert(msg){
-    $('<div class="col-lg-2 alert alert-success alert-dismissable">'+
+    $('<div class="col-lg-12 alert alert-success alert-dismissable">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
@@ -528,7 +528,7 @@ function append_alert(msg){
 
 //function to append error message to the alert pane
 function append_error(msg){
-    $('<div class="col-lg-3 alert alert-danger">'+
+    $('<div class="col-lg-12 alert alert-danger">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
