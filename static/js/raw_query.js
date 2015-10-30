@@ -235,16 +235,17 @@ function handleQueryError(request, error, editor){
             break;
         case "ParserError":
             var lines = editor.getValue().split('\n');
+            console.log("ParseError", pos);
             var pos = {
-                begin : error.error.position,
+                begin : error.error.position.begin,
                 end : {
                     line : lines.length,
-                    column:lines[lines.length-1].length
+                    column:lines[lines.length-1].length +1 
                 }
             }
             var marker = {
                 errorType : error.errorType,
-                positions : [error.error.position],
+                positions : [pos],
                 message : error.error.message
             }
             e.push(marker);
@@ -262,6 +263,7 @@ function addErrorMarkers(editor, errors){
     for (var n in errors){
         for(i in errors[n].positions){
             var pos =errors[n].positions[i];
+            console.log("pos", pos);
             addSguiglylines(editor, pos, errors[n].message, annotations)
         }
     }
@@ -315,12 +317,7 @@ function addSguiglylines(editor, pos, msg, annotations){
         var text = lines[pos.begin.line];
         mark(pos.begin.line, pos.begin.column, text.length);
         for(var n = pos.begin.line ; n < pos.end.line-1 ; n++){
-            addmarker({
-                    begin:{line : n, column : 1},
-                    end:{line : n, column : 2}
-                },
-                "lineError"
-            );
+            mark(n, 1, lines[n].length+1);
         }
         mark(pos.end.line, 0, pos.end.column);
     }
@@ -509,8 +506,8 @@ function add_files_to_dialog(files){
 //            setStatus(this, error);
 //        });
 
-//        $("#"+i.name).val(f.name);
-//        $("#"+i.type).val(f.type);
+        $("#"+i.name).val(f.name);
+        $("#"+i.type).val(f.type);
 
 
    }

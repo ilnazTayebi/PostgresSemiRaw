@@ -1,6 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
 
@@ -60,7 +58,7 @@
 			}
 
 			#graph_tab{
-				height: 700px;
+				height: 540px;
 				font-size: 18px;        
 			}
 			.navbar-brand,
@@ -213,49 +211,51 @@
 								<!-- check how to do this relative to the size-->
 								<div class="tab-pane active" id="values"></div>
 								<div class="tab-pane" id="graph_tab">
-									<button class="btn btn-primary dropdown-toggle" id="draw_table_btn" type="button" style="float:left">
-										<span class="glyphicon glyphicon-th"></span>
-									</button>
-									<div class="dropdown" style="float:left">
-										<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-											<span class="caret"></span>
-											<span class="glyphicon glyphicon-stats"></span>
-										</button>
-										<ul class="dropdown-menu" >
-											<li><a href="#" id="draw_pie">Pie Chart</a></li>
-											<li><a href="#" id="draw_bar">Bar Chart</a></li>
-											<li><a href="#" id="draw_line">Line Chart</a></li>
-											<li><a href="#" id="draw_scatter">XY Scatter</a></li>
-											<li><a href="#" id="draw_histogram">Histogram</a></li>
-										</ul>
-									</div>
-									<div class="dropdown" style="float:left">
-										<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-											<span class="caret"></span>
-											<span class="glyphicon glyphicon-dashboard"></span>
-										</button>
-										<ul class="dropdown-menu" >
-											<li><a href="#" id="draw_3dsurface">3D surface</a></li>
-											<li><a href="#" id="draw_3dbars">3D Bars</a></li>
-											<li><a href="#" id="draw_heatmap">Heatmap</a></li>
-										</ul>
-									</div>
-									<div class="dropdown" style="float:left">
-										<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-											<span class="caret"></span>
-											<span class="glyphicon glyphicon-object-align-horizontal"></span>
-										</button>
-										<ul class="dropdown-menu" >
-											<li><a href="#" id="draw_tree">Tree</a></li>
-											<li><a href="#" id="draw_sunburst">Sunburst graph</a></li>
-											<li><a href="#" id="draw_circle_pack">Circle packing</a></li>
-											<li><a href="#" id="draw_treemap">Tree Map</a></li>
-											<li><a href="#" id="draw_bubblechart">Bubble Plot</a></li>
-										</ul>
-									</div>
-									<button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" style="float:left">
-										<span class="glyphicon glyphicon-globe"></span>
-									</button>
+                                    <div class="btn-group" role="toolbar">
+									    <button class="btn btn-primary dropdown-toggle" id="draw_table_btn" type="button" style="float:left">
+										    <span class="glyphicon glyphicon-th"></span>
+									    </button>
+									    <div class="dropdown" style="float:left">
+										    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+											    <span class="caret"></span>
+											    <span class="glyphicon glyphicon-stats"></span>
+										    </button>
+										    <ul class="dropdown-menu" >
+											    <li><a href="#" id="draw_pie">Pie Chart</a></li>
+											    <li><a href="#" id="draw_bar">Bar Chart</a></li>
+											    <li><a href="#" id="draw_line">Line Chart</a></li>
+											    <li><a href="#" id="draw_scatter">XY Scatter</a></li>
+											    <li><a href="#" id="draw_histogram">Histogram</a></li>
+										    </ul>
+									    </div>
+									    <div class="dropdown" style="float:left" aria-label="...">
+										    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+											    <span class="caret"></span>
+											    <span class="glyphicon glyphicon-dashboard"></span>
+										    </button>
+										    <ul class="dropdown-menu" >
+											    <li><a href="#" id="draw_3dsurface">3D surface</a></li>
+											    <li><a href="#" id="draw_3dbars">3D Bars</a></li>
+											    <li><a href="#" id="draw_heatmap">Heatmap</a></li>
+										    </ul>
+									    </div>
+									    <div class="dropdown" style="float:left">
+										    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+											    <span class="caret"></span>
+											    <span class="glyphicon glyphicon-object-align-horizontal"></span>
+										    </button>
+										    <ul class="dropdown-menu" >
+											    <li><a href="#" id="draw_tree">Tree</a></li>
+											    <li><a href="#" id="draw_sunburst">Sunburst graph</a></li>
+											    <li><a href="#" id="draw_circle_pack">Circle packing</a></li>
+											    <li><a href="#" id="draw_treemap">Tree Map</a></li>
+											    <li><a href="#" id="draw_bubblechart">Bubble Plot</a></li>
+										    </ul>
+									    </div>
+									    <button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" style="float:left">
+										    <span class="glyphicon glyphicon-globe"></span>
+									    </button>
+                                    </div>
 									<div class="container" id="graph" style="height: 95%; width: 95%;float:right;"></div>
 								</div>
 							</div>
