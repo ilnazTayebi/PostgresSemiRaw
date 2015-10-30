@@ -407,17 +407,28 @@ function add_from_dropbox(){
         success: function (files){
             var options = get_dropbox_options(files);
             var inputs = add_files_to_dialog(options);
-
             document.getElementById("register_button").onclick = function(){
+                var ok = true;
+                var files = [];
                 for(n in options){
                     var f = options[n];
-
                     f.name = $("#"+inputs[n].name).val();
+                    if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
+            
+                    /* checks if the name is ok*/
                     f.type = $("#"+inputs[n].type).val();
-                    register_file(f, upload_alerts);
+                    if (f.type == null) ok = false;
+                    files.push(f)
+                }
+
+                if(ok){
+                    for (n in files){
+                        register_file(files[n], upload_alerts);
+                    }
                     //closes the dialog
                     $("#register_dialog").modal('hide');
                }
+                
             }
 
             $("#register_dialog").modal('show');
@@ -428,6 +439,7 @@ function add_from_dropbox(){
 
     Dropbox.choose(options);
 }
+
 
 // adds a dataset from a URL
 function add_from_url(url, name, type) {
@@ -445,23 +457,54 @@ function add_files_to_dialog(files){
     for( n in files){
         var f = files[n];
         var id = f.filename.replace(/[ \.~-]/g,'_');
-        var i = {name : 'n_'+id, type : 't_'+id};
+        var i = {name : 'n_'+id, type : 't_'+id };
         inputs.push(i);
         console.log('adding file', f);
         $('<div class="form-group">\
             <div class="input-append">\
-              <input type="text" class="form-control" id="' + i.name + '" placeholder="file name" style="float:left;width:80%;">\
-              <div class="btn-group" style=style="float:right;">\
-                <select class="form-control" id="'+ i.type +'">\
-	                <option value="csv">CSV</option>\
-	                <option value="json">JSON</option>\
-                </select>\
-              </div>\
+                <div class="form-group has-feedback  has-success">\
+                    <input type="text" class="form-control" id="' + i.name + '" placeholder="file name" style="float:left;width:80%;">\
+                </div>\
+                <div class="btn-group " style=style="float:right;">\
+                    <select class="form-control" id="'+ i.type +'">\
+                    <option value="csv">CSV</option>\
+                    <option value="json">JSON</option>\
+                    </select>\
+                </div>\
             </div>\
         </div>').appendTo("#modal_body");
 
+        var setStatus = function(obj, error){
+            parent = $(obj).parent();
+            parent.removeClass("has-success");
+            parent.removeClass("has-error");
+            if ( error){
+                parent.addClass("has-error");
+                $('<span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>').appendTo(parent)
+            }
+            else{
+                parent.addClass("has-success");
+                $('<span class="glyphicon glyphicon-ok form-control-feedback"></span>').appendTo(parent);
+            }
+        }
+
+        $("#"+i.name).change (function(){
+            var text = $( this ).text();
+            
+            var error = ! /[_a-zA-Z]\w*/.test(text);
+            setStatus(this, error);
+        });
+
+        $("#"+i.type).change (function(){
+            var text = $( this ).text();
+            var error = text == null;
+            setStatus(this, error);
+        });
+
         $("#"+i.name).val(f.name);
         $("#"+i.type).val(f.type);
+
+
    }
 
     // adds the button at the end
