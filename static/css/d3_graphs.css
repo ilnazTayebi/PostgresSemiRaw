@@ -188,7 +188,7 @@ Query errors on JC editor
 
 .lineError::before{
     position:absolute;
-    content: '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^';
+    content: '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^';
     top: +80%;
     color : red;
     font-size: 60%;
@@ -198,7 +198,7 @@ Query errors on JC editor
 .errorHighlight{
   position:absolute;
   z-index:20;
-  background-color:rgba(255,60,60,0.3);
+  background-color:rgba(155,60,60,0.3);
   border: 1px solid rgba(221, 240, 255, 0.30);
   text-decoration: underline;
   color : red;

@@ -132,7 +132,10 @@ $(document).ready(function(){
                         removeAllErrors(editor);
                         error = JSON.parse(error);
                         if (status == 400) {
-                            handleQueryError(request, error, editor)
+                            handleQueryError(request, error, editor);
+                        }
+                        else if (status == 500){
+                            handleServerError(request, error, editor);
                         }
                         else{
                             //append_error( "Internal error, exception type: " + error.exceptionType);
@@ -212,6 +215,37 @@ function downloadObj(obj, filename, format){
     dlElem.setAttribute("href", dataStr);
     dlElem.setAttribute("download", filename);
     dlElem.click();
+}
+
+function handleServerError(request, error, editor){
+    
+    if (error.exceptionType == "java.lang.RuntimeException"){
+        console.log("regex Error!!!");
+        var matches = error.message.match(/regex\|\|\|\|(.*)\|\|\|\|(.*)/);
+        var regex = matches[1];
+        var msg = matches[2];
+        var lines = editor.getValue().split("\n");
+        console.log("searching for", regex, "message", msg);
+        var errors = [];
+        for (var n in lines){
+            var column = lines[n].indexOf(regex) + 1;
+            if ( column > 0){
+                console.log("found in line", n, lines[n], regex);
+                var marker = {
+                    errorType : "RegexError",
+                    positions: [
+                        {
+                            begin: {line: n +1, column: column},
+                            end: { line: n +1, column: column + regex.length }
+                        }
+                    ],
+                    message : msg
+                }
+                errors.push(marker);
+            }
+        }
+        addErrorMarkers(editor, errors);
+    }
 }
 
 //Will handle query errors (status 400 from scala server)
@@ -321,7 +355,7 @@ function addSguiglylines(editor, pos, msg, annotations){
         }
         mark(pos.end.line, 0, pos.end.column);
     }
-    addmarker(pos,  "errorHighlight");
+    //addmarker(pos,  "errorHighlight");
 }
 
 // removes all errors and markers added by addErrorMarkers
