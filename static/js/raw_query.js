@@ -234,6 +234,14 @@ function handleQueryError(request, error, editor){
             }
             break;
         case "ParserError":
+            var lines = editor.getValue().split('\n');
+            var pos = {
+                begin : error.error.position,
+                end : {
+                    line : lines.length,
+                    column:lines[lines.length-1].length
+                }
+            }
             var marker = {
                 errorType : error.errorType,
                 positions : [error.error.position],
@@ -288,7 +296,7 @@ function addSguiglylines(editor, pos, msg, annotations){
 
     var mark = function(line, start, end){
         if(end==start) end++;
-        for (var n = start ; n < end ; n+=3){
+        for (var n = start ; n < end ; n++){
             addmarker({
                     begin:{line : line, column : n},
                     end:{line : line, column : n+1}
@@ -501,8 +509,8 @@ function add_files_to_dialog(files){
 //            setStatus(this, error);
 //        });
 
-        $("#"+i.name).val(f.name);
-        $("#"+i.type).val(f.type);
+//        $("#"+i.name).val(f.name);
+//        $("#"+i.type).val(f.type);
 
 
    }
