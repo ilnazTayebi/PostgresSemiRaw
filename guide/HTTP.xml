@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<guide>
+
+<step>
+<doc>The user interface is about to run in demo mode. It is going to walk
+through a number of QRAWL queries, illustrating the capabilities of the language.
+For that we need a dataset. We'll use ([httplogs][1]) (please click the name
+to load it, and wait until there is a success notification at the bottom of the screen).
+[1]:javascript:load_dataset("httplogs")
+</doc>
+</step>
+
+<step>
+<doc>The query below should execute successfully and return a number of rows.
+Have a quick look to the httplogs table content displayed on the right side
+of the screen. Rows are plain records with information about requests
+issued to an HTTP server.
+
+If this doesn't work, then go back to the previous step and ensure the dataset is loaded.
+</doc>
+<query>
+select * from httplogs
+</query>
+</step>
+
+    <step>
+        <query>select * from httplogs where method = "POST"</query>
+        <doc>
+            QRAWL is intended to be compatible with SQL and can perform typical filtering operations.
+        </doc>
+    </step>
+
+    <step>
+        <query>select distinct method, count(*) from httplogs group by method</query>
+        <doc>Typical SQL aggregation are supported. Here we report the number of
+            requests in each possible method.
+        </doc>
+    </step>
+
+    <step>
+        <query>select distinct method, count(*) from httplogs group by method</query>
+        <doc>
+In QRAWL, the star sign is in fact an alias to *the subset of httplogs having a certain method*, and the
+count operator runs on that collection and returns the number of elements it contains. This means
+the star sign can be handled as a collection itself. Click next to see.
+        </doc>
+    </step>
+
+    <step>
+        <query>select distinct method, * from httplogs group by method</query>
+        <doc>Here we removed the aggregation function (count), so that the query returns
+rows which now contain a *nested list* of log lines (the ones with the corresponding method)
+in plae of the initial count.
+Let's do some more processing on this inner collection.
+        </doc>
+    </step>
+
+    <step>
+        <query>select distinct method, (select code from *) from httplogs group by method</query>
+        <doc>We extract the return codes form that inner collection.
+        </doc>
+    </step>
+
+    <step>
+        <query>select distinct method, (select code from *) from httplogs group by method</query>
+<doc>We think using the star sign in a *from* is not very readable (but it does work).
+We prefer to use the *partition* keyword instead. For now one consider the
+*partition* keyword as an alias to the star sign for the grouped queries (there is a difference
+and we'll see later on other queries). Let's use partition (click next).
+</doc>
+    </step>
+
+    <step>
+        <query>select distinct method, (select code from partition) from httplogs group by method</query>
+        <doc>It is more readable. Let's do more queries.
+        </doc>
+    </step>
+
+    <step>
+        <query>
+            select distinct method, (select distinct code, count(partition)
+                                     from partition group by code)
+            from httplogs
+            group by method
+        </query>
+        <doc>We do an inner group by on the grouped data. That query returns four rows
+(one per method) and each row contains a field being a list of codes
+associated to the number of httplogs born that code (and having already been filtered on their
+method).
+
+But we can also extract the logs themselves instead of counting them (click next).
+        </doc>
+    </step>
+
+
+    <step>
+        <doc>Now we find the original log rows in the inner list. As expected, the logs
+            found in the inner nested list are all of the corresponding method and code.
+        </doc>
+        <query>
+            select distinct method, (select distinct code, partition
+                                     from partition group by code)
+            from httplogs
+            group by method
+        </query>
+    </step>
+
+    <step>
+        <doc>This is it for nested queries. Now let's review the programming capabilities
+            of QRAWL.
+        </doc>
+        <query>
+        </query>
+    </step>
+
+    <step>
+        <query>
+            {
+                x := 32768;
+                large := select * from httplogs where size >= x;
+                large // return value of the block
+            }
+        </query>
+        <doc>QRAWL supports variable assignments to simplify the edition of queries.
+        </doc>
+    </step>
+
+    <step>
+        <query>
+            {
+                x := 32768;
+                large := select * from httplogs where size >= x;
+                small := select * from httplogs where size &lt; x;
+                (small, large)
+            }
+        </query>
+        <doc>A slightly more complicated example which  returns a record with two collections
+            of queries.
+
+            Let's have a look to regular expressions in QRAWL queries now.
+        </doc>
+    </step>
+
+    <step>
+        <query>
+            {
+                root := \x -> x parse as r"/([^/]*).*";
+                select root(url) as r, url, code, size from httplogs
+            }
+        </query>
+        <doc>
+This function using a regular expression to extract the root directory of a
+URL. This is a feature of QRAWL: the *as* operator parses the string *x* as the
+given regular expression and returns the string matching the group (the inner
+part between parenthesis).
+
+Therefore, if passed a URL string, *root* will return the top level directory of the file. (We will
+see later what happens if the regular expression contains more than one group.)
+Let's use this function in a group by query.</doc>
+    </step>
+
+    <step>
+        <query>
+            {
+                root := \x -> x parse as r"/([^/]*).*";
+                cgis := select * from httplogs where root(url) = "cgi-bin";
+                select url from cgis
+            }
+        </query>
+        <doc>We use *root* to filter requests to CGI related URLs.</doc>
+    </step>
+
+    <step>
+        <query>
+        {
+            root := \x -> x parse as r"/([^/]*).*";
+            cgis := select * from httplogs where root(url) = "cgi-bin";
+            select distinct code, * from cgis group by code
+        }
+        </query>
+        <doc>This is a regular group by (with nested data returned) applied
+            on log lines filtered by *root*</doc>
+    </step>
+
+    <step>
+        <query>
+{
+    root := \x -> x parse as r"/([-\\w]*).*";
+    failure := \c -> c >= 400;
+    select distinct root(url), (select distinct code, url, count(*) as n
+                                       from * group by code, url)
+    from httplogs
+    where failure(code)
+    group by root(url)
+}
+        </query>
+    <doc>Now we filter failures and group by root.</doc>
+    </step>
+
+</guide>
