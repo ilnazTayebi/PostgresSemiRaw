@@ -235,7 +235,7 @@ function handleServerError(request, error, editor){
         var matches = error.message.match(/regex\|\|\|\|((.|\n)*)\|\|\|\|(.*)/);
         console.log("parsed ", matches);
         var regex = matches[1];
-        var msg = matches[2];
+        var msg = matches[3];
         var alts = createAlternatives(regex);
         console.log("searching for", alts);
         var lines = editor.getValue().split("\n");
