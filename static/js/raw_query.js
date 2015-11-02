@@ -720,10 +720,10 @@ function list_schemas(){
 
 function load_dataset(what) {
     var datasets = {
-        "httplogs": {"url": "https://www.dropbox.com/s/mun7lpgk4jpdw9d/httplogs.csv?dl=1", "name":"httplogs"},
-        "publications": {"url": "https://www.dropbox.com/s/77youjyiz9u0eh9/publications.json?dl=1", "name":"publications"},
-        "authors": {"url": "https://www.dropbox.com/s/vvuvydjqb8rdhhr/authors.json?dl=1", "name": "authors"}
+        "httplogs": {"url": "https://www.dropbox.com/s/mun7lpgk4jpdw9d/httplogs.csv?dl=1", "name":"httplogs", "type":"csv"},
+        "publications": {"url": "https://www.dropbox.com/s/77youjyiz9u0eh9/publications.json?dl=1", "name":"publications", "type":"json"},
+        "authors": {"url": "https://www.dropbox.com/s/vvuvydjqb8rdhhr/authors.json?dl=1", "name": "authors", "type":"json"}
     };
-    add_from_url(datasets[what].url, datasets[what].name, "json");
+    add_from_url(datasets[what].url, datasets[what].name, datasets[what].type);
     append_alert('Loading ' + datasets[what].name);
 }

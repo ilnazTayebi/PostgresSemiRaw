@@ -137,7 +137,7 @@ But we can also extract the logs themselves instead of counting them (click next
         <doc>A slightly more complicated example which  returns a record with two collections
             of queries.
 
-            Let's have a look to regular expressions in QRAWL queries now.
+Let's have a look to regular expressions in QRAWL queries now.
         </doc>
     </step>
 
@@ -175,26 +175,44 @@ Let's use this function in a group by query.</doc>
         {
             root := \x -> x parse as r"/([^/]*).*";
             cgis := select * from httplogs where root(url) = "cgi-bin";
-            select distinct code, * from cgis group by code
+            select distinct code, *
+            from cgis
+            group by code
         }
         </query>
         <doc>This is a regular group by (with nested data returned) applied
-            on log lines filtered by *root*</doc>
+            on log lines filtered by *root*. We notice there are some
+            failures because some HTTP codes are over 400.</doc>
     </step>
 
     <step>
         <query>
 {
-    root := \x -> x parse as r"/([-\\w]*).*";
-    failure := \c -> c >= 400;
-    select distinct root(url), (select distinct code, url, count(*) as n
-                                       from * group by code, url)
-    from httplogs
+    root := \x -> x parse as r"/([^/]*).*";
+    failure := \c -> (c >= 400);
+    cgis := select * from httplogs where root(url) = "cgi-bin";
+    select distinct code, count(*), *
+    from cgis
     where failure(code)
-    group by root(url)
+    group by code
 }
         </query>
-    <doc>Now we filter failures and group by root.</doc>
+    <doc>We isolate failures and dig out a bit. There were several failing
+         requests, all with the same error. Let's investigate a bit more.</doc>
+    </step>
+
+    <step>
+        <query>
+{
+    root := \x -> x parse as r"/([^/]*).*";
+    failure := \c -> (c >= 400);
+    cgis := select * from httplogs where root(url) = "cgi-bin";
+    select distinct code, (select distinct ip from *)
+    from cgis
+    where failure(code)
+    group by code
+}        </query>
+    <doc>Here are the client host names of the failing requests.</doc>
     </step>
 
 </guide>
