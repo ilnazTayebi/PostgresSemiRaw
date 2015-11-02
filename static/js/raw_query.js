@@ -442,7 +442,7 @@ function get_dropbox_options(selection){
                 options.type = 'csv';
                 break;
             default:
-                options.type = 'select';
+                options.type = 'text';
                 //throw " unsuported file type " + extension ;
         }
         option_list.push(options);
@@ -458,6 +458,7 @@ var upload_alerts = {
            list_schemas();
         },
         error : function(request, status, error) {
+            console.log("error", request, status, error);
             var response = JSON.parse(request.responseText);
             append_error("Error registering file '" + response.name + "' : "+ response.output);
         }
@@ -486,6 +487,7 @@ function add_from_dropbox(){
 
                 if(ok){
                     for (n in files){
+                        console.log("registering file ", files[n]);
                         register_file(files[n], upload_alerts);
                     }
                     //closes the dialog
@@ -532,6 +534,7 @@ function add_files_to_dialog(files){
                     <select class="form-control" id="'+ i.type +'">\
                     <option value="csv">CSV</option>\
                     <option value="json">JSON</option>\
+                    <option value="text">TEXT</option>\
                     </select>\
                 </div>\
             </div>\
