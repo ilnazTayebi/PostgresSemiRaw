@@ -25,10 +25,13 @@ $(document).ready(function(){
         console.log(credentials);
     }
 
+
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
+    //$('#download_excel').prop('disabled', true);
+    $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
     document.getElementById('download_results').onclick = function(){
         //downloadJsonObj(queryResults, "data.json");
@@ -42,8 +45,8 @@ $(document).ready(function(){
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
-            downloadObj( queryResults, "download", "excel");
-            $("#download_dialog").modal('hide');
+//            downloadObj( queryResults, "download", "excel");
+//            $("#download_dialog").modal('hide');
         };
     };
 
@@ -60,8 +63,8 @@ $(document).ready(function(){
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
-            saveObjToDropbox( client, queryResults, "results.xls", "excel");
-            $("#download_dialog").modal('hide');
+//            saveObjToDropbox( client, queryResults, "results.xls", "excel");
+//            $("#download_dialog").modal('hide');
         };
     };
 
@@ -246,8 +249,8 @@ function handleServerError(request, error, editor){
         console.log("searching for", alts);
         var lines = editor.getValue().split("\n");
         var errors = [];
-        for (var n in lines){
-            for(var i in alts){
+        for (var n= 0 ; n < lines.length ; n++){
+            for(var i=0 ; i < alts.length ; i ++){
                 var column = lines[n].indexOf(alts[i]) + 1;
                 if ( column > 0){
                     console.log("found in line", n, lines[n], alts[i]);
