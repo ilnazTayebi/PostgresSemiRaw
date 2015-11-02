@@ -7,7 +7,7 @@ var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 var QrawlHighlightRules = function() {
 
     var keywords = (
-        "select|distinct|parse|from|where|and|or|group|by|order|limit|having|as|in|" +
+        "select|distinct|parse|into|from|where|and|or|group|by|order|limit|having|as|in|" +
         "else|desc|asc|union|if|" +
         "not|" +
         "for|yield|" +
