@@ -132,10 +132,14 @@ $(document).ready(function(){
                         removeAllErrors(editor);
                         error = JSON.parse(error);
                         if (status == 400) {
-                            handleQueryError(request, error, editor)
+                            handleQueryError(request, error, editor);
+                        }
+                        else if (status == 500){
+                            handleServerError(request, error, editor);
                         }
                         else{
-                            append_error( "Internal error, exception type: " + error.exceptionType);
+                            throw ("Unkown error status: " + status);
+                            //append_error( "Internal error, exception type: " + error.exceptionType);
                         }
                     }
                 }
@@ -214,6 +218,51 @@ function downloadObj(obj, filename, format){
     dlElem.click();
 }
 
+function handleServerError(request, error, editor){
+    function createAlternatives(regex){
+        var alt = regex.replace(/\\/g, "\\\\")
+                .replace(/\n/g, "\\n")
+                //.replace(/\b/g, "\\b")
+                .replace(/\t/g, "\\t")
+                .replace(/\r/g, "\\r");
+
+        return [regex, alt];
+    }
+
+    if (error.exceptionType == "java.lang.RuntimeException"){
+        console.log("regex Error!!!");
+        
+        var matches = error.message.match(/regex\|\|\|\|((.|\n)*)\|\|\|\|(.*)/);
+        console.log("parsed ", matches);
+        var regex = matches[1];
+        var msg = matches[3];
+        var alts = createAlternatives(regex);
+        console.log("searching for", alts);
+        var lines = editor.getValue().split("\n");
+        var errors = [];
+        for (var n in lines){
+            for(var i in alts){
+                var column = lines[n].indexOf(alts[i]) + 1;
+                if ( column > 0){
+                    console.log("found in line", n, lines[n], alts[i]);
+                    var marker = {
+                        errorType : "RegexError",
+                        positions: [
+                            {
+                                begin: {line: n +1, column: column},
+                                end: { line: n +1, column: column + alts[i].length }
+                            }
+                        ],
+                        message : msg
+                    }
+                    errors.push(marker);
+                }
+           }
+        }
+        addErrorMarkers(editor, errors);
+    }
+}
+
 //Will handle query errors (status 400 from scala server)
 // and update the UI elements (ace editor etc)
 function handleQueryError(request, error, editor){
@@ -234,9 +283,18 @@ function handleQueryError(request, error, editor){
             }
             break;
         case "ParserError":
+            var lines = editor.getValue().split('\n');
+            console.log("ParseError", pos);
+            var pos = {
+                begin : error.error.position.begin,
+                end : {
+                    line : lines.length,
+                    column:lines[lines.length-1].length +1 
+                }
+            }
             var marker = {
                 errorType : error.errorType,
-                positions : [error.error.position],
+                positions : [pos],
                 message : error.error.message
             }
             e.push(marker);
@@ -254,6 +312,7 @@ function addErrorMarkers(editor, errors){
     for (var n in errors){
         for(i in errors[n].positions){
             var pos =errors[n].positions[i];
+            console.log("pos", pos);
             addSguiglylines(editor, pos, errors[n].message, annotations)
         }
     }
@@ -288,7 +347,7 @@ function addSguiglylines(editor, pos, msg, annotations){
 
     var mark = function(line, start, end){
         if(end==start) end++;
-        for (var n = start ; n < end ; n+=3){
+        for (var n = start ; n < end ; n++){
             addmarker({
                     begin:{line : line, column : n},
                     end:{line : line, column : n+1}
@@ -307,16 +366,11 @@ function addSguiglylines(editor, pos, msg, annotations){
         var text = lines[pos.begin.line];
         mark(pos.begin.line, pos.begin.column, text.length);
         for(var n = pos.begin.line ; n < pos.end.line-1 ; n++){
-            addmarker({
-                    begin:{line : n, column : 1},
-                    end:{line : n, column : 2}
-                },
-                "lineError"
-            );
+            mark(n, 1, lines[n].length+1);
         }
         mark(pos.end.line, 0, pos.end.column);
     }
-    addmarker(pos,  "errorHighlight");
+    //addmarker(pos,  "errorHighlight");
 }
 
 // removes all errors and markers added by addErrorMarkers
@@ -407,17 +461,28 @@ function add_from_dropbox(){
         success: function (files){
             var options = get_dropbox_options(files);
             var inputs = add_files_to_dialog(options);
-
             document.getElementById("register_button").onclick = function(){
+                var ok = true;
+                var files = [];
                 for(n in options){
                     var f = options[n];
-
                     f.name = $("#"+inputs[n].name).val();
+                    //if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
+            
+                    /* checks if the name is ok*/
                     f.type = $("#"+inputs[n].type).val();
-                    register_file(f, upload_alerts);
+                    //if (f.type == null) ok = false;
+                    files.push(f)
+                }
+
+                if(ok){
+                    for (n in files){
+                        register_file(files[n], upload_alerts);
+                    }
                     //closes the dialog
                     $("#register_dialog").modal('hide');
                }
+                
             }
 
             $("#register_dialog").modal('show');
@@ -428,6 +493,7 @@ function add_from_dropbox(){
 
     Dropbox.choose(options);
 }
+
 
 // adds a dataset from a URL
 function add_from_url(url, name, type) {
@@ -445,23 +511,54 @@ function add_files_to_dialog(files){
     for( n in files){
         var f = files[n];
         var id = f.filename.replace(/[ \.~-]/g,'_');
-        var i = {name : 'n_'+id, type : 't_'+id};
+        var i = {name : 'n_'+id, type : 't_'+id };
         inputs.push(i);
         console.log('adding file', f);
         $('<div class="form-group">\
             <div class="input-append">\
-              <input type="text" class="form-control" id="' + i.name + '" placeholder="file name" style="float:left;width:80%;">\
-              <div class="btn-group" style=style="float:right;">\
-                <select class="form-control" id="'+ i.type +'">\
-	                <option value="csv">CSV</option>\
-	                <option value="json">JSON</option>\
-                </select>\
-              </div>\
+                <div class="form-group has-feedback  has-success">\
+                    <input type="text" class="form-control" id="' + i.name + '" placeholder="file name" style="float:left;width:80%;">\
+                </div>\
+                <div class="btn-group " style=style="float:right;">\
+                    <select class="form-control" id="'+ i.type +'">\
+                    <option value="csv">CSV</option>\
+                    <option value="json">JSON</option>\
+                    </select>\
+                </div>\
             </div>\
         </div>').appendTo("#modal_body");
 
+        var setStatus = function(obj, error){
+            parent = $(obj).parent();
+            parent.removeClass("has-success");
+            parent.removeClass("has-error");
+            if ( error){
+                parent.addClass("has-error");
+                $('<span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>').appendTo(parent)
+            }
+            else{
+                parent.addClass("has-success");
+                $('<span class="glyphicon glyphicon-ok form-control-feedback"></span>').appendTo(parent);
+            }
+        }
+
+//        $("#"+i.name).change (function(){
+//            var text = $( this ).text();
+//            
+//            var error = ! /[_a-zA-Z]\w*/.test(text);
+//            setStatus(this, error);
+//        });
+
+//        $("#"+i.type).change (function(){
+//            var text = $( this ).text();
+//            var error = text == null;
+//            setStatus(this, error);
+//        });
+
         $("#"+i.name).val(f.name);
         $("#"+i.type).val(f.type);
+
+
    }
 
     // adds the button at the end
@@ -472,7 +569,7 @@ function add_files_to_dialog(files){
 
 //function to append success message to the alert pane
 function append_alert(msg){
-    $('<div class="col-lg-2 alert alert-success alert-dismissable">'+
+    $('<div class="col-lg-12 alert alert-success alert-dismissable">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
@@ -485,7 +582,7 @@ function append_alert(msg){
 
 //function to append error message to the alert pane
 function append_error(msg){
-    $('<div class="col-lg-3 alert alert-danger">'+
+    $('<div class="col-lg-12 alert alert-danger">'+
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
