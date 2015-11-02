@@ -138,6 +138,7 @@ $(document).ready(function(){
                             handleServerError(request, error, editor);
                         }
                         else{
+                            throw ("Unkown error status: " + status);
                             //append_error( "Internal error, exception type: " + error.exceptionType);
                         }
                     }
@@ -218,31 +219,45 @@ function downloadObj(obj, filename, format){
 }
 
 function handleServerError(request, error, editor){
-    
+    function createAlternatives(regex){
+        var alt = regex.replace(/\\/g, "\\\\")
+                .replace(/\n/g, "\\n")
+                //.replace(/\b/g, "\\b")
+                .replace(/\t/g, "\\t")
+                .replace(/\r/g, "\\r");
+
+        return [regex, alt];
+    }
+
     if (error.exceptionType == "java.lang.RuntimeException"){
         console.log("regex Error!!!");
-        var matches = error.message.match(/regex\|\|\|\|(.*)\|\|\|\|(.*)/);
+        
+        var matches = error.message.match(/regex\|\|\|\|((.|\n)*)\|\|\|\|(.*)/);
+        console.log("parsed ", matches);
         var regex = matches[1];
         var msg = matches[2];
+        var alts = createAlternatives(regex);
+        console.log("searching for", alts);
         var lines = editor.getValue().split("\n");
-        console.log("searching for", regex, "message", msg);
         var errors = [];
         for (var n in lines){
-            var column = lines[n].indexOf(regex) + 1;
-            if ( column > 0){
-                console.log("found in line", n, lines[n], regex);
-                var marker = {
-                    errorType : "RegexError",
-                    positions: [
-                        {
-                            begin: {line: n +1, column: column},
-                            end: { line: n +1, column: column + regex.length }
-                        }
-                    ],
-                    message : msg
+            for(var i in alts){
+                var column = lines[n].indexOf(alts[i]) + 1;
+                if ( column > 0){
+                    console.log("found in line", n, lines[n], alts[i]);
+                    var marker = {
+                        errorType : "RegexError",
+                        positions: [
+                            {
+                                begin: {line: n +1, column: column},
+                                end: { line: n +1, column: column + alts[i].length }
+                            }
+                        ],
+                        message : msg
+                    }
+                    errors.push(marker);
                 }
-                errors.push(marker);
-            }
+           }
         }
         addErrorMarkers(editor, errors);
     }
