@@ -218,25 +218,31 @@ function downloadObj(obj, filename, format){
     dlElem.click();
 }
 
+//Will handle internal errors (status 500 from scala server)
+// for the time being just handling RuntimeException
 function handleServerError(request, error, editor){
-    function createAlternatives(regex){
-        var alt = regex.replace(/\\/g, "\\\\")
-                .replace(/\n/g, "\\n")
-                //.replace(/\b/g, "\\b")
-                .replace(/\t/g, "\\t")
-                .replace(/\r/g, "\\r");
-
-        return [regex, alt];
-    }
-
     if (error.exceptionType == "java.lang.RuntimeException"){
-        console.log("regex Error!!!");
-        
+        // here tries to create the alternatives to regexes with escaped characters
+        var create_alternatives = function(r){
+            var alt = r.replace(/\\/g, "\\\\")
+                    .replace(/\n/g, "\\n")
+                    //.replace(/\b/g, "\\b")
+                    .replace(/"/g, "\\\"")
+                    .replace(/\t/g, "\\t")
+                    .replace(/\r/g, "\\r");
+            return[r, alt];
+        };
+
         var matches = error.message.match(/regex\|\|\|\|((.|\n)*)\|\|\|\|(.*)/);
+        if (!matches){
+            throw("could not parse regex from error message: " + error.message);
+        }
+        // with the (.\n)*, for the multiline match creates a group, so group 2 is ignored
         console.log("parsed ", matches);
         var regex = matches[1];
         var msg = matches[3];
-        var alts = createAlternatives(regex);
+        var alts = create_alternatives (regex);
+
         console.log("searching for", alts);
         var lines = editor.getValue().split("\n");
         var errors = [];
@@ -260,6 +266,9 @@ function handleServerError(request, error, editor){
            }
         }
         addErrorMarkers(editor, errors);
+    }
+    else{
+        throw ("Unknown error type" + error.exceptionType);
     }
 }
 
@@ -313,17 +322,17 @@ function addErrorMarkers(editor, errors){
         for(i in errors[n].positions){
             var pos =errors[n].positions[i];
             console.log("pos", pos);
-            addSguiglylines(editor, pos, errors[n].message, annotations)
+            addSquiglylines(editor, pos, errors[n].message, annotations)
         }
     }
 
     editor.session.setAnnotations( annotations );
 }
 
-// adds a squigly lines, from a position nad a message,
+// adds a squigly lines, from a position and a message,
 // this is hacky, I tried to check in Ace editor but could not find, 
 // TODO: check if there is a better way of doing this
-function addSguiglylines(editor, pos, msg, annotations){
+function addSquiglylines(editor, pos, msg, annotations){
 
     var addmarker= function(p, type){
         if(pos.begin.line == p.end.line && 
@@ -433,7 +442,7 @@ function get_dropbox_options(selection){
                 options.type = 'csv';
                 break;
             default:
-                options.type = 'select';
+                options.type = 'text';
                 //throw " unsuported file type " + extension ;
         }
         option_list.push(options);
@@ -449,6 +458,7 @@ var upload_alerts = {
            list_schemas();
         },
         error : function(request, status, error) {
+            console.log("error", request, status, error);
             var response = JSON.parse(request.responseText);
             append_error("Error registering file '" + response.name + "' : "+ response.output);
         }
@@ -477,6 +487,7 @@ function add_from_dropbox(){
 
                 if(ok){
                     for (n in files){
+                        console.log("registering file ", files[n]);
                         register_file(files[n], upload_alerts);
                     }
                     //closes the dialog
@@ -523,6 +534,7 @@ function add_files_to_dialog(files){
                     <select class="form-control" id="'+ i.type +'">\
                     <option value="csv">CSV</option>\
                     <option value="json">JSON</option>\
+                    <option value="text">TEXT</option>\
                     </select>\
                 </div>\
             </div>\
