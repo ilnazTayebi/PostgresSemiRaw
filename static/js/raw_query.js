@@ -218,9 +218,11 @@ function downloadObj(obj, filename, format){
     dlElem.click();
 }
 
+//Will handle internal errors (status 500 from scala server)
+// for the time being just handling RuntimeException
 function handleServerError(request, error, editor){
     if (error.exceptionType == "java.lang.RuntimeException"){
-        // here tries to create the alternative with escaped characters
+        // here tries to create the alternatives to regexes with escaped characters
         var create_alternatives = function(r){
             var alt = r.replace(/\\/g, "\\\\")
                     .replace(/\n/g, "\\n")
@@ -264,6 +266,9 @@ function handleServerError(request, error, editor){
            }
         }
         addErrorMarkers(editor, errors);
+    }
+    else{
+        throw ("Unknown error type" + error.exceptionType);
     }
 }
 
@@ -324,7 +329,7 @@ function addErrorMarkers(editor, errors){
     editor.session.setAnnotations( annotations );
 }
 
-// adds a squigly lines, from a position nad a message,
+// adds a squigly lines, from a position and a message,
 // this is hacky, I tried to check in Ace editor but could not find, 
 // TODO: check if there is a better way of doing this
 function addSquiglylines(editor, pos, msg, annotations){
