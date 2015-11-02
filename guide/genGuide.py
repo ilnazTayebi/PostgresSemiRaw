@@ -15,12 +15,23 @@ matcher = SequenceMatcher()
 def tokenize(x):
     reg = re.compile("""(\w+|\d*\.\d+|\d+|"[^"]*"|\s+|.)""")
     return [m.group(0) for m in reg.finditer(x)]
-        
+
+def cleantext(s):
+    return str(s).strip()
+
+def cleanquery(q):
+    e = re.compile("^\s*$")
+    lines = filter(lambda(l): not e.match(l), q.splitlines())
+    if lines == []:
+        return ""
+    iRe = re.compile("^\s*")
+    indentation = min(map(lambda x: len(iRe.search(x).group(0)), lines))
+    return "\n".join(map(lambda x: x[indentation:], lines))
 
 def make_step(doc, query, q0):
-    doc = md.convert(str(doc.strip()))
-    query = str(query.strip())
-    q0 = q0.strip()
+    doc = md.convert(cleantext(doc))
+    query = str(cleanquery(query))
+    q0 = str(cleanquery(q0))
     tokens1 = tokenize(q0)
     tokens2 = tokenize(query)
     matcher.set_seqs(tokens1, tokens2)

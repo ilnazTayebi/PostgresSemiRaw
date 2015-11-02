@@ -1,4 +1,4 @@
 stepFile=../static/js/raw_walkthrough_steps.js
 all: $(stepFile)
-$(stepFile):guide.xml
+$(stepFile):HTTP.xml
 	./genGuide.py $^ > $@
