@@ -26,7 +26,7 @@ def cleanquery(q):
         return ""
     iRe = re.compile("^\s*")
     indentation = min(map(lambda x: len(iRe.search(x).group(0)), lines))
-    return "\n".join(map(lambda x: x[indentation:], lines))
+    return "\n".join(map(lambda x: x[indentation:], lines)).strip()
 
 def make_step(doc, query, q0):
     doc = md.convert(cleantext(doc))
@@ -87,6 +87,7 @@ if __name__ == "__main__":
             if query == []:
                 nextQ = ""
             else:
+                logging.debug(query[0].firstChild.wholeText)
                 nextQ = query[0].firstChild.wholeText
             # queries to be exported to test (we skip empty strings)
             if nextQ.strip() != '':

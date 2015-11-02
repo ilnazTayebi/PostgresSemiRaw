@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guide>
-
 <step>
 <doc>The user interface is about to run in demo mode. It is going to walk
 through a number of QRAWL queries, illustrating the capabilities of the language.
@@ -19,7 +18,7 @@ issued to an HTTP server.
 If this doesn't work, then go back to the previous step and ensure the dataset is loaded.
 </doc>
 <query>
-select * from httplogs
+select * from httplogs where size > 20000
 </query>
 </step>
 
@@ -56,13 +55,13 @@ Let's do some more processing on this inner collection.
     </step>
 
     <step>
-        <query>select distinct method, (select code from *) from httplogs group by method</query>
+        <query>select distinct method, (select returned from *) from httplogs group by method</query>
         <doc>We extract the return codes form that inner collection.
         </doc>
     </step>
 
     <step>
-        <query>select distinct method, (select code from *) from httplogs group by method</query>
+        <query>select distinct method, (select returned from *) from httplogs group by method</query>
 <doc>We think using the star sign in a *from* is not very readable (but it does work).
 We prefer to use the *partition* keyword instead. For now one consider the
 *partition* keyword as an alias to the star sign for the grouped queries (there is a difference
@@ -71,21 +70,21 @@ and we'll see later on other queries). Let's use partition (click next).
     </step>
 
     <step>
-        <query>select distinct method, (select code from partition) from httplogs group by method</query>
+        <query>select distinct method, (select returned from partition) from httplogs group by method</query>
         <doc>It is more readable. Let's do more queries.
         </doc>
     </step>
 
     <step>
         <query>
-            select distinct method, (select distinct code, count(partition)
-                                     from partition group by code)
+            select distinct method, (select distinct returned, count(partition)
+                                     from partition group by returned)
             from httplogs
             group by method
         </query>
         <doc>We do an inner group by on the grouped data. That query returns four rows
 (one per method) and each row contains a field being a list of codes
-associated to the number of httplogs born that code (and having already been filtered on their
+associated to the number of httplogs born that returned (and having already been filtered on their
 method).
 
 But we can also extract the logs themselves instead of counting them (click next).
@@ -95,18 +94,18 @@ But we can also extract the logs themselves instead of counting them (click next
 
     <step>
         <doc>Now we find the original log rows in the inner list. As expected, the logs
-            found in the inner nested list are all of the corresponding method and code.
+            found in the inner nested list are all of the corresponding method and returned.
         </doc>
         <query>
-            select distinct method, (select distinct code, partition
-                                     from partition group by code)
+            select distinct method, (select distinct returned, partition
+                                     from partition group by returned)
             from httplogs
             group by method
         </query>
     </step>
 
     <step>
-        <doc>This is it for nested queries. Now let's review the programming capabilities
+        <doc>This is it for nested queries. Now let's review the scripting capabilities
             of QRAWL.
         </doc>
         <query>
@@ -118,10 +117,13 @@ But we can also extract the logs themselves instead of counting them (click next
             {
                 x := 32768;
                 large := select * from httplogs where size >= x;
-                large // return value of the block
+                large // returned value
             }
         </query>
         <doc>QRAWL supports variable assignments to simplify the edition of queries.
+
+Below we assign an integer value to *x*, then we store results of a *select* in *large*,
+finally the program returns the value of *large*.
         </doc>
     </step>
 
@@ -135,7 +137,7 @@ But we can also extract the logs themselves instead of counting them (click next
             }
         </query>
         <doc>A slightly more complicated example which  returns a record with two collections
-            of queries.
+            of requests.
 
 Let's have a look to regular expressions in QRAWL queries now.
         </doc>
@@ -145,7 +147,7 @@ Let's have a look to regular expressions in QRAWL queries now.
         <query>
             {
                 root := \x -> x parse as r"/([^/]*).*";
-                select root(url) as r, url, code, size from httplogs
+                root("/logos/company_logo.png")
             }
         </query>
         <doc>
@@ -163,8 +165,8 @@ Let's use this function in a group by query.</doc>
         <query>
             {
                 root := \x -> x parse as r"/([^/]*).*";
-                cgis := select * from httplogs where root(url) = "cgi-bin";
-                select url from cgis
+                cgis := select * from httplogs where root(path) = "cgi-bin";
+                select path from cgis
             }
         </query>
         <doc>We use *root* to filter requests to CGI related URLs.</doc>
@@ -174,10 +176,10 @@ Let's use this function in a group by query.</doc>
         <query>
         {
             root := \x -> x parse as r"/([^/]*).*";
-            cgis := select * from httplogs where root(url) = "cgi-bin";
-            select distinct code, *
+            cgis := select * from httplogs where root(path) = "cgi-bin";
+            select distinct returned, *
             from cgis
-            group by code
+            group by returned
         }
         </query>
         <doc>This is a regular group by (with nested data returned) applied
@@ -190,11 +192,11 @@ Let's use this function in a group by query.</doc>
 {
     root := \x -> x parse as r"/([^/]*).*";
     failure := \c -> (c >= 400);
-    cgis := select * from httplogs where root(url) = "cgi-bin";
-    select distinct code, count(*), *
+    cgis := select * from httplogs where root(path) = "cgi-bin";
+    select distinct returned, count(*), *
     from cgis
-    where failure(code)
-    group by code
+    where failure(returned)
+    group by returned
 }
         </query>
     <doc>We isolate failures and dig out a bit. There were several failing
@@ -206,13 +208,89 @@ Let's use this function in a group by query.</doc>
 {
     root := \x -> x parse as r"/([^/]*).*";
     failure := \c -> (c >= 400);
-    cgis := select * from httplogs where root(url) = "cgi-bin";
-    select distinct code, (select distinct ip from *)
+    cgis := select * from httplogs where root(path) = "cgi-bin";
+    select distinct returned, (select distinct host from *)
     from cgis
-    where failure(code)
-    group by code
+    where failure(returned)
+    group by returned
 }        </query>
-    <doc>Here are the client host names of the failing requests.</doc>
+    <doc>Here are the client host names of the failing requests. Let's
+        see if the HTTP method is a discriminant</doc>
     </step>
+
+    <step>
+        <query>
+{
+    root := \x -> x parse as r"/([^/]*).*";
+    failure := \c -> (c >= 400);
+    cgis := select * from httplogs where root(path) = "cgi-bin";
+    select distinct method, returned, (select distinct host from *)
+    from cgis
+    where failure(returned)
+    group by method, returned
+}        </query>
+    <doc>Here are the client host names of the failing requests. Let's
+        see if the HTTP method is a discriminant</doc>
+    </step>
+
+    <step>
+    <doc>In real life, server logs are found in text files where each line encodes
+an event in a custom format. Let's see an example.</doc>
+    </step>
+
+    <step>
+        <query>
+select * from log_example
+</query>
+    <doc>The HTTP requests are encoding in plain strings which have a specific format.
+QRAWL can apply regular expressions to strings. Let's use this to read the file and
+tokenize the string.</doc>
+    </step>
+
+    <step>
+        <query>
+select row parse as r"""(host:[\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+from row in log_example
+</query>
+    <doc>See how the regular expression applied to the file now returns a record of fields</doc>
+    </step>
+
+    <step>
+        <query>
+select row parse as r"""(host:[\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+into (date, host, method, path, returned: toInt(returned), size: toInt(size))
+from row in log_example
+</query>
+    <doc>Now the records are processed into typed records (size is an integer, etc.). Let's run
+    a simple filtering.</doc>
+    </step>
+
+
+    <step>
+        <query>
+{
+    log1 := select row parse as r"""(host:[\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+            into (date, host, method, path, returned: toInt(returned), size: toInt(size))
+            from row in log_example;
+    select * from log1 where returned >= 400
+}
+</query>
+    <doc>The integer comparison over the *returned* field works.</doc>
+    </step>
+
+
+    <step>
+        <query>
+{
+    log1 := select row parse as r"""(host:[\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+            into (date, host, method, path, returned: toInt(returned), size: toInt(size))
+            from row in log_example;
+    root := \x -> x parse as r"/([^/]*).*";
+    select distinct root(path), count(*) from log1 group by root(path)
+}
+</query>
+    <doc>Here we reuse our former *root* function and perform a similar grouping as we saw earlier.</doc>
+    </step>
+
 
 </guide>
