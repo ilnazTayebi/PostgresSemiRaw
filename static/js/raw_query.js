@@ -225,6 +225,7 @@ function handleServerError(request, error, editor){
             var alt = r.replace(/\\/g, "\\\\")
                     .replace(/\n/g, "\\n")
                     //.replace(/\b/g, "\\b")
+                    .replace(/"/g, "\\\"")
                     .replace(/\t/g, "\\t")
                     .replace(/\r/g, "\\r");
             return[r, alt];
@@ -316,7 +317,7 @@ function addErrorMarkers(editor, errors){
         for(i in errors[n].positions){
             var pos =errors[n].positions[i];
             console.log("pos", pos);
-            addSguiglylines(editor, pos, errors[n].message, annotations)
+            addSquiglylines(editor, pos, errors[n].message, annotations)
         }
     }
 
@@ -326,7 +327,7 @@ function addErrorMarkers(editor, errors){
 // adds a squigly lines, from a position nad a message,
 // this is hacky, I tried to check in Ace editor but could not find, 
 // TODO: check if there is a better way of doing this
-function addSguiglylines(editor, pos, msg, annotations){
+function addSquiglylines(editor, pos, msg, annotations){
 
     var addmarker= function(p, type){
         if(pos.begin.line == p.end.line && 
