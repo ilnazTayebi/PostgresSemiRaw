@@ -219,24 +219,27 @@ function downloadObj(obj, filename, format){
 }
 
 function handleServerError(request, error, editor){
-    function createAlternatives(regex){
-        var alt = regex.replace(/\\/g, "\\\\")
-                .replace(/\n/g, "\\n")
-                //.replace(/\b/g, "\\b")
-                .replace(/\t/g, "\\t")
-                .replace(/\r/g, "\\r");
-
-        return [regex, alt];
-    }
-
     if (error.exceptionType == "java.lang.RuntimeException"){
-        console.log("regex Error!!!");
-        
+        // here tries to create the alternative with escaped characters
+        var create_alternatives = function(r){
+            var alt = r.replace(/\\/g, "\\\\")
+                    .replace(/\n/g, "\\n")
+                    //.replace(/\b/g, "\\b")
+                    .replace(/\t/g, "\\t")
+                    .replace(/\r/g, "\\r");
+            return[r, alt];
+        };
+
         var matches = error.message.match(/regex\|\|\|\|((.|\n)*)\|\|\|\|(.*)/);
+        if (!matches){
+            throw("could not parse regex from error message: " + error.message);
+        }
+        // with the (.\n)*, for the multiline match creates a group, so group 2 is ignored
         console.log("parsed ", matches);
         var regex = matches[1];
         var msg = matches[3];
-        var alts = createAlternatives(regex);
+        var alts = create_alternatives (regex);
+
         console.log("searching for", alts);
         var lines = editor.getValue().split("\n");
         var errors = [];
