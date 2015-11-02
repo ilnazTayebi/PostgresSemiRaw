@@ -7,14 +7,15 @@ var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
 var QrawlHighlightRules = function() {
 
     var keywords = (
-        "select|from|where|and|or|group|by|order|limit|having|as|" +
+        "select|distinct|parse|from|where|and|or|group|by|order|limit|having|as|in|" +
         "else|desc|asc|union|if|" +
-        "not|null|" +
-        "yield|for|in"
+        "not|" +
+        "for|yield|" +
+        "partition"
     );
 
     var builtinConstants = (
-        "true|false|partition"
+        "true|false|null"
     );
 
     var builtinFunctions = (
