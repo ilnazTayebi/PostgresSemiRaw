@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guide>
+<!--
 <step>
 <doc>The user interface is about to run in demo mode. It is going to walk
 through a number of QRAWL queries, illustrating the capabilities of the language.
@@ -362,7 +363,7 @@ message). This is because certain lines do not report a size with digits, but an
     <doc>Now it works. But this will be a problem for parsing sizes into integers. We should be careful
 with these special cases.</doc>
     </step>
-
+-->
     <step>
         <query>
 {
@@ -397,10 +398,106 @@ with these special cases.</doc>
               returned: toInt(returned), size: mkSize(size))
         from l in log_example2;
     log3 := log1 bag_union log2;
+    log3
+}</query>
+    <doc>The two logs are merged. Let's do some queries.</doc>
+    </step>
+
+    <step>
+        <query>
+{
+    log1 := select l parse as r"""(host:[-\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+        into (date:to_epoch(date,"dd/MMM/yyyy:HH:mm:ss Z"), host, method, path,
+              returned: toInt(returned), size: toInt(size))
+        from l in log_example;
+    // integer cleaning
+    mkSize := \x -> if x = "-" then -1 else toInt(x);
+    log2 := select l
+        parse as r"""(host:[-\w\._]+) \[(date:\d+-\d+-\d+ \d+:\d+:\d+)\] "(method:\w+) (path:[^\s]+) (protocol:\w+)/(version:\d\.\d)" (returned:\d+) (size:[-\d]+)"""
+        into (date:to_epoch(date, "yyyy-MM-dd kk:mm:ss"), host, method, path,
+              returned: toInt(returned), size: mkSize(size))
+        from l in log_example2;
+    log3 := log1 bag_union log2;
+    t1 := to_epoch("2015-07-01 06:10:00", "yyyy-MM-dd kk:mm:ss");
+    t2 := to_epoch("2015-07-01 06:30:00", "yyyy-MM-dd kk:mm:ss");
+    isolate := \log -> select i from i in log where i.date > t1 and i.date &lt; t2;
+    isolate(log3)
+}</query>
+    <doc>Here we filter evengs in the log on their timestamps.</doc>
+    </step>
+
+    <step>
+        <query>
+{
+    log1 := select l parse as r"""(host:[-\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+        into (date:to_epoch(date,"dd/MMM/yyyy:HH:mm:ss Z"), host, method, path,
+              returned: toInt(returned), size: toInt(size))
+        from l in log_example;
+    // integer cleaning
+    mkSize := \x -> if x = "-" then -1 else toInt(x);
+    log2 := select l
+        parse as r"""(host:[-\w\._]+) \[(date:\d+-\d+-\d+ \d+:\d+:\d+)\] "(method:\w+) (path:[^\s]+) (protocol:\w+)/(version:\d\.\d)" (returned:\d+) (size:[-\d]+)"""
+        into (date:to_epoch(date, "yyyy-MM-dd kk:mm:ss"), host, method, path,
+              returned: toInt(returned), size: mkSize(size))
+        from l in log_example2;
+    log3 := log1 bag_union log2;
+    t1 := to_epoch("2015-07-01 06:10:00", "yyyy-MM-dd kk:mm:ss");
+    t2 := to_epoch("2015-07-01 06:30:00", "yyyy-MM-dd kk:mm:ss");
+    isolate := \log -> select i from i in log where i.date > t1 and i.date &lt; t2;
+    (log1: isolate(log1), log2: isolate(log2), log3: isolate(log3))
+}</query>
+    <doc>Since we picked an overlapping interval, one can see *log3* is indeed a merge of *log1* and *log2*.</doc>
+    </step>
+
+    <step>
+        <query>
+{
+    log1 := select l parse as r"""(host:[-\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+        into (date:to_epoch(date,"dd/MMM/yyyy:HH:mm:ss Z"), host, method, path,
+              returned: toInt(returned), size: toInt(size))
+        from l in log_example;
+    // integer cleaning
+    mkSize := \x -> if x = "-" then -1 else toInt(x);
+    log2 := select l
+        parse as r"""(host:[-\w\._]+) \[(date:\d+-\d+-\d+ \d+:\d+:\d+)\] "(method:\w+) (path:[^\s]+) (protocol:\w+)/(version:\d\.\d)" (returned:\d+) (size:[-\d]+)"""
+        into (date:to_epoch(date, "yyyy-MM-dd kk:mm:ss"), host, method, path,
+              returned: toInt(returned), size: mkSize(size))
+        from l in log_example2;
+    log3 := log1 bag_union log2;
+    t1 := to_epoch("2015-07-01 06:10:00", "yyyy-MM-dd kk:mm:ss");
+    t2 := to_epoch("2015-07-01 06:30:00", "yyyy-MM-dd kk:mm:ss");
+    isolate := \log -> select i from i in log where i.date > t1 and i.date &lt; t2;
+    roots := \log -> select distinct x.path parse as r"/([^/]*).*" from x in log;
+    (log1: roots(isolate(log1)), log2: roots(isolate(log2)), log3: roots(isolate(log3)))
+}</query>
+    <doc>Maybe a simpler way to figure out by identifying roots of paths which are found in *log3*.
+
+*Thanks for your attention*.</doc>
+    </step>
+
+
+
+    <step>
+        <query>
+{
+    log1 := select l parse as r"""(host:[-\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
+        into (date:to_epoch(date,"dd/MMM/yyyy:HH:mm:ss Z"), host, method, path,
+              returned: toInt(returned), size: toInt(size))
+        from l in log_example;
+    // integer cleaning
+    mkSize := \x -> if x = "-" then -1 else toInt(x);
+    log2 := select l
+        parse as r"""(host:[-\w\._]+) \[(date:\d+-\d+-\d+ \d+:\d+:\d+)\] "(method:\w+) (path:[^\s]+) (protocol:\w+)/(version:\d\.\d)" (returned:\d+) (size:[-\d]+)"""
+        into (date:to_epoch(date, "yyyy-MM-dd kk:mm:ss"), host, method, path,
+              returned: toInt(returned), size: mkSize(size))
+        from l in log_example2;
+    log3 := log1 bag_union log2;
     select * from log3 where returned >= 400
 }</query>
     <doc>The two logs are merged.</doc>
     </step>
+
+
 
     <step>
         <query>
