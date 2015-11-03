@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guide>
-<!--
 <step>
 <doc>The user interface is about to run in demo mode. It is going to walk
 through a number of QRAWL queries, illustrating the capabilities of the language.
@@ -363,7 +362,6 @@ message). This is because certain lines do not report a size with digits, but an
     <doc>Now it works. But this will be a problem for parsing sizes into integers. We should be careful
 with these special cases.</doc>
     </step>
--->
     <step>
         <query>
 {
