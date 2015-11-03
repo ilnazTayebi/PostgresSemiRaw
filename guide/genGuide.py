@@ -13,7 +13,7 @@ md = Markdown()
 matcher = SequenceMatcher()
 
 def tokenize(x):
-    reg = re.compile("""(\w+|\d*\.\d+|\d+|"[^"]*"|\s+|.)""")
+    reg = re.compile("""(\w+|\d*\.\d+|\d+|""" "\"\"\"(\"[^\"]|[^\"])*\"\"\""+ """"[^"]*"|\s+|.)""")
     return [m.group(0) for m in reg.finditer(x)]
 
 def cleantext(s):
@@ -59,7 +59,10 @@ def make_step(doc, query, q0):
             actions.append({"action":"insert", "where": pos+offset, "what": toput})
             offset -= n
             offset += len(toput)
-    return {"doc": doc, "edits": actions, "expected": query}
+    if actions:
+        return {"doc": doc, "edits": actions, "expected": query}
+    else:
+        return {"doc": doc, "expected": query}
             
         
 

@@ -1,7 +1,6 @@
 var steps = [
     {
-        "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of QRAWL queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">httplogs</a>) (please click the name\nto load it, and wait until there is a success notification at the bottom of the screen).</p>", 
-        "edits": [], 
+        "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of QRAWL queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">httplogs</a>) (please click the name\nto load it, and wait until there is a success notification at the bottom of the screen).</p>\n<ul>\n<li>httplogs (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">load</a>)</li>\n</ul>", 
         "expected": ""
     }, 
     {
@@ -19,37 +18,12 @@ var steps = [
         "doc": "<p>QRAWL is intended to be compatible with SQL and can perform typical filtering operations.</p>", 
         "edits": [
             {
-                "action": "suppr", 
-                "what": 4, 
-                "where": 29
-            }, 
-            {
                 "action": "insert", 
-                "what": "method", 
-                "where": 29
-            }, 
-            {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 36
-            }, 
-            {
-                "action": "insert", 
-                "what": "=", 
-                "where": 36
-            }, 
-            {
-                "action": "suppr", 
-                "what": 5, 
-                "where": 38
-            }, 
-            {
-                "action": "insert", 
-                "what": "\"POST\"", 
-                "where": 38
+                "what": " and method = \"POST\"", 
+                "where": 41
             }
         ], 
-        "expected": "select * from httplogs where method = \"POST\""
+        "expected": "select * from httplogs where size > 20000 and method = \"POST\""
     }, 
     {
         "doc": "<p>Typical SQL aggregation are supported. Here we report the number of\n            requests in each possible method.</p>", 
@@ -71,8 +45,18 @@ var steps = [
             }, 
             {
                 "action": "insert", 
-                "what": "group by", 
+                "what": "group", 
                 "where": 47
+            }, 
+            {
+                "action": "suppr", 
+                "what": 16, 
+                "where": 53
+            }, 
+            {
+                "action": "insert", 
+                "what": "by", 
+                "where": 53
             }, 
             {
                 "action": "suppr", 
@@ -84,7 +68,6 @@ var steps = [
     }, 
     {
         "doc": "<p>In QRAWL, the star sign is in fact an alias to <em>the subset of httplogs having a certain method</em>, and the\ncount operator runs on that collection and returns the number of elements it contains. This means\nthe star sign can be handled as a collection itself. Click next to see.</p>", 
-        "edits": [], 
         "expected": "select distinct method, count(*) from httplogs group by method"
     }, 
     {
@@ -121,7 +104,6 @@ var steps = [
     }, 
     {
         "doc": "<p>We think using the star sign in a <em>from</em> is not very readable (but it does work).\nWe prefer to use the <em>partition</em> keyword instead. For now one consider the\n<em>partition</em> keyword as an alias to the star sign for the grouped queries (there is a difference\nand we'll see later on other queries). Let's use partition (click next).</p>", 
-        "edits": [], 
         "expected": "select distinct method, (select returned from *) from httplogs group by method"
     }, 
     {
@@ -141,7 +123,7 @@ var steps = [
         "expected": "select distinct method, (select returned from partition) from httplogs group by method"
     }, 
     {
-        "doc": "<p>We do an inner group by on the grouped data. That query returns four rows\n(one per method) and each row contains a field being a list of codes\nassociated to the number of httplogs born that returned (and having already been filtered on their\nmethod).</p>\n<p>But we can also extract the logs themselves instead of counting them (click next).</p>", 
+        "doc": "<p>We do an inner group by on the grouped data. That query returns one row\nper method, and each row contains a field being a list of returned codes\nassociated to the number of requests which returned that code\n(and having already been filtered on the related upper\nmethod).</p>\n<p>But we can also extract the logs themselves instead of counting them. We only need\nto use <em>partition</em> (click next).</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -210,7 +192,7 @@ var steps = [
         "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    large // returned value\n}"
     }, 
     {
-        "doc": "<p>A slightly more complicated example which  returns a record with two collections\n            of requests.</p>\n<p>Let's have a look to regular expressions in QRAWL queries now.</p>", 
+        "doc": "<p>A slightly more complicated example which  returns a record with two collections\n            of requests.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -231,47 +213,23 @@ var steps = [
         "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    small := select * from httplogs where size < x;\n    (small, large)\n}"
     }, 
     {
-        "doc": "<p>This function using a regular expression to extract the root directory of a\nURL. This is a feature of QRAWL: the <em>as</em> operator parses the string <em>x</em> as the\ngiven regular expression and returns the string matching the group (the inner\npart between parenthesis).</p>\n<p>Therefore, if passed a URL string, <em>root</em> will return the top level directory of the file. (We will\nsee later what happens if the regular expression contains more than one group.)\nLet's use this function in a group by query.</p>", 
+        "doc": "<p>Let's have a look to regular expressions in QRAWL queries now.</p>", 
         "edits": [
             {
                 "action": "suppr", 
-                "what": 1, 
-                "where": 6
-            }, 
+                "what": 143, 
+                "where": 0
+            }
+        ], 
+        "expected": ""
+    }, 
+    {
+        "doc": "<p>This function using a regular expression to extract the root directory of a\nURL. This is a feature of QRAWL: the <em>parse as</em> operator parses the string <em>x</em> as the\ngiven regular expression and returns the string matching the group (the inner\npart between parenthesis).</p>\n<p>Therefore, if passed a URL string, <em>root</em> will return the top level directory of the file. (We will\nsee later what happens if the regular expression contains more than one group.)\nLet's use this function in a group by query.</p>", 
+        "edits": [
             {
                 "action": "insert", 
-                "what": "root", 
-                "where": 6
-            }, 
-            {
-                "action": "suppr", 
-                "what": 5, 
-                "where": 14
-            }, 
-            {
-                "action": "insert", 
-                "what": "\\x -> x parse as r\"/([^/]*).*\"", 
-                "where": 14
-            }, 
-            {
-                "action": "suppr", 
-                "what": 105, 
-                "where": 50
-            }, 
-            {
-                "action": "insert", 
-                "what": "root", 
-                "where": 50
-            }, 
-            {
-                "action": "suppr", 
-                "what": 12, 
-                "where": 55
-            }, 
-            {
-                "action": "insert", 
-                "what": "\"/logos/company_logo.png\"", 
-                "where": 55
+                "what": "{\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    root(\"/logos/company_logo.png\")\n}", 
+                "where": 0
             }
         ], 
         "expected": "{\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    root(\"/logos/company_logo.png\")\n}"
@@ -285,19 +243,29 @@ var steps = [
                 "where": 50
             }, 
             {
+                "action": "insert", 
+                "what": "path) = ", 
+                "where": 92
+            }, 
+            {
                 "action": "suppr", 
-                "what": 25, 
-                "where": 92
+                "what": 23, 
+                "where": 101
             }, 
             {
                 "action": "insert", 
-                "what": "path", 
-                "where": 92
+                "what": "cgi-bin", 
+                "where": 101
+            }, 
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 109
             }, 
             {
                 "action": "insert", 
-                "what": " = \"cgi-bin\";\n    select path from cgis", 
-                "where": 97
+                "what": ";\n    select path from cgis", 
+                "where": 109
             }
         ], 
         "expected": "{\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    cgis := select * from httplogs where root(path) = \"cgi-bin\";\n    select path from cgis\n}"
@@ -350,7 +318,7 @@ var steps = [
         "expected": "{\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    failure := \\c -> (c >= 400);\n    cgis := select * from httplogs where root(path) = \"cgi-bin\";\n    select distinct returned, count(*), *\n    from cgis\n    where failure(returned)\n    group by returned\n}"
     }, 
     {
-        "doc": "<p>Here are the client host names of the failing requests. Let's\n        see if the HTTP method is a discriminant</p>", 
+        "doc": "<p>Here are the client host names of the failing CGI requests.</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -371,82 +339,118 @@ var steps = [
         "expected": "{\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    failure := \\c -> (c >= 400);\n    cgis := select * from httplogs where root(path) = \"cgi-bin\";\n    select distinct returned, (select distinct host from *)\n    from cgis\n    where failure(returned)\n    group by returned\n}"
     }, 
     {
-        "doc": "<p>Here are the client host names of the failing requests. Let's\n        see if the HTTP method is a discriminant</p>", 
-        "edits": [
-            {
-                "action": "insert", 
-                "what": "method, ", 
-                "where": 164
-            }, 
-            {
-                "action": "insert", 
-                "what": "method, ", 
-                "where": 267
-            }
-        ], 
-        "expected": "{\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    failure := \\c -> (c >= 400);\n    cgis := select * from httplogs where root(path) = \"cgi-bin\";\n    select distinct method, returned, (select distinct host from *)\n    from cgis\n    where failure(returned)\n    group by method, returned\n}"
-    }, 
-    {
-        "doc": "<p>In real life, server logs are found in text files where each line encodes\nan event in a custom format. Let's see an example.</p>", 
+        "doc": "<p>In real life, server logs are found in text files where each line encodes\nan event in a custom string format. Let's see an example. Please load the file\nbefore continuing.</p>\n<ul>\n<li>log_example (<a href=\"javascript:load_dataset(&quot;log_example&quot;)\">load</a>)</li>\n</ul>", 
         "edits": [
             {
                 "action": "suppr", 
-                "what": 285, 
+                "what": 269, 
                 "where": 0
             }
         ], 
         "expected": ""
     }, 
     {
-        "doc": "<p>The HTTP requests are encoding in plain strings which have a specific format.\nQRAWL can apply regular expressions to strings. Let's use this to read the file and\ntokenize the string.</p>", 
+        "doc": "<p>The HTTP requests are encoded in plain strings which have a specific format.\nIt is not a well structured CSV file.\nWe saw how QRAWL can apply regular expressions to strings. Let's use this to read the file and\ntokenize the string.</p>\n<p>First we need to access that string with a variable. For that we use the <em>in</em> syntax. Click next.</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": "select * from log_example", 
+                "what": "select *\nfrom log_example", 
                 "where": 0
             }
         ], 
-        "expected": "select * from log_example"
+        "expected": "select *\nfrom log_example"
     }, 
     {
-        "doc": "<p>See how the regular expression applied to the file now returns a record of fields</p>", 
+        "doc": "<p>We will use the <em>parse as</em> keyword to apply a regular expression to each line</p>", 
         "edits": [
-            {
-                "action": "insert", 
-                "what": "row parse as r\"\"\"(host:[\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s", 
-                "where": 7
-            }, 
             {
                 "action": "suppr", 
                 "what": 1, 
-                "where": 132
+                "where": 7
             }, 
             {
                 "action": "insert", 
-                "what": "\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n", 
-                "where": 132
+                "what": "l", 
+                "where": 7
             }, 
             {
                 "action": "insert", 
-                "what": "row in ", 
-                "where": 174
+                "what": "l in ", 
+                "where": 14
             }
         ], 
-        "expected": "select row parse as r\"\"\"(host:[\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\nfrom row in log_example"
+        "expected": "select l\nfrom l in log_example"
     }, 
     {
-        "doc": "<p>Now the records are processed into typed records (size is an integer, etc.). Let's run\n    a simple filtering.</p>", 
+        "doc": "<p>See how the regular expression applied to the file now returns a record of two fields.\nLet's keep adding groups in the regular expression.</p>", 
         "edits": [
             {
                 "action": "insert", 
-                "what": "into (date, host, method, path, returned: toInt(returned), size: toInt(size))\n", 
-                "where": 169
+                "what": " parse as r\"\"\"([-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(.*)\\].*\"\"\"", 
+                "where": 8
             }
         ], 
-        "expected": "select row parse as r\"\"\"(host:[\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\ninto (date, host, method, path, returned: toInt(returned), size: toInt(size))\nfrom row in log_example"
+        "expected": "select l parse as r\"\"\"([-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(.*)\\].*\"\"\"\nfrom l in log_example"
     }, 
     {
-        "doc": "<p>The integer comparison over the <em>returned</em> field works.</p>", 
+        "doc": "<p>See how the regular expression applied to the file now returns a record of fields. The records\nhave default numbered fields. We'd like instead to give them meaningful names. Click next to see.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "\\s*\"(\\w+)\\s+([^\\s]+) (\\w+)/([0-9.]+)\\s*\"\\s+(\\d+)\\s+(\\d+)", 
+                "where": 53
+            }
+        ], 
+        "expected": "select l parse as r\"\"\"([-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(.*)\\]\\s*\"(\\w+)\\s+([^\\s]+) (\\w+)/([0-9.]+)\\s*\"\\s+(\\d+)\\s+(\\d+).*\"\"\"\nfrom l in log_example"
+    }, 
+    {
+        "doc": "<p>We embedded field names in the regular expressions. They become immediately available as record\nfields. Let's make a simple query.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "host:", 
+                "where": 23
+            }, 
+            {
+                "action": "insert", 
+                "what": "date:", 
+                "where": 53
+            }, 
+            {
+                "action": "insert", 
+                "what": "method:", 
+                "where": 68
+            }, 
+            {
+                "action": "insert", 
+                "what": "path:", 
+                "where": 83
+            }, 
+            {
+                "action": "insert", 
+                "what": "protocol:", 
+                "where": 97
+            }, 
+            {
+                "action": "insert", 
+                "what": "version:", 
+                "where": 112
+            }, 
+            {
+                "action": "insert", 
+                "what": "returned:", 
+                "where": 136
+            }, 
+            {
+                "action": "insert", 
+                "what": "size:", 
+                "where": 153
+            }
+        ], 
+        "expected": "select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\nfrom l in log_example"
+    }, 
+    {
+        "doc": "<p>It fails because <em>parse as</em> returned a record of strings. In order to convert strings into\ne.g. integers, we can turn that record of strings into a new expression (using the keyword <em>into</em>).</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -456,80 +460,211 @@ var steps = [
             {
                 "action": "suppr", 
                 "what": 1, 
-                "where": 182
+                "where": 181
             }, 
             {
                 "action": "insert", 
-                "what": "\n            ", 
-                "where": 182
+                "what": "\n        ", 
+                "where": 181
+            }, 
+            {
+                "action": "insert", 
+                "what": ";\n    select * from log1 where size > 20000\n}", 
+                "where": 211
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        from l in log_example;\n    select * from log1 where size > 20000\n}"
+    }, 
+    {
+        "doc": "<p>Now the records are processed into typed records (size is an integer, etc.). The query\nruns successfully. Let's add a second log file.</p>\n<ul>\n<li>log_example2 (<a href=\"javascript:load_dataset(&quot;log_example2&quot;)\">load</a>)</li>\n</ul>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path, returned: toInt(returned), size: toInt(size))", 
+                "where": 181
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path, returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    select * from log1 where size > 20000\n}"
+    }, 
+    {
+        "doc": "<p>It is similar to the first one except the \"-\" signs after the host and the date format\nis different. Let's parse it with a second regular expression.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 1, 
+                "where": 261
+            }, 
+            {
+                "action": "insert", 
+                "what": "\n              ", 
+                "where": 261
+            }, 
+            {
+                "action": "suppr", 
+                "what": 2, 
+                "where": 364
+            }, 
+            {
+                "action": "insert", 
+                "what": "l\n    ", 
+                "where": 364
+            }, 
+            {
+                "action": "suppr", 
+                "what": 23, 
+                "where": 375
+            }, 
+            {
+                "action": "insert", 
+                "what": "l in log_example2", 
+                "where": 375
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    select l\n    from l in log_example2\n}"
+    }, 
+    {
+        "doc": "<p>There is a failure. The regular expression did not apply to a specific line (see the error\nmessage). This is because certain lines do not report a size with digits, but an \"invalid size\" with\n\"-\". Let's fix the regular expression to accept \"-\" in the <em>size</em> field.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "log2 := ", 
+                "where": 357
+            }, 
+            {
+                "action": "insert", 
+                "what": "\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:\\d+)\"\"\"\n        from l in log_example2;", 
+                "where": 373
+            }, 
+            {
+                "action": "insert", 
+                "what": "select * ", 
+                "where": 573
+            }, 
+            {
+                "action": "suppr", 
+                "what": 17, 
+                "where": 587
+            }, 
+            {
+                "action": "insert", 
+                "what": "log2", 
+                "where": 587
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:\\d+)\"\"\"\n        from l in log_example2;\n    select * from log2\n}"
+    }, 
+    {
+        "doc": "<p>Now it works. But this will be a problem for parsing sizes into integers. We should be careful\nwith these special cases.</p>", 
+        "edits": [
+            {
+                "action": "suppr", 
+                "what": 2, 
+                "where": 529
+            }, 
+            {
+                "action": "insert", 
+                "what": "[-\\d]", 
+                "where": 529
+            }, 
+            {
+                "action": "insert", 
+                "what": " where size = \"-\"", 
+                "where": 594
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        from l in log_example2;\n    select * from log2 where size = \"-\"\n}"
+    }, 
+    {
+        "doc": "<p>We are now settled with our two logs in a unified format.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "// integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    ", 
+                "where": 357
+            }, 
+            {
+                "action": "insert", 
+                "what": "\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))", 
+                "where": 617
+            }, 
+            {
+                "action": "suppr", 
+                "what": 3, 
+                "where": 825
+            }, 
+            {
+                "action": "insert", 
+                "what": "-1", 
+                "where": 825
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    // integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))\n        from l in log_example2;\n    select * from log2 where size = -1\n}"
+    }, 
+    {
+        "doc": "<p>The two logs are merged.</p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "log3 := log1 bag_union log2;\n    ", 
+                "where": 793
+            }, 
+            {
+                "action": "suppr", 
+                "what": 4, 
+                "where": 840
+            }, 
+            {
+                "action": "insert", 
+                "what": "log3", 
+                "where": 840
+            }, 
+            {
+                "action": "suppr", 
+                "what": 9, 
+                "where": 851
+            }, 
+            {
+                "action": "insert", 
+                "what": "returned >= 400", 
+                "where": 851
+            }
+        ], 
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    // integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))\n        from l in log_example2;\n    log3 := log1 bag_union log2;\n    select * from log3 where returned >= 400\n}"
+    }, 
+    {
+        "doc": "<p>Another example query.</p>\n<p><em>Thanks for your attention.</em></p>", 
+        "edits": [
+            {
+                "action": "insert", 
+                "what": "roots := \\log -> ", 
+                "where": 826
             }, 
             {
                 "action": "suppr", 
                 "what": 1, 
-                "where": 272
+                "where": 850
             }, 
             {
                 "action": "insert", 
-                "what": "\n            ", 
-                "where": 272
+                "what": "distincts x.path parse as r\"/([^/]*).*\"", 
+                "where": 850
             }, 
             {
                 "action": "insert", 
-                "what": ";\n    select * from log1 where returned >= 400\n}", 
-                "where": 308
-            }
-        ], 
-        "expected": "{\n    log1 := select row parse as r\"\"\"(host:[\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n            into (date, host, method, path, returned: toInt(returned), size: toInt(size))\n            from row in log_example;\n    select * from log1 where returned >= 400\n}"
-    }, 
-    {
-        "doc": "<p>Here we reuse our former <em>root</em> function and perform a similar grouping as we saw earlier.</p>", 
-        "edits": [
-            {
-                "action": "insert", 
-                "what": "root := \\x -> x parse as r\"/([^/]*).*\";\n    ", 
-                "where": 314
+                "what": "x in log;\n    roots(log1), roots(log2), roots(", 
+                "where": 895
             }, 
             {
-                "action": "insert", 
-                "what": "distinct root(path), count(", 
-                "where": 365
+                "action": "suppr", 
+                "what": 22, 
+                "where": 945
             }, 
             {
                 "action": "insert", 
                 "what": ")", 
-                "where": 393
-            }, 
-            {
-                "action": "suppr", 
-                "what": 5, 
-                "where": 405
-            }, 
-            {
-                "action": "insert", 
-                "what": "group", 
-                "where": 405
-            }, 
-            {
-                "action": "suppr", 
-                "what": 8, 
-                "where": 411
-            }, 
-            {
-                "action": "insert", 
-                "what": "by", 
-                "where": 411
-            }, 
-            {
-                "action": "suppr", 
-                "what": 6, 
-                "where": 414
-            }, 
-            {
-                "action": "insert", 
-                "what": "root(path)", 
-                "where": 414
+                "where": 945
             }
         ], 
-        "expected": "{\n    log1 := select row parse as r\"\"\"(host:[\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n            into (date, host, method, path, returned: toInt(returned), size: toInt(size))\n            from row in log_example;\n    root := \\x -> x parse as r\"/([^/]*).*\";\n    select distinct root(path), count(*) from log1 group by root(path)\n}"
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    // integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))\n        from l in log_example2;\n    log3 := log1 bag_union log2;\n    roots := \\log -> select distincts x.path parse as r\"/([^/]*).*\" from x in log;\n    roots(log1), roots(log2), roots(log3)\n}"
     }
 ];

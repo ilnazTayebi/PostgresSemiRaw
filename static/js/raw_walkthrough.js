@@ -73,6 +73,7 @@ function demo_next() {
         todos = [];
         return;
     }
+
     editor.focus();
     // reset the editor with the current step query
     if (idx == -1 || !steps[idx].expected)

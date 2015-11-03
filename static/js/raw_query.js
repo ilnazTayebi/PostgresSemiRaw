@@ -80,6 +80,7 @@ $(document).ready(function(){
     //Syntax checker in ace uses same setAnnotations api, and clears old anotations.
     // check http://stackoverflow.com/questions/25903709/ace-editors-setannotations-wont-stay-permanent
     editor.session.setOption("useWorker", false);
+    editor.session.setUseWrapMode(true);
 
     var container = document.getElementById("values");
     var options = { mode: 'view' };
@@ -736,9 +737,10 @@ function list_schemas(){
 function load_dataset(what) {
     var datasets = {
         "httplogs": {"url": "https://www.dropbox.com/s/mun7lpgk4jpdw9d/httplogs.csv?dl=1", "name":"httplogs", "type":"csv"},
+        "log_example": {"url": "https://www.dropbox.com/s/29bzcqvfjiwhk14/log_example.log?dl=1", "name":"log_example", "type":"text"},
+        "log_example2": {"url": "https://www.dropbox.com/s/i4b5hjmkf4f8g8o/log_example2.log?dl=1", "name":"log_example2", "type":"text"},
         "publications": {"url": "https://www.dropbox.com/s/77youjyiz9u0eh9/publications.json?dl=1", "name":"publications", "type":"json"},
         "authors": {"url": "https://www.dropbox.com/s/vvuvydjqb8rdhhr/authors.json?dl=1", "name": "authors", "type":"json"}
     };
     add_from_url(datasets[what].url, datasets[what].name, datasets[what].type);
-    append_alert('Loading ' + datasets[what].name);
 }
