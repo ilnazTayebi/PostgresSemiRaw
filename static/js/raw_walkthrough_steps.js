@@ -480,25 +480,15 @@ var steps = [
         "edits": [
             {
                 "action": "insert", 
-                "what": "\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path, returned: toInt(returned), size: toInt(size))", 
+                "what": "\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))", 
                 "where": 181
             }
         ], 
-        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path, returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    select * from log1 where size > 20000\n}"
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    select * from log1 where size > 20000\n}"
     }, 
     {
         "doc": "<p>It is similar to the first one except the \"-\" signs after the host and the date format\nis different. Let's parse it with a second regular expression.</p>", 
         "edits": [
-            {
-                "action": "suppr", 
-                "what": 1, 
-                "where": 261
-            }, 
-            {
-                "action": "insert", 
-                "what": "\n              ", 
-                "where": 261
-            }, 
             {
                 "action": "suppr", 
                 "what": 2, 
@@ -646,25 +636,25 @@ var steps = [
             }, 
             {
                 "action": "insert", 
-                "what": "distincts x.path parse as r\"/([^/]*).*\"", 
+                "what": "distinct x.path parse as r\"/([^/]*).*\"", 
                 "where": 850
             }, 
             {
                 "action": "insert", 
                 "what": "x in log;\n    roots(log1), roots(log2), roots(", 
-                "where": 895
+                "where": 894
             }, 
             {
                 "action": "suppr", 
                 "what": 22, 
-                "where": 945
+                "where": 944
             }, 
             {
                 "action": "insert", 
                 "what": ")", 
-                "where": 945
+                "where": 944
             }
         ], 
-        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    // integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))\n        from l in log_example2;\n    log3 := log1 bag_union log2;\n    roots := \\log -> select distincts x.path parse as r\"/([^/]*).*\" from x in log;\n    roots(log1), roots(log2), roots(log3)\n}"
+        "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    // integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))\n        from l in log_example2;\n    log3 := log1 bag_union log2;\n    roots := \\log -> select distinct x.path parse as r\"/([^/]*).*\" from x in log;\n    roots(log1), roots(log2), roots(log3)\n}"
     }
 ];

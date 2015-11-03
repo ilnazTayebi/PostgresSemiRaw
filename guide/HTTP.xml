@@ -302,7 +302,8 @@ e.g. integers, we can turn that record of strings into a new expression (using t
         <query>
 {
     log1 := select l parse as r"""(host:[-\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
-        into (date:to_epoch(date,"dd/MMM/yyyy:HH:mm:ss Z"), host, method, path, returned: toInt(returned), size: toInt(size))
+        into (date:to_epoch(date,"dd/MMM/yyyy:HH:mm:ss Z"), host, method, path,
+              returned: toInt(returned), size: toInt(size))
         from l in log_example;
     select * from log1 where size > 20000
 }
@@ -416,7 +417,7 @@ with these special cases.</doc>
               returned: toInt(returned), size: mkSize(size))
         from l in log_example2;
     log3 := log1 bag_union log2;
-    roots := \log -> select distincts x.path parse as r"/([^/]*).*" from x in log;
+    roots := \log -> select distinct x.path parse as r"/([^/]*).*" from x in log;
     roots(log1), roots(log2), roots(log3)
 }
 </query>

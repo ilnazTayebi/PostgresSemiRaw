@@ -106,7 +106,7 @@ if __name__ == "__main__":
         impl = getDOMImplementation()
         newdoc = impl.createDocument(None, "queries", None)
         xmlTests = newdoc.documentElement
-        xmlTests.setAttribute("dataset", "publications")
+        xmlTests.setAttribute("dataset", "httplogs")
         for query in queries:
                 t = newdoc.createElement("query")
                 c = newdoc.createElement("qrawl")
