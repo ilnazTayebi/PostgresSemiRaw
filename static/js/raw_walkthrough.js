@@ -16,7 +16,7 @@ function demo_init(aceEditor, call, editor_reset) {
     $('#next').click(demo_next);
     post_query = call;
     editor_set_autoexecute = editor_reset;
-    demo_stop();
+//    demo_stop();
 }
 
 function demo_start() {

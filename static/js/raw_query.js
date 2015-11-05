@@ -1,30 +1,30 @@
-//dropbox credentials
-var credentials = undefined;
+
 var markers = [];
 var queryResults = undefined;
+var credentials= undefined;
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
 
-    // will authenticate with dropbox
-    var client = new Dropbox.Client({ key: "f64lfu3jyw86z4t" });
-
-    // Try to finish OAuth authorization.
-    client.authenticate({interactive: true}, function (error) {
-        if (error) {
-            append_error( 'Authentication error: ' + error);
-        }
-    });
-
-    //alert(client.isAuthenticated());
-
-    if (client.isAuthenticated()) {
-        // Client is authenticated. Display UI.
-        credentials = client._credentials;
-        console.log(credentials);
+    //  gets url parameters
+    var params_data = parse_url_params();
+    if( params_data['dropbox'] && params_data['dropbox'] == 'false'){
+        console.log("not using dropbox authentication");
     }
-
+    else{
+        var client = new Dropbox.Client({ key: "f64lfu3jyw86z4t" });
+        console.log("authenticating using dropbox");
+        // Try to finish OAuth authorization.
+        client.authenticate({interactive: true}, function (error) {
+            if( error ) append_error(error);
+        });
+        if (client.isAuthenticated()) {
+            // Client is authenticated. Display UI.
+            credentials = client._credentials;
+            console.log("got credentials", credentials);
+        }
+    }
 
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
@@ -55,15 +55,15 @@ $(document).ready(function(){
         //downloadJsonObj(queryResults, "data.json");
         $("#download_dialog").modal('show');
         document.getElementById('download_json').onclick = function () {
-            saveObjToDropbox( client , queryResults, "results.json", "json");
+            saveObjToDropbox(  queryResults, "results.json", "json");
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_csv').onclick = function () {
-            saveObjToDropbox( client , queryResults, "results.csv", "csv");
+            saveObjToDropbox(  queryResults, "results.csv", "csv");
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
-//            saveObjToDropbox( client, queryResults, "results.xls", "excel");
+//            saveObjToDropbox(  queryResults, "results.xls", "excel");
 //            $("#download_dialog").modal('hide');
         };
     };
@@ -87,9 +87,7 @@ $(document).ready(function(){
 
     //function to be used when a new query changes in the editor
     function post_query(){
-
         var query = editor.getValue();
-
         // skip if empty (otherwise it fails with an error)
         if (query == "") {
             return;
@@ -179,15 +177,42 @@ $(document).ready(function(){
             editor_set_autoexecute(false);
         }
     }
-
     // init demo stuff, pointing it to the editor
     demo_init(editor, post_query, editor_set_autoexecute);
+    
+    if( params_data["demo"] && params_data["demo"] == 'true' ){
+        demo_start();
+    }
+    else{
+        demo_stop();
+    }
 
     // starts listing the schemas
     list_schemas();
 });
 
-function saveObjToDropbox(client, obj, filename, format){
+function parse_url_params(){
+    //parses the parameters from the url
+    var parts= location.href .split('?');
+    var params= [];
+    if (parts.length > 1){
+        console.log("got url parameters", parts );
+        params = parts[1].split('&');
+    }
+    var params_data = {};
+    for (x in params)
+     {
+        params_data[ params[x].split('=')[0] ] = params[x].split('=')[1];
+     }
+    return params_data;
+}
+
+function saveObjToDropbox( obj, filename, format){
+    var client = new Dropbox.Client({ key: "f64lfu3jyw86z4t" });
+    // Try to finish OAuth authorization.
+    client.authenticate({interactive: true}, function (error) {
+        if(error)append_error(error);
+    });
     client.writeFile(filename, formatResults( obj, format) , function (error) {
         if (error) {
             append_error('Could not save ' + filename  + ' , erro:' + error);
@@ -481,13 +506,12 @@ function add_from_dropbox(){
                     var f = options[n];
                     f.name = $("#"+inputs[n].name).val();
                     //if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
-            
+
                     /* checks if the name is ok*/
                     f.type = $("#"+inputs[n].type).val();
                     //if (f.type == null) ok = false;
                     files.push(f)
                 }
-
                 if(ok){
                     for (n in files){
                         console.log("registering file ", files[n]);
@@ -606,87 +630,9 @@ function append_error(msg){
          '</div>').appendTo("#alerts");
 }
 
-//TODO: make the post connect json instead of url encoded (check server.py also)
-//function to send a query to the query service
-// arg: query, the query string
-// arg: callbacks, callbacks from when the post finishes, (see jquery ajax post)
-//     success: the sucess callback function, prototype:  function(data)
-//     error, the error callback function, prototype:  function(request, status, error) 
-function send_query(query, callbacks){
-    var data = {
-        query : query,
-        token : credentials.token
-    }
-
-    http_json_request('POST', '/query' , data , callbacks)
-}
-
-//registers file for querying 
-function register_file(options, callbacks){
-    // adds the token to the data to send
-    options.token = credentials.token;
-    http_json_request("POST", '/register-file', options, callbacks)
-}
-
-//sends the request to list the schemas
-function get_schema_list(module, callbacks){
-    var data = {
-        module : module,
-        token : credentials.token
-    }
-
-    http_json_request("POST", "/schemas", data, callbacks);
-}
-
-// sends url enconded request using XMLHttpRequest (ajax did not work with redirects with all browsers)
-function http_url_encoded(method, url, data, callbacks){
-    var request = new XMLHttpRequest();
-    request.open(method, url, true);
-    var params ="";
-    for(name in data){
-         params += name + '=' +escape(data[name]) + '&'
-    }
-    //Send the proper header information along with the request
-    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    request.onreadystatechange=function(){
-        if (request.readyState==4) {
-            if (request.status==200){
-                var data = JSON.parse( request.response )
-                callbacks.success(data);
-            }
-            else{
-                callbacks.error( request, request.status, request.responseText)
-            }
-       }
-    }
-    request.send(params);
-}
-
-// sends json request using XMLHttpRequest
-function http_json_request(method, url, data, callbacks){
-    var request = new XMLHttpRequest();
-    request.open(method, url, true);
-   
-    //Send the proper header information along with the request
-    request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
-    request.onreadystatechange=function(){
-        if (request.readyState==4) {
-            if (request.status==200){
-
-                var data = JSON.parse( request.response )
-                callbacks.success(data);
-            }
-            else{
-                callbacks.error( request, request.status, request.responseText)
-            }
-       }
-    }
-    request.send(JSON.stringify(data));
-}
-
 //Will get the schemas and update the UI
 function list_schemas(){
-    get_schema_list( "User", {
+    get_schema_list(  {
         success: function(data) {
             $("#schemas").empty();
             var tree =[];
@@ -731,6 +677,89 @@ function list_schemas(){
             append_error(response.responseText);
         }
      });
+}
+
+//TODO: make the post connect json instead of url encoded (check server.py also)
+//function to send a query to the query service
+// arg: query, the query string
+// arg: callbacks, callbacks from when the post finishes, (see jquery ajax post)
+//     success: the sucess callback function, prototype:  function(data)
+//     error, the error callback function, prototype:  function(request, status, error) 
+function send_query(query, callbacks){
+    var data = {
+        query : query
+    };
+    http_json_request('POST', '/query' , data , callbacks)
+}
+
+//registers file for querying 
+function register_file(options, callbacks){
+    http_json_request("POST", '/register-file', options, callbacks)
+}
+
+//this will change to a get without data
+//sends the request to list the schemas
+function get_schema_list( callbacks){
+    var data = { }
+
+    http_json_request("POST", "/schemas", data, callbacks);
+}
+
+// sends json request using XMLHttpRequest
+function http_json_request(method, url, data, callbacks){
+    var request = new XMLHttpRequest();
+    request.open(method, url, true);
+    if ( credentials == undefined ){
+        console.log("Sending request without credentials");
+    }
+    else{
+        console.log("Sending request with credentials", credentials);
+        request.setRequestHeader('Authorization','Bearer ' + credentials.token);
+        data.token = credentials.token;
+    }
+
+    //Send the proper header information along with the request
+    request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+
+    request.onreadystatechange=function(){
+        if (request.readyState==4) {
+            if (request.status==200){
+
+                var data = JSON.parse( request.response )
+                callbacks.success(data);
+            }
+            else{
+                callbacks.error( request, request.status, request.responseText)
+            }
+       }
+    }
+    request.send(JSON.stringify(data));
+}
+
+
+// sends url enconded request using XMLHttpRequest (ajax did not work with redirects with all browsers)
+function http_url_encoded(method, url, data, callbacks){
+    var request = new XMLHttpRequest();
+    request.open(method, url, true);
+    var params ="";
+    for(name in data){
+         params += name + '=' +escape(data[name]) + '&'
+    }
+    //Send the proper header information along with the request
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    
+    request.onreadystatechange=function(){
+        if (request.readyState==4) {
+            if (request.status==200){
+                var data = JSON.parse( request.response )
+                callbacks.success(data);
+            }
+            else{
+                callbacks.error( request, request.status, request.responseText)
+            }
+       }
+    }
+    request.send(params);
 }
 
 function load_dataset(what) {

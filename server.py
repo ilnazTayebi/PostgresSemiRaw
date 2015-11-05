@@ -1,11 +1,26 @@
 from flask import Flask, request, jsonify, Response, send_from_directory, redirect
 from argparse import ArgumentParser, FileType
+from flask.ext.basicauth import BasicAuth
 
 import socket
 localhost_ip = socket.gethostbyname(socket.gethostname())
 
 app = Flask(__name__, static_url_path='/static')
+#app = Flask(__name__)
+
+# settigns for basic auth
+app.config['BASIC_AUTH_USERNAME'] = 'admin'
+app.config['BASIC_AUTH_PASSWORD'] = 'admin'
+basic_auth = BasicAuth(app)
+#app.config['BASIC_AUTH_FORCE'] = True
+
 worker_url = None
+
+#@app.route('/static/index.html')
+#@basic_auth.required
+#def index(filename):
+#    print "need auth"
+#    return send_from_directory('static', 'index.html')
 
 @app.route('/query', methods=['POST'])
 def query():
