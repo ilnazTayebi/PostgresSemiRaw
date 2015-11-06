@@ -702,11 +702,12 @@ function register_file(options, callbacks){
 function get_schema_list( callbacks){
     var data = { }
 
-    http_json_request("POST", "/schemas", data, callbacks);
+    http_json_request("GET", "/schemas", data, callbacks);
 }
 
 // sends json request using XMLHttpRequest
 function http_json_request(method, url, data, callbacks){
+    console.log("sending", method, url);
     var request = new XMLHttpRequest();
     request.open(method, url, true);
     if ( credentials == undefined ){
@@ -714,8 +715,8 @@ function http_json_request(method, url, data, callbacks){
     }
     else{
         console.log("Sending request with credentials", credentials);
+        request.withCredentials = true;
         request.setRequestHeader('Authorization','Bearer ' + credentials.token);
-        data.token = credentials.token;
     }
 
     //Send the proper header information along with the request
@@ -724,7 +725,6 @@ function http_json_request(method, url, data, callbacks){
     request.onreadystatechange=function(){
         if (request.readyState==4) {
             if (request.status==200){
-
                 var data = JSON.parse( request.response )
                 callbacks.success(data);
             }
