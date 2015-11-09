@@ -28,7 +28,7 @@ def cleanquery(q):
     indentation = min(map(lambda x: len(iRe.search(x).group(0)), lines))
     return "\n".join(map(lambda x: x[indentation:], lines)).strip()
 
-def make_step(doc, query, q0):
+def make_step(title, doc, query, q0):
     doc = md.convert(cleantext(doc))
     query = str(cleanquery(query))
     q0 = str(cleanquery(q0))
@@ -59,10 +59,12 @@ def make_step(doc, query, q0):
             actions.append({"action":"insert", "where": pos+offset, "what": toput})
             offset -= n
             offset += len(toput)
+    v = {"doc": doc, "expected": query}
     if actions:
-        return {"doc": doc, "edits": actions, "expected": query}
-    else:
-        return {"doc": doc, "expected": query}
+        v["edits"] = actions
+    if title:
+        v["section"] = title
+    return v
             
         
 
@@ -82,26 +84,30 @@ if __name__ == "__main__":
 
     for g in guide.getElementsByTagName("guide"):
         initialQ = ""
-        for step in g.getElementsByTagName("step"):
-            doc   = step.getElementsByTagName("doc")
-            query = step.getElementsByTagName("query")
-            assert len(doc) == 1
-            assert len(query) <= 1
-            if query == []:
-                nextQ = ""
-            else:
-                logging.debug(query[0].firstChild.wholeText)
-                nextQ = query[0].firstChild.wholeText
-            # queries to be exported to test (we skip empty strings)
-            if nextQ.strip() != '':
-                queries.append(nextQ)
-            desc = doc[0].firstChild.wholeText
-            # we skip entries about failing queries (they are there for test purpose)
-            if desc.find("failing query #") != -1:
-                continue
-            steps.append(make_step(doc[0].firstChild.wholeText, nextQ, initialQ))
-            initialQ = nextQ
-
+        for section in g.getElementsByTagName("section"):
+            title = section.getAttribute("title")
+            for step in section.getElementsByTagName("step"):
+                doc   = step.getElementsByTagName("doc")
+                query = step.getElementsByTagName("query")
+                assert len(doc) == 1
+                assert len(query) <= 1
+                if query == []:
+                    nextQ = ""
+                else:
+                    logging.debug(query[0].firstChild.wholeText)
+                    nextQ = query[0].firstChild.wholeText
+                # queries to be exported to test (we skip empty strings)
+                if nextQ.strip() != '':
+                    queries.append(nextQ)
+                desc = doc[0].firstChild.wholeText
+                # we skip entries about failing queries (they are there for test purpose)
+                if desc.find("failing query #") != -1:
+                    continue
+                steps.append(make_step(title, doc[0].firstChild.wholeText, nextQ, initialQ))
+                initialQ = nextQ
+                if title is not None:
+                    title = None
+    
     if args.xmltest:
         impl = getDOMImplementation()
         newdoc = impl.createDocument(None, "queries", None)

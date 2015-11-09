@@ -1,7 +1,8 @@
 var steps = [
     {
         "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of QRAWL queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">httplogs</a>) (please click the name\nto load it, and wait until there is a success notification at the bottom of the screen).</p>\n<ul>\n<li>httplogs (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">load</a>)</li>\n</ul>", 
-        "expected": ""
+        "expected": "", 
+        "section": "Query language"
     }, 
     {
         "doc": "<p>The query below should execute successfully and return a number of rows.\nHave a quick look to the httplogs table content displayed on the right side\nof the screen. Rows are plain records with information about requests\nissued to an HTTP server.</p>\n<p>If this doesn't work, then go back to the previous step and ensure the dataset is loaded.</p>", 
@@ -189,7 +190,8 @@ var steps = [
                 "where": 0
             }
         ], 
-        "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    large // returned value\n}"
+        "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    large // returned value\n}", 
+        "section": "Scripting"
     }, 
     {
         "doc": "<p>A slightly more complicated example which  returns a record with two collections\n            of requests.</p>", 
@@ -221,7 +223,8 @@ var steps = [
                 "where": 0
             }
         ], 
-        "expected": ""
+        "expected": "", 
+        "section": "Regular expressions"
     }, 
     {
         "doc": "<p>This function using a regular expression to extract the root directory of a\nURL. This is a feature of QRAWL: the <em>parse as</em> operator parses the string <em>x</em> as the\ngiven regular expression and returns the string matching the group (the inner\npart between parenthesis).</p>\n<p>Therefore, if passed a URL string, <em>root</em> will return the top level directory of the file. (We will\nsee later what happens if the regular expression contains more than one group.)\nLet's use this function in a group by query.</p>", 
@@ -347,7 +350,8 @@ var steps = [
                 "where": 0
             }
         ], 
-        "expected": ""
+        "expected": "", 
+        "section": "Text file parsing and querying"
     }, 
     {
         "doc": "<p>The HTTP requests are encoded in plain strings which have a specific format.\nIt is not a well structured CSV file.\nWe saw how QRAWL can apply regular expressions to strings. Let's use this to read the file and\ntokenize the string.</p>\n<p>First we need to access that string with a variable. For that we use the <em>in</em> syntax. Click next.</p>", 

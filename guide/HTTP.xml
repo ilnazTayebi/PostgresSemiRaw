@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guide>
+<section title="Query language">
 <step>
 <doc>The user interface is about to run in demo mode. It is going to walk
 through a number of QRAWL queries, illustrating the capabilities of the language.
@@ -114,6 +115,9 @@ to use *partition* (click next).
         </query>
     </step>
 
+    </section>
+    <section title="Scripting">
+
     <step>
         <query>
             {
@@ -141,6 +145,8 @@ finally the program returns the value of *large*.
         <doc>A slightly more complicated example which  returns a record with two collections
             of requests.</doc>
     </step>
+    </section>
+    <section title="Regular expressions">
 
     <step><doc>
 Let's have a look to regular expressions in QRAWL queries now.
@@ -220,7 +226,9 @@ Let's use this function in a group by query.</doc>
 }        </query>
     <doc>Here are the client host names of the failing CGI requests.</doc>
     </step>
+    </section>
 
+    <section title="Text file parsing and querying">
     <step>
     <doc>In real life, server logs are found in text files where each line encodes
 an event in a custom string format. Let's see an example. Please load the file
@@ -521,7 +529,7 @@ with these special cases.</doc>
 *Thanks for your attention.*</doc>
     </step>
 
-
+</section>
 
 
 

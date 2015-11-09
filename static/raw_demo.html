@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 	<head>
 
@@ -167,17 +167,37 @@
 					</ul>
 
 				</div>
-			</div>
+		</div>
 		</div>
 		<div class="container-fluid">
 		    <div id="demoBox" class="row hidden" >
 				<div class="panel-body" style="height:160px">
                     <div id="demoComments"  class="col-lg-12" style="height:80%"></div>
                     <div id="demoNavigation" class="col-lg-12" style="height:20%">
-                        <p>
-                            <span id="prev" class="label label-success">prev</span> 
-                            <span id="next" class="label label-success">next</span> 
-                        </p>
+<div class="btn-group" role="group" aria-label="...">
+  <button id="prev" type="button" class="btn btn-default"> 
+    <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+  </button>
+  <button id="next" type="button" class="btn btn-default"> 
+    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+  </button>
+
+  <div class="btn-group" role="group">
+    <button id="demo-choose" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Jump to
+      <span class="caret"></span>
+    </button>
+    <ul id="demo-choice-list" class="dropdown-menu">
+    <!--
+      <li class="dropdown-header">Language</li>
+      <li><a href="javascript:demo_jump(5)">TODO1</a></li>
+      <li><a href="javascript:demo_jump(10)">TODO2</a></li>
+      <li class="dropdown-header">Regular expressions</li>
+      <li><a href="#">TODO3</a></li>
+    -->
+    </ul>
+  </div>
+</div>
                     </div>
 				</div>
             </div>

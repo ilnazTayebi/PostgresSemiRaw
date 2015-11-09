@@ -92,33 +92,42 @@ $(document).ready(function(){
     //function to be used when a new query changes in the editor
     function post_query(){
         var query = editor.getValue();
-        // skip if empty (otherwise it fails with an error)
+
+        // if something is still ongoing, return. We do not send another
+        // request while the former one hasn't returned.
+        if(ongoing == true) return;
+
+        // from here on, the server is waiting for our query.
+
+        // do not send if the query is empty.
         if (query == "") {
+            // pretend we sent it and return.
+            lastQuery = "";
+            setIndicatorLabel("Ready");
+            removeAllErrors(editor);
             return;
         }
 
-        // if something is still ongoing returns
-        if(ongoing == true) return;
-        ongoing = true;
+        // otherwise send the query.
         setIndicatorLabel("Running...");
-
         console.log("sending query", query);
         send_query( query, {
                 success: function(data){
                     queryResults = data.output;
                     ongoing = false;
-                    setIndicatorLabel("Ready")
-                    jsonEditor.set(data.output);
 
-                    //jsonEditor.expandAll();
-                    //if the query changed in the mean time resend
-                    if(editor.getValue() != lastQuery){
+                    // what to do with these results
+                    if(editor.getValue() != lastQuery) {
+                        // if the editor content changed to another query
+                        // in the mean time resend
+                        // instead of displaying results
                         post_query();
                     }
-                    else{
-                        // here refreshes the graphs
+                    else {
+                        // else update plots and data displays
+                        setIndicatorLabel("Ready")
+                        jsonEditor.set(data.output);
                         redraw_graph( data.output);
-                        removeAllErrors(editor);
                     }
                 },
                 error : function(request, status, error) {
@@ -150,6 +159,7 @@ $(document).ready(function(){
                 }
            }
         );
+        ongoing = true;
         lastQuery = query;
     }
     
@@ -159,6 +169,7 @@ $(document).ready(function(){
             btn.style.visibility = 'hidden';
             editor.getSession().on('change', function(e) { 
                 if (document.getElementById("auto_query").checked){
+                    removeAllErrors(editor);
                     post_query(); 
                 }
             });
@@ -181,7 +192,7 @@ $(document).ready(function(){
         }
     }
     // init demo stuff, pointing it to the editor
-    demo_init(editor, post_query, editor_set_autoexecute);
+    demo_init(editor);
     
     if( params_data["demo"] && params_data["demo"] == 'true' ){
         demo_start();

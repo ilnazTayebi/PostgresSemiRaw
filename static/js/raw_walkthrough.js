@@ -3,19 +3,24 @@
 
 var editor;
 var editor_bytes;
-var auto_query = null;
 var comments;
 var idx;
 var animation_ongoing = null;
-var post_query = null;
-var editor_set_autoexecute
 
-function demo_init(aceEditor, call, editor_reset) {
+function navigation_init() {
+    $('#demo-choice-list').val();
+    for (var i=0; i<steps.length; i++) {
+        if (steps[i].section) {
+            $('#demo-choice-list').append("<li><a href='javascript:demo_jump(" + i + ")'>" + steps[i].section + "</a></li>");
+        }
+    }
+}
+            
+function demo_init(aceEditor) {
     editor = aceEditor;
     $('#prev').click(demo_prev);
     $('#next').click(demo_next);
-    post_query = call;
-    editor_set_autoexecute = editor_reset;
+    navigation_init();
 //    demo_stop();
 }
 
@@ -26,8 +31,6 @@ function demo_start() {
     $("#demoBox").removeClass("hidden");
 
     auto_query = $("#auto_query").attr('checked');
-    $("#auto_query").prop('checked', false);
-    editor_set_autoexecute(false);
     $('#demo_mode').addClass("active");
 //    $('#demoBox').css('height', '150px');
 //    $('#demoBox').css('line-height', '150px');
@@ -45,10 +48,6 @@ function demo_stop() {
     // reset auto query
     console.log("demo_stop");
     $("#demoBox").removeClass("hidden");
-    if (auto_query) {
-        $("#auto_query").prop('checked', auto_query);
-        editor_set_autoexecute(auto_query);
-    }
     $('#demo_mode').off("click");
     $('#demo_mode').click(demo_start);
     $('#demoBox').css('height', 0);
@@ -82,7 +81,7 @@ function demo_next() {
         demo_editor_reset(steps[idx].expected);
     }
     // start animation of next query
-    idx++;
+    idx = idx+1;
     if (steps[idx].edits) {
         animate(steps[idx].edits);
     }
@@ -91,19 +90,22 @@ function demo_next() {
 }
 
 function demo_prev() {
+    if (idx > 0) demo_jump(idx-1);
+}
+
+function demo_jump(step) {
     // disable animation if it is going on
     if (animation_ongoing) {
         todos = [];
         return;
     }
     editor.focus();
-    if (idx > 0) idx--;
+    idx = step;
     // reset the editor with the current step query
     if (idx == -1 || !steps[idx].expected)
         demo_editor_reset("");
     else {
         demo_editor_reset(steps[idx].expected);
-        post_query();
     }
     demo_comments(steps[idx].doc);
 }
@@ -178,7 +180,6 @@ function animate(edits) {
             // typing finished, update screen in case there was
             // a mess and print comments.
             demo_editor_reset(steps[idx].expected);
-            post_query();
             demo_comments(steps[idx].doc);
             animation_ongoing = false;
         }
@@ -209,6 +210,6 @@ function demo_comments(content) {
   $("#demoComments").fadeOut().next().text(content).fadeIn();
 }
 */
-function demo_clear_comments() {
-  $("#demoComments").finish().empty().fadeOut();
+function demo_flush_comments() {
+  $("#demoComments").finish();
 }
