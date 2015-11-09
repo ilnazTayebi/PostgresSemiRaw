@@ -5,12 +5,17 @@ var credentials= undefined;
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
+    
     $('#side_panel').BootSideMenu({side:"right"});
 
     //  gets url parameters
     var params_data = parse_url_params();
+
     if( params_data['dropbox'] && params_data['dropbox'] == 'false'){
-        console.log("not using dropbox authentication");
+        $('#add_data_menu').remove();
+        //$('#add_dropbox').remove();
+        $('#add_dropbox2').remove();
+        $('#save_to_dropbox').remove();
     }
     else{
         var client = new Dropbox.Client({ key: "f64lfu3jyw86z4t" });
@@ -24,10 +29,27 @@ $(document).ready(function(){
             credentials = client._credentials;
             console.log("got credentials", credentials);
         }
+        document.getElementById('add_dropbox').onclick = add_from_dropbox;
+        document.getElementById('add_dropbox2').onclick = add_from_dropbox;
+        //save to dropbox
+        document.getElementById('save_to_dropbox').onclick = function(){
+            //downloadJsonObj(queryResults, "data.json");
+            $("#download_dialog").modal('show');
+            document.getElementById('download_json').onclick = function () {
+                saveObjToDropbox(  queryResults, "results.json", "json");
+                $("#download_dialog").modal('hide');
+            };
+            document.getElementById('download_csv').onclick = function () {
+                saveObjToDropbox(  queryResults, "results.csv", "csv");
+                $("#download_dialog").modal('hide');
+            };
+            document.getElementById('download_excel').onclick = function () {
+                //saveObjToDropbox(  queryResults, "results.xls", "excel");
+                //$("#download_dialog").modal('hide');
+            };
+        };
     }
 
-    document.getElementById('add_dropbox').onclick = add_from_dropbox;
-    document.getElementById('add_dropbox2').onclick = add_from_dropbox;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
     //$('#download_excel').prop('disabled', true);
@@ -49,25 +71,6 @@ $(document).ready(function(){
 //            $("#download_dialog").modal('hide');
         };
     };
-
-    //save to dropbox
-    document.getElementById('save_to_dropbox').onclick = function(){
-        //downloadJsonObj(queryResults, "data.json");
-        $("#download_dialog").modal('show');
-        document.getElementById('download_json').onclick = function () {
-            saveObjToDropbox(  queryResults, "results.json", "json");
-            $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_csv').onclick = function () {
-            saveObjToDropbox(  queryResults, "results.csv", "csv");
-            $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_excel').onclick = function () {
-//            saveObjToDropbox(  queryResults, "results.xls", "excel");
-//            $("#download_dialog").modal('hide');
-        };
-    };
-
 
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;
@@ -149,7 +152,6 @@ $(document).ready(function(){
         );
         lastQuery = query;
     }
-    
     
     function editor_set_autoexecute(b) {
         var btn = document.getElementById('execute_btn');
