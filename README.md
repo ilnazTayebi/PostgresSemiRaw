@@ -11,10 +11,13 @@ sudo apt-get install docker.io
 ```
 
 then you can just use a standard nginx docker image.
+
 just use the script start.sh
 ```
 cd <cloned folder>
 ./start.sh
 ```
 
-go to http://localhost:5000/static/raw_demo.html to see the web UI
+to see the web UI go to:
+
+http://localhost:5000/static/raw_demo.html 
