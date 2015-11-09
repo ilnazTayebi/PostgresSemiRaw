@@ -1,8 +1,18 @@
-# raw-frontend
-Front end web UI for raw
+# Packages Required
+
+Instructions based on Ubuntu 14.04:
+you will need nginx or docker in order run the web UI
 
 ## Howto run
-you will need docker installed in your machine.
-if you are running Ubuntu linux just type:
+The easiest way is to run using docker, so if you do not have it installed already type:
+```
 sudo apt-get install docker.io
+```
+
+then you can just use a standard nginx docker image.
+just use the script start.sh
+```
+cd <cloned folder>
+./start.sh
+```
 
