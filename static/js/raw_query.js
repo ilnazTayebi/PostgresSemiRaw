@@ -580,20 +580,6 @@ function add_files_to_dialog(files){
                 $('<span class="glyphicon glyphicon-ok form-control-feedback"></span>').appendTo(parent);
             }
         }
-
-//        $("#"+i.name).change (function(){
-//            var text = $( this ).text();
-//            
-//            var error = ! /[_a-zA-Z]\w*/.test(text);
-//            setStatus(this, error);
-//        });
-
-//        $("#"+i.type).change (function(){
-//            var text = $( this ).text();
-//            var error = text == null;
-//            setStatus(this, error);
-//        });
-
         $("#"+i.name).val(f.name);
         $("#"+i.type).val(f.type);
 
