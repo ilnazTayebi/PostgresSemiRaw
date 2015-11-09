@@ -1,6 +1,7 @@
 # Packages Required
 
 Instructions based on Ubuntu 14.04:
+    
 you will need nginx or docker in order run the web UI
 
 ## Howto run
@@ -16,3 +17,4 @@ cd <cloned folder>
 ./start.sh
 ```
 
+go to http://localhost:5000/static/raw_demo.html to see the web UI
