@@ -41,8 +41,6 @@ $(document).ready(function(){
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
-//            downloadObj( queryResults, "download", "excel");
-//            $("#download_dialog").modal('hide');
         };
     };
 
@@ -96,4 +94,3 @@ $(document).ready(function(){
     list_schemas();
     $('#side_panel').BootSideMenu({side:"right"});
 });
-

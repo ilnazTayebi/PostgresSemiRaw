@@ -35,7 +35,7 @@ function post_query(editor, jsonEditor){
                     // if the editor content changed to another query
                     // in the mean time resend
                     // instead of displaying results
-                    post_query();
+                    post_query(editor, jsonEditor);
                 }
                 else {
                     // else update plots and data displays
@@ -54,7 +54,7 @@ function post_query(editor, jsonEditor){
 
                 //if the query changed in the mean time resend
                 if(editor.getValue() != lastQuery){
-                    post_query();
+                    post_query(editor, jsonEditor);
                 }
                 else{
                     removeAllErrors(editor);
