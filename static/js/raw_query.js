@@ -385,7 +385,6 @@ function setIndicatorLabel(label){
 //helper function that transforms an object returned from the dropbox chooser
 // to something that we can register in our server
 function get_dropbox_options(selection){
-
     var option_list = [];
     for(n in selection){
         var options = {protocol : 'url'};
