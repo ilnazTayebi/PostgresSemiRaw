@@ -569,18 +569,6 @@ function list_schemas(){
         success: function(data) {
             $("#schemas").empty();
             var tree =[];
-            function get_parent(name){
-                for (n in tree){
-                    if (name == tree[n].text){
-                        if (! tree[n].nodes)tree[n].nodes = [];
-                        return tree[n];
-                   }
-                }
-                var node ={text: name , nodes : []} ; 
-                tree.push(node);
-                return node
-            }
-
             function node_exists(name){
                 for (n in tree){
                     if (name == tree[n].text) return true;
@@ -589,7 +577,6 @@ function list_schemas(){
             }
             for(n in data.schemas){
                 var node = {text : data.schemas[n] };
-                var items = node.text.split("_");
                 //TODO: check for a better way to find out if it is an internal extent 
                 tree.push(node);
             }

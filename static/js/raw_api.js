@@ -1,7 +1,7 @@
-//the token will be passed in the authorization header in the requests (GET, POST ...)
-var credentials= undefined;
 // raw dropbox key
 var dropbox_key = "f64lfu3jyw86z4t";
+//the token will be passed in the authorization header in the requests (GET, POST ...)
+var credentials= undefined;
 
 function ini_credentials(options){
     if ( options && options['dropbox'] == true){
