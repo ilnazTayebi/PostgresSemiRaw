@@ -1,7 +1,6 @@
 
 var markers = [];
 var queryResults = undefined;
-var credentials= undefined;
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
@@ -18,17 +17,8 @@ $(document).ready(function(){
         $('#save_to_dropbox').remove();
     }
     else{
-        var client = new Dropbox.Client({ key: "f64lfu3jyw86z4t" });
-        console.log("authenticating using dropbox");
-        // Try to finish OAuth authorization.
-        client.authenticate({interactive: true}, function (error) {
-            if( error ) append_error(error);
-        });
-        if (client.isAuthenticated()) {
-            // Client is authenticated. Display UI.
-            credentials = client._credentials;
-            console.log("got credentials", credentials);
-        }
+        // initializes credentials using dropbox
+        ini_credentials({dropbox:true});
         document.getElementById('add_dropbox').onclick = add_from_dropbox;
         document.getElementById('add_dropbox2').onclick = add_from_dropbox;
         //save to dropbox
@@ -193,61 +183,6 @@ $(document).ready(function(){
     // starts listing the schemas
     list_schemas();
 });
-
-function parse_url_params(){
-    //parses the parameters from the url
-    var parts= location.href .split('?');
-    var params= [];
-    if (parts.length > 1){
-        console.log("got url parameters", parts );
-        params = parts[1].split('&');
-    }
-    var params_data = {};
-    for (x in params)
-     {
-        params_data[ params[x].split('=')[0] ] = params[x].split('=')[1];
-     }
-    return params_data;
-}
-
-function saveObjToDropbox( obj, filename, format){
-    var client = new Dropbox.Client({ key: "f64lfu3jyw86z4t" });
-    // Try to finish OAuth authorization.
-    client.authenticate({interactive: true}, function (error) {
-        if(error)append_error(error);
-    });
-    client.writeFile(filename, formatResults( obj, format) , function (error) {
-        if (error) {
-            append_error('Could not save ' + filename  + ' , erro:' + error);
-        } else {
-            append_alert('File ' + filename  + ' saved in your dropbox');
-        }
-    });
-}
-
-// transforms an obj to json, csv or html-table (excel)
-function formatResults(obj, format){
-    switch (format){
-        case "json":
-            var ident = 2;
-            return JSON.stringify(obj, null, ident);
-        case "csv":
-            return objToCSV(obj);
-        case "excel":
-            // no header for the time being
-            return objToHtmlTable(obj, true);
-    }
-}
-
-// function to download result from a query 
-function downloadObj(obj, filename, format){ 
-    //TODO: check if there are limits in the size of data for encodeURIComponent
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
-    var dlElem = document.getElementById('downloadAnchorElem');
-    dlElem.setAttribute("href", dataStr);
-    dlElem.setAttribute("download", filename);
-    dlElem.click();
-}
 
 //Will handle internal errors (status 500 from scala server)
 // for the time being just handling RuntimeException
@@ -535,7 +470,6 @@ function add_from_dropbox(){
     Dropbox.choose(options);
 }
 
-
 // adds a dataset from a URL
 function add_from_url(url, name, type) {
     var f = { "name": name, "filename": name + "." + type, "url": url, "type": type, "protocol": "url" };
@@ -643,21 +577,11 @@ function list_schemas(){
                 }
                 return false;
             }
-
             for(n in data.schemas){
-         
                 var node = {text : data.schemas[n] };
                 var items = node.text.split("_");
                 //TODO: check for a better way to find out if it is an internal extent 
-                if (items.length >= 3 && items[0] == "s"){
-                    // We will not insert these items for the moment
-                    // then tries to find the parent
-                    //var parent = get_parent(items[1]);
-                    //parent.nodes.push(node);
-                }
-                else if (! node_exists(node.text)){
-                    tree.push(node);
-                }
+                tree.push(node);
             }
             $('#schema_tree').treeview({data: tree });
         },
@@ -666,89 +590,6 @@ function list_schemas(){
             append_error(response.responseText);
         }
      });
-}
-
-//TODO: make the post connect json instead of url encoded (check server.py also)
-//function to send a query to the query service
-// arg: query, the query string
-// arg: callbacks, callbacks from when the post finishes, (see jquery ajax post)
-//     success: the sucess callback function, prototype:  function(data)
-//     error, the error callback function, prototype:  function(request, status, error) 
-function send_query(query, callbacks){
-    var data = {
-        query : query
-    };
-    http_json_request('POST', '/query' , data , callbacks)
-}
-
-//registers file for querying 
-function register_file(options, callbacks){
-    http_json_request("POST", '/register-file', options, callbacks)
-}
-
-//this will change to a get without data
-//sends the request to list the schemas
-function get_schema_list( callbacks){
-    var data = { }
-
-    http_json_request("GET", "/schemas", data, callbacks);
-}
-
-// sends json request using XMLHttpRequest
-function http_json_request(method, url, data, callbacks){
-    console.log("sending", method, url);
-    var request = new XMLHttpRequest();
-    request.open(method, url, true);
-    if ( credentials == undefined ){
-        console.log("Sending request without credentials");
-    }
-    else{
-        console.log("Sending request with credentials", credentials);
-        request.withCredentials = true;
-        request.setRequestHeader('Authorization','Bearer ' + credentials.token);
-    }
-
-    //Send the proper header information along with the request
-    request.setRequestHeader("Content-type", "application/json;charset=UTF-8");
-
-    request.onreadystatechange=function(){
-        if (request.readyState==4) {
-            if (request.status==200){
-                var data = JSON.parse( request.response )
-                callbacks.success(data);
-            }
-            else{
-                callbacks.error( request, request.status, request.responseText)
-            }
-       }
-    }
-    request.send(JSON.stringify(data));
-}
-
-
-// sends url enconded request using XMLHttpRequest (ajax did not work with redirects with all browsers)
-function http_url_encoded(method, url, data, callbacks){
-    var request = new XMLHttpRequest();
-    request.open(method, url, true);
-    var params ="";
-    for(name in data){
-         params += name + '=' +escape(data[name]) + '&'
-    }
-    //Send the proper header information along with the request
-    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    
-    request.onreadystatechange=function(){
-        if (request.readyState==4) {
-            if (request.status==200){
-                var data = JSON.parse( request.response )
-                callbacks.success(data);
-            }
-            else{
-                callbacks.error( request, request.status, request.responseText)
-            }
-       }
-    }
-    request.send(params);
 }
 
 function load_dataset(what) {
