@@ -1,7 +1,4 @@
 
-var markers = [];
-var queryResults = undefined;
-
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
 
