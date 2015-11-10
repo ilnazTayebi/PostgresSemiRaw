@@ -8,24 +8,6 @@ $(document).ready(function(){
         ini_credentials({dropbox:true});
     }
 
-    //save to dropbox
-    document.getElementById('save_to_dropbox').onclick = function(){
-        //downloadJsonObj(queryResults, "data.json");
-        $("#download_dialog").modal('show');
-        document.getElementById('download_json').onclick = function () {
-            saveObjToDropbox(  queryResults, "results.json", "json");
-            $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_csv').onclick = function () {
-            saveObjToDropbox(  queryResults, "results.csv", "csv");
-            $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_excel').onclick = function () {
-            //saveObjToDropbox(  queryResults, "results.xls", "excel");
-            //$("#download_dialog").modal('hide');
-        };
-    };
-
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
     //$('#download_excel').prop('disabled', true);
@@ -43,8 +25,7 @@ $(document).ready(function(){
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
-//            downloadObj( queryResults, "download", "excel");
-//            $("#download_dialog").modal('hide');
+            
         };
     };
 

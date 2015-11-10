@@ -1,10 +1,7 @@
 var lastQuery = "";
 var ongoing = false;
 var queryResults = undefined;
-
-
 var markers = [];
-
 
 //function to be used when a new query changes in the editor
 function post_query(editor, jsonEditor){
