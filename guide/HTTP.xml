@@ -4,11 +4,7 @@
 <step>
 <doc>The user interface is about to run in demo mode. It is going to walk
 through a number of RAW queries, illustrating the capabilities of the language.
-For that we need a dataset. We'll use ([httplogs][1]) (please click the name
-to load it, and wait until there is a success notification at the bottom of the screen).
-
-* httplogs ([load][1])
-[1]:javascript:load_dataset("httplogs")
+For that we need a dataset. We'll use httplogs
 </doc>
 </step>
 

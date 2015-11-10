@@ -1,6 +1,6 @@
 var steps = [
     {
-        "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of RAW queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">httplogs</a>) (please click the name\nto load it, and wait until there is a success notification at the bottom of the screen).</p>\n<ul>\n<li>httplogs (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">load</a>)</li>\n</ul>", 
+        "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of RAW queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use httplogs</p>", 
         "expected": "", 
         "section": "Query language"
     }, 
