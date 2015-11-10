@@ -1,3 +1,80 @@
+var lastQuery = "";
+var ongoing = false;
+
+//function to be used when a new query changes in the editor
+function post_query(editor, jsonEditor){
+    var query = editor.getValue();
+
+    // if something is still ongoing, return. We do not send another
+    // request while the former one hasn't returned.
+    if(ongoing == true) return;
+
+    // from here on, the server is waiting for our query.
+
+    // do not send if the query is empty.
+    if (query == "") {
+        // pretend we sent it and return.
+        lastQuery = "";
+        setIndicatorLabel("Ready");
+        removeAllErrors(editor);
+        return;
+    }
+
+    // otherwise send the query.
+    setIndicatorLabel("Running...");
+    console.log("sending query", query);
+    send_query( query, {
+            success: function(data){
+                queryResults = data.output;
+                ongoing = false;
+
+                // what to do with these results
+                if(editor.getValue() != lastQuery) {
+                    // if the editor content changed to another query
+                    // in the mean time resend
+                    // instead of displaying results
+                    post_query();
+                }
+                else {
+                    // else update plots and data displays
+                    setIndicatorLabel("Ready")
+                    jsonEditor.set(data.output);
+                    redraw_graph( data.output);
+                }
+            },
+            error : function(request, status, error) {
+                
+                console.log("request", request);
+                console.log("Error", error);
+                console.log("status", status);
+                ongoing = false;
+                setIndicatorLabel("Error");
+
+                //if the query changed in the mean time resend
+                if(editor.getValue() != lastQuery){
+                    post_query();
+                }
+                else{
+                    removeAllErrors(editor);
+                    error = JSON.parse(error);
+                    if (status == 400) {
+                        handleQueryError(request, error, editor);
+                    }
+                    else if (status == 500){
+                        handleServerError(request, error, editor);
+                    }
+                    else{
+                        throw ("Unkown error status: " + status);
+                        //append_error( "Internal error, exception type: " + error.exceptionType);
+                    }
+                }
+            }
+       }
+    );
+    ongoing = true;
+    lastQuery = query;
+}
+
 
 //Will handle internal errors (status 500 from scala server)
 // for the time being just handling RuntimeException
