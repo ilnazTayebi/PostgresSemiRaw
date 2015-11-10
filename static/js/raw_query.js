@@ -4,8 +4,6 @@ var queryResults = undefined;
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
-    
-    $('#side_panel').BootSideMenu({side:"right"});
 
     //  gets url parameters
     var params_data = parse_url_params();
@@ -193,6 +191,7 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
+    $('#side_panel').BootSideMenu({side:"right"});
 });
 
 //Will handle internal errors (status 500 from scala server)
