@@ -15,9 +15,17 @@ function ini_credentials(options){
         if (client.isAuthenticated()) {
             // Client is authenticated. Display UI.
             credentials = client._credentials;
+            credentials.type = 'dropbox';
             console.log("got credentials", credentials);
         }
-   }
+    }
+    else if ( options && options['test_basic'] == true){
+        credentials = {
+            type : 'basic auth',
+            user : 'admin',
+            password : 'admin'
+        }
+    }
 }
 
 //TODO: make the post connect json instead of url encoded (check server.py also)
