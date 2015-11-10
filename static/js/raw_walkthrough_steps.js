@@ -1,7 +1,8 @@
 var steps = [
     {
-        "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of QRAWL queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">httplogs</a>) (please click the name\nto load it, and wait until there is a success notification at the bottom of the screen).</p>\n<ul>\n<li>httplogs (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">load</a>)</li>\n</ul>", 
-        "expected": ""
+        "doc": "<p>The user interface is about to run in demo mode. It is going to walk\nthrough a number of RAW queries, illustrating the capabilities of the language.\nFor that we need a dataset. We'll use (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">httplogs</a>) (please click the name\nto load it, and wait until there is a success notification at the bottom of the screen).</p>\n<ul>\n<li>httplogs (<a href=\"javascript:load_dataset(&quot;httplogs&quot;)\">load</a>)</li>\n</ul>", 
+        "expected": "", 
+        "section": "Query language"
     }, 
     {
         "doc": "<p>The query below should execute successfully and return a number of rows.\nHave a quick look to the httplogs table content displayed on the right side\nof the screen. Rows are plain records with information about requests\nissued to an HTTP server.</p>\n<p>If this doesn't work, then go back to the previous step and ensure the dataset is loaded.</p>", 
@@ -15,7 +16,7 @@ var steps = [
         "expected": "select * from httplogs where size > 20000"
     }, 
     {
-        "doc": "<p>QRAWL is intended to be compatible with SQL and can perform typical filtering operations.</p>", 
+        "doc": "<p>RAW is intended to be compatible with SQL and can perform typical filtering operations.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -67,7 +68,7 @@ var steps = [
         "expected": "select distinct method, count(*) from httplogs group by method"
     }, 
     {
-        "doc": "<p>In QRAWL, the star sign is in fact an alias to <em>the subset of httplogs having a certain method</em>, and the\ncount operator runs on that collection and returns the number of elements it contains. This means\nthe star sign can be handled as a collection itself. Click next to see.</p>", 
+        "doc": "<p>In RAW, the star sign is in fact an alias to <em>the subset of httplogs having a certain method</em>, and the\ncount operator runs on that collection and returns the number of elements it contains. This means\nthe star sign can be handled as a collection itself. Click next to see.</p>", 
         "expected": "select distinct method, count(*) from httplogs group by method"
     }, 
     {
@@ -170,7 +171,7 @@ var steps = [
         "expected": "select distinct method, (select distinct returned, partition\n                         from partition group by returned)\nfrom httplogs\ngroup by method"
     }, 
     {
-        "doc": "<p>This is it for nested queries. Now let's review the scripting capabilities\n            of QRAWL.</p>", 
+        "doc": "<p>This is it for nested queries. Now let's review the scripting capabilities\n            of RAW.</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -181,7 +182,7 @@ var steps = [
         "expected": ""
     }, 
     {
-        "doc": "<p>QRAWL supports variable assignments to simplify the edition of queries.</p>\n<p>Below we assign an integer value to <em>x</em>, then we store results of a <em>select</em> in <em>large</em>,\nfinally the program returns the value of <em>large</em>.</p>", 
+        "doc": "<p>RAW supports variable assignments to simplify the edition of queries.</p>\n<p>Below we assign an integer value to <em>x</em>, then we store results of a <em>select</em> in <em>large</em>,\nfinally the program returns the value of <em>large</em>.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -189,7 +190,8 @@ var steps = [
                 "where": 0
             }
         ], 
-        "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    large // returned value\n}"
+        "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    large // returned value\n}", 
+        "section": "Scripting"
     }, 
     {
         "doc": "<p>A slightly more complicated example which  returns a record with two collections\n            of requests.</p>", 
@@ -213,7 +215,7 @@ var steps = [
         "expected": "{\n    x := 32768;\n    large := select * from httplogs where size >= x;\n    small := select * from httplogs where size < x;\n    (small, large)\n}"
     }, 
     {
-        "doc": "<p>Let's have a look to regular expressions in QRAWL queries now.</p>", 
+        "doc": "<p>Let's have a look to regular expressions in RAW queries now.</p>", 
         "edits": [
             {
                 "action": "suppr", 
@@ -221,10 +223,11 @@ var steps = [
                 "where": 0
             }
         ], 
-        "expected": ""
+        "expected": "", 
+        "section": "Regular expressions"
     }, 
     {
-        "doc": "<p>This function using a regular expression to extract the root directory of a\nURL. This is a feature of QRAWL: the <em>parse as</em> operator parses the string <em>x</em> as the\ngiven regular expression and returns the string matching the group (the inner\npart between parenthesis).</p>\n<p>Therefore, if passed a URL string, <em>root</em> will return the top level directory of the file. (We will\nsee later what happens if the regular expression contains more than one group.)\nLet's use this function in a group by query.</p>", 
+        "doc": "<p>This function using a regular expression to extract the root directory of a\nURL. This is a feature of RAW: the <em>parse as</em> operator parses the string <em>x</em> as the\ngiven regular expression and returns the string matching the group (the inner\npart between parenthesis).</p>\n<p>Therefore, if passed a URL string, <em>root</em> will return the top level directory of the file. (We will\nsee later what happens if the regular expression contains more than one group.)\nLet's use this function in a group by query.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -347,10 +350,11 @@ var steps = [
                 "where": 0
             }
         ], 
-        "expected": ""
+        "expected": "", 
+        "section": "Text file parsing and querying"
     }, 
     {
-        "doc": "<p>The HTTP requests are encoded in plain strings which have a specific format.\nIt is not a well structured CSV file.\nWe saw how QRAWL can apply regular expressions to strings. Let's use this to read the file and\ntokenize the string.</p>\n<p>First we need to access that string with a variable. For that we use the <em>in</em> syntax. Click next.</p>", 
+        "doc": "<p>The HTTP requests are encoded in plain strings which have a specific format.\nIt is not a well structured CSV file.\nWe saw how RAW can apply regular expressions to strings. Let's use this to read the file and\ntokenize the string.</p>\n<p>First we need to access that string with a variable. For that we use the <em>in</em> syntax. Click next.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -382,7 +386,7 @@ var steps = [
         "expected": "select l\nfrom l in log_example"
     }, 
     {
-        "doc": "<p>See how the regular expression applied to the file now returns a record of two fields.\nLet's keep adding groups in the regular expression.</p>", 
+        "doc": "<p>The regular expression applied to the file so that we get records of two fields corresponding\nto the two regular expressions groups.  Let's keep adding groups in the regular expression.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -393,7 +397,7 @@ var steps = [
         "expected": "select l parse as r\"\"\"([-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(.*)\\].*\"\"\"\nfrom l in log_example"
     }, 
     {
-        "doc": "<p>See how the regular expression applied to the file now returns a record of fields. The records\nhave default numbered fields. We'd like instead to give them meaningful names. Click next to see.</p>", 
+        "doc": "<p>The records\nhave now all expected fields, with default numbered fields. We'd like instead to give them meaningful names.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -404,7 +408,7 @@ var steps = [
         "expected": "select l parse as r\"\"\"([-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(.*)\\]\\s*\"(\\w+)\\s+([^\\s]+) (\\w+)/([0-9.]+)\\s*\"\\s+(\\d+)\\s+(\\d+).*\"\"\"\nfrom l in log_example"
     }, 
     {
-        "doc": "<p>We embedded field names in the regular expressions. They become immediately available as record\nfields. Let's make a simple query.</p>", 
+        "doc": "<p>In order to name fields with custom names, we embedded names in the regular expression groups. They are assigned to the fields.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -450,7 +454,7 @@ var steps = [
         "expected": "select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\nfrom l in log_example"
     }, 
     {
-        "doc": "<p>It fails because <em>parse as</em> returned a record of strings. In order to convert strings into\ne.g. integers, we can turn that record of strings into a new expression (using the keyword <em>into</em>).</p>", 
+        "doc": "<p>The query fails because <em>parse as</em> returned a record of strings. The <em>size</em> field cannot be compared to an integer.\nWe need to convert this string (as well as <em>date</em> and <em>returned</em>) to other types.</p>", 
         "edits": [
             {
                 "action": "insert", 
@@ -476,7 +480,7 @@ var steps = [
         "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        from l in log_example;\n    select * from log1 where size > 20000\n}"
     }, 
     {
-        "doc": "<p>Now the records are processed into typed records (size is an integer, etc.). The query\nruns successfully. Let's add a second log file.</p>\n<ul>\n<li>log_example2 (<a href=\"javascript:load_dataset(&quot;log_example2&quot;)\">load</a>)</li>\n</ul>", 
+        "doc": "<p>By turning the record of strings into another expression, the records are processed into records with properly typed fields (size is an integer, etc.). The query\nruns successfully. Let's add a second log file.</p>\n<ul>\n<li>log_example2 (<a href=\"javascript:load_dataset(&quot;log_example2&quot;)\">load</a>)</li>\n</ul>", 
         "edits": [
             {
                 "action": "insert", 
@@ -617,7 +621,7 @@ var steps = [
         "expected": "{\n    log1 := select l parse as r\"\"\"(host:[-\\w\\.\\d]+)\\s+-\\s+-\\s+\\[(date:.*)\\]\\s*\"(method:\\w+)\\s+(path:[^\\s]+) (protocol:\\w+)/(version:[0-9.]+)\\s*\"\\s+(returned:\\d+)\\s+(size:\\d+).*\"\"\"\n        into (date:to_epoch(date,\"dd/MMM/yyyy:HH:mm:ss Z\"), host, method, path,\n              returned: toInt(returned), size: toInt(size))\n        from l in log_example;\n    // integer cleaning\n    mkSize := \\x -> if x = \"-\" then -1 else toInt(x);\n    log2 := select l\n        parse as r\"\"\"(host:[-\\w\\._]+) \\[(date:\\d+-\\d+-\\d+ \\d+:\\d+:\\d+)\\] \"(method:\\w+) (path:[^\\s]+) (protocol:\\w+)/(version:\\d\\.\\d)\" (returned:\\d+) (size:[-\\d]+)\"\"\"\n        into (date:to_epoch(date, \"yyyy-MM-dd kk:mm:ss\"), host, method, path,\n              returned: toInt(returned), size: mkSize(size))\n        from l in log_example2;\n    log3 := log1 bag_union log2;\n    log3\n}"
     }, 
     {
-        "doc": "<p>Here we filter evengs in the log on their timestamps.</p>", 
+        "doc": "<p>Here we filter events in the log on their timestamps.</p>", 
         "edits": [
             {
                 "action": "insert", 

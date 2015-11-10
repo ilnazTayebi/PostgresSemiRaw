@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guide>
 
+<section title="Query language">
 <step>
 <doc>The user interface is about to run in demo mode. This means we're going to walk
 through a number of QRAWL queries which illustrate the capabilities of the language.
@@ -201,5 +202,6 @@ from the authors titles.
 }
 </query>
 </step>
+</section>
 
 </guide>

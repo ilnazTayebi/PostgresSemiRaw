@@ -12,7 +12,7 @@ sudo apt-get install docker.io
 
 then you can just use a standard nginx docker image.
 
-just use the script start.sh
+just use the script start.sh, you might need sudo if your user is not part of the docker group.
 ```
 cd <cloned folder>
 ./start.sh

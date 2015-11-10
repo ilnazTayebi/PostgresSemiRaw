@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guide>
+<section title="Query language">
 <step>
 <doc>The user interface is about to run in demo mode. It is going to walk
-through a number of QRAWL queries, illustrating the capabilities of the language.
+through a number of RAW queries, illustrating the capabilities of the language.
 For that we need a dataset. We'll use ([httplogs][1]) (please click the name
 to load it, and wait until there is a success notification at the bottom of the screen).
 
@@ -25,7 +26,7 @@ If this doesn't work, then go back to the previous step and ensure the dataset i
     <step>
         <query>select * from httplogs where size > 20000 and method = "POST"</query>
         <doc>
-            QRAWL is intended to be compatible with SQL and can perform typical filtering operations.
+            RAW is intended to be compatible with SQL and can perform typical filtering operations.
         </doc>
     </step>
 
@@ -39,7 +40,7 @@ If this doesn't work, then go back to the previous step and ensure the dataset i
     <step>
         <query>select distinct method, count(*) from httplogs group by method</query>
         <doc>
-In QRAWL, the star sign is in fact an alias to *the subset of httplogs having a certain method*, and the
+In RAW, the star sign is in fact an alias to *the subset of httplogs having a certain method*, and the
 count operator runs on that collection and returns the number of elements it contains. This means
 the star sign can be handled as a collection itself. Click next to see.
         </doc>
@@ -108,11 +109,14 @@ to use *partition* (click next).
 
     <step>
         <doc>This is it for nested queries. Now let's review the scripting capabilities
-            of QRAWL.
+            of RAW.
         </doc>
         <query>
         </query>
     </step>
+
+    </section>
+    <section title="Scripting">
 
     <step>
         <query>
@@ -122,7 +126,7 @@ to use *partition* (click next).
                 large // returned value
             }
         </query>
-        <doc>QRAWL supports variable assignments to simplify the edition of queries.
+        <doc>RAW supports variable assignments to simplify the edition of queries.
 
 Below we assign an integer value to *x*, then we store results of a *select* in *large*,
 finally the program returns the value of *large*.
@@ -141,9 +145,11 @@ finally the program returns the value of *large*.
         <doc>A slightly more complicated example which  returns a record with two collections
             of requests.</doc>
     </step>
+    </section>
+    <section title="Regular expressions">
 
     <step><doc>
-Let's have a look to regular expressions in QRAWL queries now.
+Let's have a look to regular expressions in RAW queries now.
         </doc>
     </step>
 
@@ -156,7 +162,7 @@ Let's have a look to regular expressions in QRAWL queries now.
         </query>
         <doc>
 This function using a regular expression to extract the root directory of a
-URL. This is a feature of QRAWL: the *parse as* operator parses the string *x* as the
+URL. This is a feature of RAW: the *parse as* operator parses the string *x* as the
 given regular expression and returns the string matching the group (the inner
 part between parenthesis).
 
@@ -220,7 +226,9 @@ Let's use this function in a group by query.</doc>
 }        </query>
     <doc>Here are the client host names of the failing CGI requests.</doc>
     </step>
+    </section>
 
+    <section title="Text file parsing and querying">
     <step>
     <doc>In real life, server logs are found in text files where each line encodes
 an event in a custom string format. Let's see an example. Please load the file
@@ -237,7 +245,7 @@ from log_example
 </query>
     <doc>The HTTP requests are encoded in plain strings which have a specific format.
 It is not a well structured CSV file.
-We saw how QRAWL can apply regular expressions to strings. Let's use this to read the file and
+We saw how RAW can apply regular expressions to strings. Let's use this to read the file and
 tokenize the string.
 
 First we need to access that string with a variable. For that we use the *in* syntax. Click next.</doc>
@@ -257,8 +265,8 @@ from l in log_example
 select l parse as r"""([-\w\.\d]+)\s+-\s+-\s+\[(.*)\].*"""
 from l in log_example
 </query>
-    <doc>See how the regular expression applied to the file now returns a record of two fields.
-Let's keep adding groups in the regular expression.</doc>
+    <doc>The regular expression applied to the file so that we get records of two fields corresponding
+to the two regular expressions groups.  Let's keep adding groups in the regular expression.</doc>
     </step>
 
     <step>
@@ -266,8 +274,8 @@ Let's keep adding groups in the regular expression.</doc>
 select l parse as r"""([-\w\.\d]+)\s+-\s+-\s+\[(.*)\]\s*"(\w+)\s+([^\s]+) (\w+)/([0-9.]+)\s*"\s+(\d+)\s+(\d+).*"""
 from l in log_example
 </query>
-    <doc>See how the regular expression applied to the file now returns a record of fields. The records
-have default numbered fields. We'd like instead to give them meaningful names. Click next to see.</doc>
+    <doc>The records
+have now all expected fields, with default numbered fields. We'd like instead to give them meaningful names.</doc>
     </step>
 
     <step>
@@ -275,8 +283,7 @@ have default numbered fields. We'd like instead to give them meaningful names. C
 select l parse as r"""(host:[-\w\.\d]+)\s+-\s+-\s+\[(date:.*)\]\s*"(method:\w+)\s+(path:[^\s]+) (protocol:\w+)/(version:[0-9.]+)\s*"\s+(returned:\d+)\s+(size:\d+).*"""
 from l in log_example
 </query>
-    <doc>We embedded field names in the regular expressions. They become immediately available as record
-fields. Let's make a simple query.</doc>
+    <doc>In order to name fields with custom names, we embedded names in the regular expression groups. They are assigned to the fields.</doc>
     </step>
 
     <step>
@@ -287,8 +294,8 @@ fields. Let's make a simple query.</doc>
     select * from log1 where size > 20000
 }
 </query>
-    <doc>It fails because *parse as* returned a record of strings. In order to convert strings into
-e.g. integers, we can turn that record of strings into a new expression (using the keyword *into*).
+    <doc>The query fails because *parse as* returned a record of strings. The *size* field cannot be compared to an integer.
+We need to convert this string (as well as *date* and *returned*) to other types.
     </doc>
     </step>
 {
@@ -308,7 +315,7 @@ e.g. integers, we can turn that record of strings into a new expression (using t
     select * from log1 where size > 20000
 }
 </query>
-    <doc>Now the records are processed into typed records (size is an integer, etc.). The query
+    <doc>By turning the record of strings into another expression, the records are processed into records with properly typed fields (size is an integer, etc.). The query
 runs successfully. Let's add a second log file.
 
 * log_example2 ([load][1])
@@ -421,7 +428,7 @@ with these special cases.</doc>
     isolate := \log -> select i from i in log where i.date > t1 and i.date &lt; t2;
     isolate(log3)
 }</query>
-    <doc>Here we filter evengs in the log on their timestamps.</doc>
+    <doc>Here we filter events in the log on their timestamps.</doc>
     </step>
 
     <step>
@@ -521,20 +528,7 @@ with these special cases.</doc>
 *Thanks for your attention.*</doc>
     </step>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+</section>
 
 
 </guide>
