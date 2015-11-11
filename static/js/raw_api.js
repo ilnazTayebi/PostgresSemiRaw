@@ -28,6 +28,22 @@ function ini_credentials(options){
     }
 }
 
+function query_start(query, n_results, callbacks){
+    var data = {
+        query : query,
+        resultsPerPage: n_results
+    };
+    http_json_request('POST', '/query-start' , data , callbacks)
+}
+
+function query_next(token, n_results, callbacks){
+    var data = {
+        token : token,
+        resultsPerPage: n_results
+    };
+
+    http_json_request('POST', '/query-next' , data , callbacks)
+}
 
 //function to send a query to the query service
 // arg: query, the query string
@@ -49,7 +65,7 @@ function register_file(options, callbacks){
 //this will change to a get without data
 //sends the request to list the schemas
 function get_schema_list( callbacks){
-    var data = { }
+    var data = { };
 
     http_json_request("GET", "/schemas", data, callbacks);
 }
@@ -63,7 +79,7 @@ function http_json_request(method, url, data, callbacks){
         console.log("Sending request without credentials");
     }
     else{
-        //console.log("Sending request with credentials", credentials);
+        console.log("Sending request with credentials", credentials);
         request.withCredentials = true;
         request.setRequestHeader('Authorization','Bearer ' + credentials.token);
     }
@@ -74,15 +90,22 @@ function http_json_request(method, url, data, callbacks){
     request.onreadystatechange=function(){
         if (request.readyState==4) {
             if (request.status==200){
-                var data = JSON.parse( request.response )
-                callbacks.success(data);
+                var reponse_data = JSON.parse( request.response )
+                callbacks.success(reponse_data);
             }
             else{
                 callbacks.error( request, request.status, request.responseText)
             }
        }
     }
-    request.send(JSON.stringify(data));
+    if (data) {
+        request.send(JSON.stringify(data));
+    }
+    else{
+        console.log("sending without data");
+        request.send();
+    }
+    
 }
 
 // sends url enconded request using XMLHttpRequest (ajax did not work with redirects with all browsers)
