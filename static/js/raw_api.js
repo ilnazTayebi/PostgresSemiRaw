@@ -28,7 +28,7 @@ function ini_credentials(options){
     }
 }
 
-//TODO: make the post connect json instead of url encoded (check server.py also)
+
 //function to send a query to the query service
 // arg: query, the query string
 // arg: callbacks, callbacks from when the post finishes, (see jquery ajax post)
@@ -63,7 +63,7 @@ function http_json_request(method, url, data, callbacks){
         console.log("Sending request without credentials");
     }
     else{
-        console.log("Sending request with credentials", credentials);
+        //console.log("Sending request with credentials", credentials);
         request.withCredentials = true;
         request.setRequestHeader('Authorization','Bearer ' + credentials.token);
     }
