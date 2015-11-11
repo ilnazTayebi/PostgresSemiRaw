@@ -325,6 +325,7 @@ var upload_alerts = {
 
 // will start the dropbox chooser and register files from dropbox
 function add_from_dropbox(){
+    console.log("adding from dropbox");
     var options = {
         // Required. Called when a user selects an item in the Chooser.
         success: function (files){

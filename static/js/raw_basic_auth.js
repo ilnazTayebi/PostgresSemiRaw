@@ -1,6 +1,7 @@
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
+    $('#side_panel').BootSideMenu({side:"right"});
 
     var params = parse_url_params();
     if (params['dropbox'] && params['dropbox'] == 'true'){
@@ -77,6 +78,6 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
-    $('#side_panel').BootSideMenu({side:"right"});
+
 });
 
