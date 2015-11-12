@@ -138,7 +138,7 @@ function saveObjToDropbox( obj, filename, format){
 
 function parse_url_params(){
     //parses the parameters from the url
-    var parts= location.href .split('?');
+    var parts= decodeURIComponent(location.href).split('?');
     var params= [];
     if (parts.length > 1){
         console.log("got url parameters", parts );
