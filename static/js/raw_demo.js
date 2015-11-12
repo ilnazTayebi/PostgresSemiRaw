@@ -76,7 +76,7 @@ $(document).ready(function(){
     }
     // init demo stuff, pointing it to the editor
     demo_init(editor);
-    demo_start();
+    demo_start(params["section"]);
 
     // starts listing the schemas
     list_schemas();

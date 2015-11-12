@@ -24,7 +24,7 @@ function demo_init(aceEditor) {
 //    demo_stop();
 }
 
-function demo_start() {
+function demo_start(section) {
     // save auto_query setting for later
     console.log("demo_start");
     // bootstrap hidden
@@ -40,8 +40,16 @@ function demo_start() {
     $('#demo_mode').click(demo_stop);
     comments = $("#demoComments");
     demo_editor_reset("");
-    idx = -1;
-    demo_next();
+    idx = 0;
+    if (section != null) {
+        for (var i=0; i<steps.length; i++) {
+            if (steps[i].section == section) {
+                idx = i;
+                break;
+            }
+        }
+    }
+    demo_jump(idx);
 }
 
 function demo_stop() {
