@@ -28,7 +28,6 @@ function ini_credentials(options){
     }
 }
 
-
 //function to send a query to the query service
 // arg: query, the query string
 // arg: callbacks, callbacks from when the post finishes, (see jquery ajax post)
@@ -46,7 +45,6 @@ function register_file(options, callbacks){
     http_json_request("POST", '/register-file', options, callbacks)
 }
 
-//this will change to a get without data
 //sends the request to list the schemas
 function get_schema_list( callbacks){
     var data = { }
@@ -108,16 +106,6 @@ function http_url_encoded(method, url, data, callbacks){
        }
     }
     request.send(params);
-}
-
-// function to download result from a query 
-function downloadObj(obj, filename, format){ 
-    //TODO: check if there are limits in the size of data for encodeURIComponent
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
-    var dlElem = document.getElementById('downloadAnchorElem');
-    dlElem.setAttribute("href", dataStr);
-    dlElem.setAttribute("download", filename);
-    dlElem.click();
 }
 
 //Saves an object to dropbox

@@ -4,11 +4,13 @@ $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
 
     var params = parse_url_params();
+    //for test purpose we use dropbox authentication 
     if (params['dropbox'] && params['dropbox'] == 'true'){
         // initializes credentials using dropbox
         ini_credentials({dropbox:true});
     }
 
+    document.getElementById('add_data').onclick = add_from_local;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
     //$('#download_excel').prop('disabled', true);
@@ -29,6 +31,8 @@ $(document).ready(function(){
             
         };
     };
+
+    document.getElementById('file_chooser').addEventListener('change', handleFileSelect, false);
 
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;
@@ -78,6 +82,47 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
-
 });
+
+function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+
+    // files is a FileList of File objects. List some properties.
+    var output = [];
+    for (var i = 0, f; f = files[i]; i++) {
+        console.log(i,"file" ,f);
+    }
+
+    var options = get_dropbox_options(files);
+    var inputs = add_files_to_dialog(options);
+    document.getElementById("register_button").onclick = function(){
+        var ok = true;
+        var files = [];
+        for(n in options){
+            var f = options[n];
+            f.name = $("#"+inputs[n].name).val();
+            f.type = $("#"+inputs[n].type).val();
+            //if (f.type == null) ok = false;
+            files.push(f)
+        }
+        if(ok){
+            for (n in files){
+                console.log("registering file ", files[n]);
+                register_file(files[n], upload_alerts);
+            }
+            //closes the dialog
+            $("#register_dialog").modal('hide');
+       }
+        
+    }
+
+    $("#register_dialog").modal('show');
+}
+
+//adds local file
+function add_from_local(){
+  document.getElementById('file_chooser').click();
+};
+
+
 

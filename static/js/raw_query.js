@@ -370,6 +370,16 @@ function add_from_url(url, name, type) {
     register_file(f, upload_alerts);
 }
 
+// function to download result from a query 
+function downloadObj(obj, filename, format){ 
+    //TODO: check if there are limits in the size of data for encodeURIComponent
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
+    var dlElem = document.getElementById('downloadAnchorElem');
+    dlElem.setAttribute("href", dataStr);
+    dlElem.setAttribute("download", filename);
+    dlElem.click();
+}
+
 //will add items to select name and file type for the files selected in the dialog
 // returns an array of objects with the ids of the inputs added {name, type}
 function add_files_to_dialog(files){
