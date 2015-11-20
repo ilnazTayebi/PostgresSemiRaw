@@ -19,13 +19,14 @@ function ini_credentials(options){
             console.log("got credentials", credentials);
         }
     }
-    else if ( options && options['test_basic'] == true){
+    else if ( options && options['basic_auth'] == true){
         credentials = {
             type : 'basic auth',
-            user : 'admin',
-            password : 'admin'
+            user : options.user,
+            password : options.password
         }
     }
+    console.log("initallized credentials", credentials)
 }
 
 //function to send a query to the query service
@@ -59,6 +60,12 @@ function http_json_request(method, url, data, callbacks){
     request.open(method, url, true);
     if ( credentials == undefined ){
         console.log("Sending request without credentials");
+    }
+    else if (credentials.type == 'basic auth'){
+        console.log("sending request with basic auth");
+        request.withCredentials = true;
+        request.setRequestHeader ("Authorization", 
+            "Basic " + btoa(credentials.user + ":" + credentials.password));
     }
     else{
         //console.log("Sending request with credentials", credentials);
@@ -117,7 +124,7 @@ function saveObjToDropbox( obj, filename, format){
     });
     client.writeFile(filename, formatResults( obj, format) , function (error) {
         if (error) {
-            append_error('Could not save ' + filename  + ' , erro:' + error);
+            append_error('Could not save ' + filename  + ' , error:' + error);
         } else {
             append_alert('File ' + filename  + ' saved in your dropbox');
         }
