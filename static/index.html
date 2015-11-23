@@ -1,6 +1,5 @@
-<!--!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"-->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
 	<head>
 
 		<meta charset="utf-8"/>
@@ -80,10 +79,10 @@
 	    }
 	    #execute_btn{
 		    /*cursor: pointer;*/
-		    float:right;
 		    visibility:hidden;
 	    }
 
+        
 		</style>
 		<!-- jquery -->
 		<script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
@@ -169,8 +168,7 @@
 						<div class="panel-heading">
 							<h3 class="panel-title">
 								<span id="indicator" class="label label-success">Ready</span> 
-								<!--								<span class="label label-info" id="execute_label" >Execute</span>-->
-								<button class="btn btn-info btn-xs"  style="float:right;" id="execute_btn">execute</button>
+								<button class="pull-right btn btn-info btn-xs" id="execute_btn">execute</button>
 							</h3>
 						</div>
 
@@ -182,7 +180,13 @@
 				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title">Answer</h3>
+							<h3 class="panel-title">
+                                Answer
+                                <div class="pull-right btn-group" role="group" id="next_group">
+                                    <button type="button" class="btn btn-default btn-xs" id="get_next" > get next</button>
+                                    <button type="button" class="btn btn-default btn-xs" id="get_all">get all</button>
+                                </div>
+                            </h3>
 						</div>
 						<div class="panel-body">
 							<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">

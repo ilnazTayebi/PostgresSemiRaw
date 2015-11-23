@@ -2,6 +2,10 @@
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
+
+    $('#get_next').prop('disabled', true);
+    $('#get_all').prop('disabled', true);
+
     // initializes credentials using dropbox
     ini_credentials({dropbox:true});
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
