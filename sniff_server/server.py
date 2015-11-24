@@ -7,7 +7,7 @@ from argparse import ArgumentParser, FileType
 import collections
 import requests
 import logging
-
+import json
 from sniff import sniff
 
 lock = threading.Lock()
@@ -19,9 +19,9 @@ user = ''
 
 logging.basicConfig(level=logging.INFO)
 
-def append_msg(msg):
-    info.append(msg)
-    print msg
+def append_msg(msg, msg_type='response'):
+    info.append(dict(type=msg_type,msg=msg))
+    print info
 
 def registerfile(path):
   # extracts name and type from the filename 
@@ -42,15 +42,15 @@ def registerfile(path):
         logging.warn("not registering unknon file type "+ path)
         return
 
-    data = dict(
+    data = dict( 
         protocol='url',
         filename =basename,
         url='file://%s' % os.path.abspath(path),
         name=name,
         type=file_type)
-        
     url = '%s/register-file' % executer_url 
     response=requests.post(url, json=data, auth=(user, 'pass'))
+    append_msg(dict(status=response.status_code, data=json.loads(response.text)))
 
 
 def on_start(files, do_reload=True):
@@ -61,12 +61,13 @@ def on_create(f, do_reload=True):
     registerfile(f)
   
 def on_modified(f):
-  append_msg("WARNING: File modified but feature not implemented yet" + f)
+  append_msg("WARNING: File modified but feature not implemented yet" + f, msg_type = 'warning')
 
 def on_delete(f):
-  # Do nothing on delete.
-  # The alternative would have been to reload again all other data.
-  pass
+    # Do nothing on delete.
+    # The alternative would have been to reload again all other data.
+    append_msg("WARNING: File delete but feature not implemented yet" + f, msg_type = 'warning')
+    
 
 def background_loader(do_reload=True, folder="data"):
     print "folder=%s , reload = %s " %(folder, reload)
@@ -79,8 +80,8 @@ app.config["JSON_SORT_KEYS"] = False
 
 @app.route('/status', methods=['GET'])
 def status():
-    print jsonify(info)
-    return jsonify(info)
+    print info
+    return jsonify(dict(status=list(info)))
 
 if __name__ == '__main__':
     argp = ArgumentParser(description="Raw sniff server")
