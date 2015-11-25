@@ -22,7 +22,7 @@ $(document).ready(function(){
         });
     }
 
-    document.getElementById('add_data').onclick = add_from_local;
+    //document.getElementById('add_data').onclick = add_from_local;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
     //$('#download_excel').prop('disabled', true);
@@ -43,8 +43,6 @@ $(document).ready(function(){
             
         };
     };
-
-    document.getElementById('file_chooser').addEventListener('change', handleFileSelect, false);
 
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;
@@ -131,10 +129,58 @@ function handleFileSelect(evt) {
     $("#register_dialog").modal('show');
 }
 
-//adds local file
-function add_from_local(){
-  document.getElementById('file_chooser').click();
-};
+//function to append success message to the alert pane
+function append_alert_level(msg, level){
+    
+    var m = $('<div class="col-lg-12 alert ">'+
+            '<button type="button" class="close" ' + 
+                    'data-dismiss="alert" aria-hidden="true">' + 
+                '&times;' + 
+            '</button>' +  
+            msg + 
+         '</div>').appendTo("#alerts");
 
+    m.addClass(level);
+}
+
+setInterval(refresh_info, 3000);
+function refresh_info(){
+    http_json_request("GET", "/sniff/last_status", undefined, {
+        success: function(data){
+
+            var status = data.status;
+            if (status.length > 0) console.log("got new data", status);
+            for (var n = 0 ; n <  status.length ; n++){
+                msg =  status[n].msg
+                switch( status[n].type){
+                case 'error':
+                case 'response-error':
+                    append_alert(msg, 'alert-danger')
+                    break; 
+                case 'warning':
+                    append_alert(msg, 'alert-warning')
+                    break;
+                    append_alert(msg, 'alert-danger')
+                    break;
+                case 'success':
+                    append_alert(msg, 'alert-success')
+                    break;
+                case 'info':
+                    append_alert(msg, 'alert-info')
+                    break;
+
+                }
+            }
+            $('.alert').stop().fadeOut(5000);
+            list_schemas();
+        },
+        error: function(request, status, error){
+            append_error(error);
+            console.log(error);
+            $('.alert').stop().fadeOut(5000);
+        }
+    })
+
+}
 
 

@@ -13,15 +13,17 @@ from sniff import sniff
 lock = threading.Lock()
 # deque is like a circular buffer (we will keep the last 100 messages)
 info = collections.deque(maxlen=100)
+last_info = collections.deque(maxlen=100)
+
 executer_url = ""
 user = ''
 
 
 logging.basicConfig(level=logging.INFO)
 
-def append_msg(msg, msg_type='response'):
+def append_msg( msg_type, msg):
     info.append(dict(type=msg_type,msg=msg))
-    print info
+    last_info.append(dict(type=msg_type,msg=msg))
 
 def registerfile(path):
   # extracts name and type from the filename 
@@ -40,6 +42,7 @@ def registerfile(path):
         file_type = 'text'
     else:
         logging.warn("not registering unknon file type "+ path)
+        append_msg( "warning", "not registering unknon file type %s" % path )
         return
 
     data = dict( 
@@ -50,8 +53,10 @@ def registerfile(path):
         type=file_type)
     url = '%s/register-file' % executer_url 
     response=requests.post(url, json=data, auth=(user, 'pass'))
-    append_msg(dict(status=response.status_code, data=json.loads(response.text)))
-
+    if response.status_code == 200:
+        append_msg("success", "Registered file %s, shema name %s" % (path,name))
+    else:
+        append_msg("response-error", dict(msg="Error registering file %s" %path, response=json.loads(response.text)))
 
 def on_start(files, do_reload=True):
     for f in files:
@@ -61,12 +66,13 @@ def on_create(f, do_reload=True):
     registerfile(f)
   
 def on_modified(f):
-  append_msg("WARNING: File modified but feature not implemented yet" + f, msg_type = 'warning')
+    append_msg("warning", "File changed detected, registering again %s" % f)
+    registerfile(f)
 
 def on_delete(f):
     # Do nothing on delete.
     # The alternative would have been to reload again all other data.
-    append_msg("WARNING: File delete but feature not implemented yet" + f, msg_type = 'warning')
+    append_msg("warning","File delete but feature not implemented yet %s" % f)
     
 
 def background_loader(do_reload=True, folder="data"):
@@ -80,8 +86,13 @@ app.config["JSON_SORT_KEYS"] = False
 
 @app.route('/status', methods=['GET'])
 def status():
-    print info
     return jsonify(dict(status=list(info)))
+
+@app.route('/last_status', methods=['GET'])
+def last_status():
+    l = list(last_info)
+    last_info.clear()
+    return jsonify(dict(status=l))
 
 if __name__ == '__main__':
     argp = ArgumentParser(description="Raw sniff server")

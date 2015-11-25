@@ -10,7 +10,7 @@ function ini_credentials(options){
         console.log("authenticating using dropbox");
         // Try to finish OAuth authorization.
         client.authenticate({interactive: true}, function (error) {
-            if( error ) append_error(error);
+            if( error ) console.log(error);
         });
         if (client.isAuthenticated()) {
             // Client is authenticated. Display UI.
@@ -145,13 +145,18 @@ function saveObjToDropbox( obj, filename, format){
     var client = new Dropbox.Client({ key: dropbox_key });
     // Try to finish OAuth authorization.
     client.authenticate({interactive: true}, function (error) {
-        if(error)append_error(error);
+        if(error){
+            console.log(error);
+            return error;
+       }
+        
     });
     client.writeFile(filename, formatResults( obj, format) , function (error) {
         if (error) {
-            append_error('Could not save ' + filename  + ' , error:' + error);
+            console.log('Could not save ' + filename  + ' , error:' + error);
         } else {
-            append_alert('File ' + filename  + ' saved in your dropbox');
+            console.log('File ' + filename  + ' saved in your dropbox');
+
         }
     });
 }
