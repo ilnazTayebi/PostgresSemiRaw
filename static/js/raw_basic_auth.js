@@ -129,18 +129,13 @@ function handleFileSelect(evt) {
     $("#register_dialog").modal('show');
 }
 
-//function to append success message to the alert pane
-function append_alert_level(msg, level){
-    
-    var m = $('<div class="col-lg-12 alert ">'+
-            '<button type="button" class="close" ' + 
-                    'data-dismiss="alert" aria-hidden="true">' + 
-                '&times;' + 
-            '</button>' +  
-            msg + 
-         '</div>').appendTo("#alerts");
+function append_alert(msg, level){
 
-    m.addClass(level);
+	var m = $('<div class="col-lg-12 alert ">'+
+            msg + '</div>')
+            .appendTo("#alerts");
+
+	m.addClass(level);
 }
 
 setInterval(refresh_info, 3000);
@@ -152,24 +147,27 @@ function refresh_info(){
             if (status.length > 0) console.log("got new data", status);
             for (var n = 0 ; n <  status.length ; n++){
                 msg =  status[n].msg
-                switch( status[n].type){
-                case 'error':
-                case 'response-error':
-                    append_alert(msg, 'alert-danger')
-                    break; 
-                case 'warning':
-                    append_alert(msg, 'alert-warning')
-                    break;
-                    append_alert(msg, 'alert-danger')
-                    break;
-                case 'success':
-                    append_alert(msg, 'alert-success')
-                    break;
-                case 'info':
-                    append_alert(msg, 'alert-info')
-                    break;
-
-                }
+				switch( data.status[n].type){
+					case 'error':
+						append_alert(msg, 'alert-danger')
+						break; 
+					case 'response-error':
+					    msg = '<p>' + msg.msg + '</p>'+ msg.response.message ;
+					    console.log("response-error", msg);
+						append_alert(msg, 'alert-danger')
+						break; 
+					case 'warning':
+						append_alert(msg, 'alert-warning')
+							break;
+						append_alert(msg, 'alert-danger')
+							break;
+					case 'success':
+						append_alert(msg, 'alert-success')
+							break;
+					case 'info':
+						append_alert(msg, 'alert-info')
+							break;
+				}
             }
             $('.alert').stop().fadeOut(5000);
             list_schemas();
