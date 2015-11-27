@@ -170,6 +170,7 @@ function refresh_info(){
 				}
             }
             $('.alert').stop().fadeOut(5000);
+            $("#alerts").empty();
             list_schemas();
         },
         error: function(request, status, error){
