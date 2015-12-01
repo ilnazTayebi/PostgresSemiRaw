@@ -92,6 +92,12 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
+    //for test purpose we use dropbox authentication 
+    if (params['sniff'] && params['sniff'] == 'true'){
+        // Will periodically check the sniff server for new info
+        setInterval(refresh_info, 3000);
+    }
+
 });
 
 function handleFileSelect(evt) {
@@ -138,7 +144,7 @@ function append_alert(msg, level){
 	m.addClass(level);
 }
 
-setInterval(refresh_info, 3000);
+
 function refresh_info(){
     http_json_request("GET", "/sniff/last_status", undefined, {
         success: function(data){
