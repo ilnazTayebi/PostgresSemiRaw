@@ -77,12 +77,13 @@
                 </div>
             </div>
         </div>
-        <script src="js/bootstrap-treeview.js"></script>
+        <script src="js/raw-treeview.js"></script>
 		<script type="text/javascript" src="js/raw_api.js"></script>
         <script src="jstree/dist/jstree.min.js"></script>
 		<script>
-*            
+            
             var tree =[ 
+
                 { text: "Cursor 1", children: []},
                 { text: "Cursor 2", nodes: []},
                 { text: "Cursor 3", nodes: []},
@@ -101,6 +102,7 @@
                     //$(node.nodeId).treeview({data: tree});
                     //var jnode =  $('.node-tree [data-nodeid="'+node.nodeid+'"]').treeview({data: tree});
                     node.nodes = tree;
+                    //$('#tree').render();
                     //console.log("selection", jnode);
                 })
                 .on('nodeSelected', function (event, node){
