@@ -42,7 +42,7 @@ def registerfile(path):
         file_type = 'text'
     else:
         logging.warn("not registering unknon file type "+ path)
-        append_msg( "warning", "not registering unknon file type %s" % path )
+        append_msg( "warning", "not registering unknown file type %s" % path )
         return
 
     data = dict( 

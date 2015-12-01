@@ -1,33 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+
 		<meta charset="utf-8"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<meta name="description" content=""/>
 		<meta name="author" content=""/>
 		<link rel="icon" href="../../favicon.ico"/>
-
-		<title>RAW demo</title>
+		<title>Sniff server status</title>
 
 		<link rel="stylesheet" href="css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="css/bootstrap-theme.min.css"/>
 		<!--<link rel="stylesheet" href="theme.css">-->
 		<link rel="stylesheet" href="jquery-ui-1.11.4/jquery-ui.min.css"/>
-		<link rel="stylesheet" href="css/BootSideMenu.css"/>
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
-
-
-        
-		</style>
-		<!-- jquery -->
-		<script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
-		<script src="jquery-ui-1.11.4/jquery-ui.min.js" type="text/javascript"></script>
-		<script src="js/bootstrap.min.js" type="text/javascript"></script>
-
-		
-
-	</head>
+		<style type="text/css" media="screen"></style>
         <style>
 	        .navbar-brand,
 	        .navbar-nav li a {
@@ -69,44 +57,77 @@
             <div class="panel panel-default col-lg-6">
                 <div class="panel-heading">
 	                <h3 class="panel-title">
-                        Results from the DB
+                        Last sniffing events
                     </h3>
                 </div>
 			    <div class="panel-body">
-		            <div class="col-lg-12 " id="tree"></div>
+		            <div class="col-lg-12 " id="alerts"></div>
                 </div>
             </div>
         </div>
-        <script src="js/bootstrap-treeview.js"></script>
 		<script type="text/javascript" src="js/raw_api.js"></script>
-        <script src="jstree/dist/jstree.min.js"></script>
 		<script>
-*            
-            var tree =[ 
-                { text: "Cursor 1", children: []},
-                { text: "Cursor 2", nodes: []},
-                { text: "Cursor 3", nodes: []},
-                { text: "Cursor 4", nodes: []}
-            ];
 
-            var n_cursor = 4;
-            $('#tree').treeview({data: tree})
-                .on('nodeExpanded', function(event, node){
-                    console.log("node expanded");
-                    var tree = [];
-                    for( n=0; n < 3 ; n++ ){
-                        tree.push({text: "cursor " + n_cursor++, nodes : [] });
-                    }
-                    console.log(tree)
-                    //$(node.nodeId).treeview({data: tree});
-                    //var jnode =  $('.node-tree [data-nodeid="'+node.nodeid+'"]').treeview({data: tree});
-                    node.nodes = tree;
-                    //console.log("selection", jnode);
-                })
-                .on('nodeSelected', function (event, node){
-                    console.log("node selected");
-                });
+//function to append success message to the alert pane
+function append_alert(msg, level){
 
+	var m = $('<div class="col-lg-12 alert ">'+
+            msg + '</div>')
+            .appendTo("#alerts");
+
+	m.addClass(level);
+}
+
+var status = []
+function refresh_info(){
+
+	http_json_request("GET", "/sniff/status", undefined, {
+		success: function(data){
+			if (status == data.status){
+				console.log("no new data");
+				return;
+			}
+			$("#alerts").empty();
+			status = data.status;
+			console.log("got new data", data.status);
+			for (var n = data.status.length -1 ; n >=  0 ; n--){
+				msg =  data.status[n].msg
+					switch( data.status[n].type){
+						case 'error':
+							append_alert(msg, 'alert-danger')
+							break; 
+						case 'response-error':
+						    msg = '<p>' + msg.msg + '</p>'+ msg.response.message ;
+						    console.log("response-error", msg);
+							append_alert(msg, 'alert-danger');
+							break; 
+						case 'warning':
+							append_alert(msg, 'alert-warning');
+							break;
+							append_alert(msg, 'alert-danger');
+							break;
+						case 'success':
+							append_alert(msg, 'alert-success');
+							break;
+						case 'info':
+							append_alert(msg, 'alert-info');
+							break;
+
+					}
+			}
+
+		},
+		error: function(request, status, error){
+			append_alert(error, 'alert-danger');
+			console.log(error);
+		}
+	})
+
+}
+
+setInterval(refresh_info, 3000);
+
+refresh_info();
 
 
 		</script>
