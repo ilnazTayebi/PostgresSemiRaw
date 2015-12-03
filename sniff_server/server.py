@@ -8,6 +8,7 @@ import collections
 import requests
 import logging
 import json
+import datetime
 from sniff import sniff
 
 lock = threading.Lock()
@@ -22,8 +23,8 @@ user = ''
 logging.basicConfig(level=logging.INFO)
 
 def append_msg( msg_type, msg):
-    info.append(dict(type=msg_type,msg=msg))
-    last_info.append(dict(type=msg_type,msg=msg))
+    info.append(dict(type=msg_type,msg=msg,date=datetime.datetime.now()))
+    last_info.append(dict(type=msg_type,msg=msg,date=datetime.datetime.now()))
 
 def registerfile(path):
   # extracts name and type from the filename 

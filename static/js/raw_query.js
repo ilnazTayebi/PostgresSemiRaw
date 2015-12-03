@@ -211,6 +211,7 @@ function handleServerError(request, error, editor){
         addErrorMarkers(editor, errors);
     }
     else{
+        console.log(error);
         throw ("Unknown error type" + error.exceptionType);
     }
 }
