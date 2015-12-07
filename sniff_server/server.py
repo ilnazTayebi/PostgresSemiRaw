@@ -37,6 +37,8 @@ def registerfile(path):
         file_type = 'csv'
     elif extension == ".json":
         file_type = 'json'
+    elif extension == ".parquet":
+        file_type = 'parquet'
     elif extension == '.log' or \
             extension == '.text' or \
             extension =='.txt':
