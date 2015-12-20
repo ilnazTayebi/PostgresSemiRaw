@@ -6,7 +6,7 @@ if __name__ == '__main__':
     argp = ArgumentParser(description="Register file")
     argp.add_argument( "--executer", "-e", default="http://localhost:54321",
             help="url of the scala executer" , metavar="URL")        
-    argp.add_argument("--user", "-u", default="admin",
+    argp.add_argument("--user", "-u", required=True,
             help="user name to register files")
     argp.add_argument("file", help="file to register")
 
