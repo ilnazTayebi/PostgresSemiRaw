@@ -91,14 +91,18 @@ if __name__ == "__main__":
                 query = step.getElementsByTagName("query")
                 assert len(doc) == 1
                 assert len(query) <= 1
+                disabled = False
                 if query == []:
                     nextQ = ""
                 else:
                     logging.debug(query[0].firstChild.wholeText)
                     nextQ = query[0].firstChild.wholeText
+                    d = query[0].getAttribute("disabled")
+                    if d.lower() == "true":
+                        disabled = True
                 # queries to be exported to test (we skip empty strings)
                 if nextQ.strip() != '':
-                    queries.append(nextQ)
+                    queries.append({"code":nextQ, "disabled": disabled})
                 desc = doc[0].firstChild.wholeText
                 # we skip entries about failing queries (they are there for test purpose)
                 if desc.find("failing query #") != -1:
@@ -115,8 +119,10 @@ if __name__ == "__main__":
         xmlTests.setAttribute("dataset", "httplogs")
         for query in queries:
                 t = newdoc.createElement("query")
+                if query["disabled"]:
+                    t.setAttribute("disabled", "known to fail")
                 c = newdoc.createElement("qrawl")
-                c.appendChild(newdoc.createCDATASection(query))
+                c.appendChild(newdoc.createCDATASection(query["code"]))
                 t.appendChild(c)
                 xmlTests.appendChild(t)
         print xmlTests.toprettyxml(indent="   ", newl="\n")

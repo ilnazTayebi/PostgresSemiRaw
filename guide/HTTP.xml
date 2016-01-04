@@ -27,14 +27,14 @@ If this doesn't work, then go back to the previous step and ensure the dataset i
     </step>
 
     <step>
-        <query>select distinct method, count(*) from httplogs group by method</query>
+        <query disabled="true">select distinct method, count(*) from httplogs group by method</query>
         <doc>Typical SQL aggregation are supported. Here we report the number of
             requests in each possible method.
         </doc>
     </step>
 
     <step>
-        <query>select distinct method, count(*) from httplogs group by method</query>
+        <query disabled="true">select distinct method, count(*) from httplogs group by method</query>
         <doc>
 In RAW, the star sign is in fact an alias to *the subset of httplogs having a certain method*, and the
 count operator runs on that collection and returns the number of elements it contains. This means
@@ -43,7 +43,7 @@ the star sign can be handled as a collection itself. Click next to see.
     </step>
 
     <step>
-        <query>select distinct method, * from httplogs group by method</query>
+        <query disabled="true">select distinct method, * from httplogs group by method</query>
         <doc>Here we removed the aggregation function (count), so that the query returns
 rows which now contain a *nested list* of log lines (the ones with the corresponding method)
 in plae of the initial count.
@@ -52,13 +52,13 @@ Let's do some more processing on this inner collection.
     </step>
 
     <step>
-        <query>select distinct method, (select returned from *) from httplogs group by method</query>
+        <query disabled="true">select distinct method, (select returned from *) from httplogs group by method</query>
         <doc>We extract the return codes form that inner collection.
         </doc>
     </step>
 
     <step>
-        <query>select distinct method, (select returned from *) from httplogs group by method</query>
+        <query disabled="true">select distinct method, (select returned from *) from httplogs group by method</query>
 <doc>We think using the star sign in a *from* is not very readable (but it does work).
 We prefer to use the *partition* keyword instead. For now one consider the
 *partition* keyword as an alias to the star sign for the grouped queries (there is a difference
@@ -67,13 +67,13 @@ and we'll see later on other queries). Let's use partition (click next).
     </step>
 
     <step>
-        <query>select distinct method, (select returned from partition) from httplogs group by method</query>
+        <query disabled="true">select distinct method, (select returned from partition) from httplogs group by method</query>
         <doc>It is more readable. Let's do more queries.
         </doc>
     </step>
 
     <step>
-        <query>
+        <query disabled="true">
             select distinct method, (select distinct returned, count(partition)
                                      from partition group by returned)
             from httplogs
@@ -95,7 +95,7 @@ to use *partition* (click next).
         <doc>Now we find the original log rows in the inner list. As expected, the logs
             found in the inner nested list are all of the corresponding method and returned.
         </doc>
-        <query>
+        <query disabled="true">
             select distinct method, (select distinct returned, partition
                                      from partition group by returned)
             from httplogs
@@ -179,7 +179,7 @@ Let's use this function in a group by query.</doc>
     </step>
 
     <step>
-        <query>
+        <query disabled="true">
         {
             root := \x -> x parse as r"/([^/]*).*";
             cgis := select * from httplogs where root(path) = "cgi-bin";
@@ -194,7 +194,7 @@ Let's use this function in a group by query.</doc>
     </step>
 
     <step>
-        <query>
+        <query disabled="true">
 {
     root := \x -> x parse as r"/([^/]*).*";
     failure := \c -> (c >= 400);
@@ -210,7 +210,7 @@ Let's use this function in a group by query.</doc>
     </step>
 
     <step>
-        <query>
+        <query disabled="true">
 {
     root := \x -> x parse as r"/([^/]*).*";
     failure := \c -> (c >= 400);
