@@ -147,6 +147,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 // function that redraws the graph
 function redraw_graph(new_data){
 	draw_data.data=new_data;
+    check_compatible_graphs(new_data);
 	if (tab_selected != "graph_li" ) return;
 
 	if (draw_data.last_draw != ""){
@@ -157,6 +158,110 @@ function redraw_graph(new_data){
 		console.log("last_draw empty");
 	}
 
+}
+
+// checks if all keys are numeric starting from start
+// This is useful to check the compatibility of certain graphs
+function all_numeric(data, start){
+    var types = [];
+    for (var k in data){
+        types.push(getType(data[k]))
+    }
+    for (var n = start; n < types.length ; n++){
+        if (types[n] != "number") return false;
+    }
+    return true;
+}
+
+function check_compatible_graphs(data){
+    console.log("checking compatible graphs") ;
+    var enable = function(enabled ) {
+        elements = ['draw_table_btn',
+                    'draw_pie',
+                    'draw_bar',
+                    'draw_histogram',
+                    'draw_scatter',
+                    'draw_line',
+                    'draw_geo',
+                    'draw_sunburst',
+                    'draw_tree',
+                    'draw_circle_pack',
+                    'draw_treemap',
+                    'draw_bubblechart',
+                    'draw_3dsurface',
+                    'draw_3dbars',
+                    'draw_heatmap',
+                    '2d_dropdown',
+                    '3d_dropdown',
+                    'hierarchy_dropdown'];
+
+        console.log('enabling', enabled);
+        for(var n in elements){
+            $('#'+elements[n]).addClass('disabled');
+        }
+        for(var n in enabled){
+            $('#'+enabled[n]).removeClass('disabled');
+        }
+    };
+
+    var type = getType(data);
+    var to_enable= [];
+    console.log('type', type);
+    // hierarchical stuff 
+    if (type != "undefined" || ( type == "array" && data.length >= 0)){
+        console.log('enabling hierarchy graphs');
+        to_enable.push ('draw_sunburst',
+                        'draw_tree',
+                        'draw_circle_pack',
+                        'draw_treemap',
+                        'draw_bubblechart',
+                        'draw_table_btn',
+                        'hierarchy_dropdown');
+
+    }
+    if (type == "array"){
+        type = getType(data[0]);
+        console.log("sub type", type)
+        console.log("all_numeric 0" , all_numeric(data[0], 0));
+        console.log("all_numeric 1" , all_numeric(data[0], 1));
+
+        if (type == "object" ){
+            keys = Object.keys(data[0]);
+            // at least one non numeric value
+            if (all_numeric(data[0], 0) == false){
+                to_enable.push('draw_geo');
+            }
+            if (keys.length >= 2 && all_numeric(data[0], 1) ){
+                to_enable.push('draw_bar',
+                            'draw_histogram',
+                            'draw_scatter',
+                            'draw_line',
+                            '2d_dropdown');
+                to_enable.push('draw_geo');
+                if (all_numeric(data[0], 0) == false) {
+                    to_enable.push('draw_pie');
+                }
+            }
+            if (keys.length >= 3 && all_numeric(data[0], 0)){
+                to_enable.push('3d_dropdown', 'draw_3dsurface', 'draw_3dbars');
+                
+            }
+        }
+        else if (type == "number" ){
+            to_enable.push('draw_histogram',
+                          '2d_dropdown');
+        }
+        else if (type == "string"){
+            to_enable.push('draw_geo');
+        }
+        else if (type == "array"){
+            console.log('enabling heatmap');
+            to_enable.push('3d_dropdown', 'draw_heatmap');
+        }
+
+    }
+
+    enable(to_enable)
 }
 
 // assigns the callbacks to all the elements
