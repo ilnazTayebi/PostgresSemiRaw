@@ -2,13 +2,27 @@
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
+    
+    $('#get_next').prop('disabled', true);
+    $('#get_all').prop('disabled', true);
 
     var params = parse_url_params();
+    //for test purpose we use dropbox authentication 
     if (params['dropbox'] && params['dropbox'] == 'true'){
         // initializes credentials using dropbox
         ini_credentials({dropbox:true});
     }
+    else if ( params['user'] && params['password']){
+        console.log("initializing basic auth credentials");
+        ini_credentials({
+            basic_auth : true,
+            user: params.user,
+            password : params.password
+            
+        });
+    }
 
+    //document.getElementById('add_data').onclick = add_from_local;
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 
     //$('#download_excel').prop('disabled', true);
@@ -78,6 +92,100 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
+    //for test purpose we use dropbox authentication 
+    if (params['sniff'] && params['sniff'] == 'true'){
+        // Will periodically check the sniff server for new info
+        setInterval(refresh_info, 3000);
+    }
 
 });
+
+function handleFileSelect(evt) {
+    var files = evt.target.files; // FileList object
+
+    // files is a FileList of File objects. List some properties.
+    var output = [];
+    for (var i = 0, f; f = files[i]; i++) {
+        console.log(i,"file" ,f);
+    }
+
+    var options = get_dropbox_options(files);
+    var inputs = add_files_to_dialog(options);
+    document.getElementById("register_button").onclick = function(){
+        var ok = true;
+        var files = [];
+        for(n in options){
+            var f = options[n];
+            f.name = $("#"+inputs[n].name).val();
+            f.type = $("#"+inputs[n].type).val();
+            //if (f.type == null) ok = false;
+            files.push(f)
+        }
+        if(ok){
+            for (n in files){
+                console.log("registering file ", files[n]);
+                register_file(files[n], upload_alerts);
+            }
+            //closes the dialog
+            $("#register_dialog").modal('hide');
+       }
+        
+    }
+
+    $("#register_dialog").modal('show');
+}
+
+function append_alert(msg, level){
+
+	var m = $('<div class="col-lg-12 alert ">'+
+            msg + '</div>')
+            .appendTo("#alerts");
+
+	m.addClass(level);
+}
+
+
+function refresh_info(){
+    http_json_request("GET", "/sniff/last_status", undefined, {
+        success: function(data){
+
+            var status = data.status;
+            if (status.length > 0) console.log("got new data", status);
+            for (var n = 0 ; n <  status.length ; n++){
+                msg =  status[n].msg
+				switch( data.status[n].type){
+					case 'error':
+						append_alert(msg, 'alert-danger')
+						break; 
+					case 'response-error':
+					    msg = '<p>' + msg.msg + '</p>'+ msg.response.message ;
+					    console.log("response-error", msg);
+						append_alert(msg, 'alert-danger')
+						break; 
+					case 'warning':
+						append_alert(msg, 'alert-warning')
+							break;
+						append_alert(msg, 'alert-danger')
+							break;
+					case 'success':
+						append_alert(msg, 'alert-success')
+							break;
+					case 'info':
+						append_alert(msg, 'alert-info')
+							break;
+				}
+            }
+            $('.alert').stop().fadeOut(5000);
+            $("#alerts").empty();
+            list_schemas();
+        },
+        error: function(request, status, error){
+            append_error(error);
+            console.log(error);
+            $('.alert').stop().fadeOut(5000);
+        }
+    })
+
+}
+
 

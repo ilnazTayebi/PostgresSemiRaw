@@ -288,9 +288,14 @@ function getChildren(data,root, defaultName){
             getChildrenFromOb(data, root );
             break;
         case "array":
-            for(var i in data){
-                getChildrenArray(data[i], root, defaultName +":"+String(i));
+            if (data.length == 1){
+                getChildrenFromOb(data[0], root);
             }
+            else{
+                for(var i in data){
+                    getChildrenArray(data[i], root, defaultName +":"+String(i));
+                }
+            }   
             break;        
         case "number":
             root.children.push({ name : defaultName, size : data});

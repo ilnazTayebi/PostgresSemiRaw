@@ -10,7 +10,7 @@ function ini_credentials(options){
         console.log("authenticating using dropbox");
         // Try to finish OAuth authorization.
         client.authenticate({interactive: true}, function (error) {
-            if( error ) append_error(error);
+            if( error ) console.log(error);
         });
         if (client.isAuthenticated()) {
             // Client is authenticated. Display UI.
@@ -19,13 +19,31 @@ function ini_credentials(options){
             console.log("got credentials", credentials);
         }
     }
-    else if ( options && options['test_basic'] == true){
+    else if ( options && options['basic_auth'] == true){
         credentials = {
             type : 'basic auth',
-            user : 'admin',
-            password : 'admin'
+            user : options.user,
+            password : options.password
         }
     }
+    console.log("initallized credentials", credentials)
+}
+
+function query_start(query, n_results, callbacks){
+    var data = {
+        query : query,
+        resultsPerPage: n_results
+    };
+    http_json_request('POST', '/query-start' , data , callbacks)
+}
+
+function query_next(token, n_results, callbacks){
+    var data = {
+        token : token,
+        resultsPerPage: n_results
+    };
+
+    http_json_request('POST', '/query-next' , data , callbacks)
 }
 
 
@@ -46,10 +64,9 @@ function register_file(options, callbacks){
     http_json_request("POST", '/register-file', options, callbacks)
 }
 
-//this will change to a get without data
 //sends the request to list the schemas
 function get_schema_list( callbacks){
-    var data = { }
+    var data = { };
 
     http_json_request("GET", "/schemas", data, callbacks);
 }
@@ -62,8 +79,14 @@ function http_json_request(method, url, data, callbacks){
     if ( credentials == undefined ){
         console.log("Sending request without credentials");
     }
+    else if (credentials.type == 'basic auth'){
+        console.log("sending request with basic auth");
+        request.withCredentials = true;
+        request.setRequestHeader ("Authorization", 
+            "Basic " + btoa(credentials.user + ":" + credentials.password));
+    }
     else{
-        //console.log("Sending request with credentials", credentials);
+        console.log("Sending request with credentials", credentials);
         request.withCredentials = true;
         request.setRequestHeader('Authorization','Bearer ' + credentials.token);
     }
@@ -74,15 +97,22 @@ function http_json_request(method, url, data, callbacks){
     request.onreadystatechange=function(){
         if (request.readyState==4) {
             if (request.status==200){
-                var data = JSON.parse( request.response )
-                callbacks.success(data);
+                var reponse_data = JSON.parse( request.response )
+                callbacks.success(reponse_data);
             }
             else{
                 callbacks.error( request, request.status, request.responseText)
             }
        }
     }
-    request.send(JSON.stringify(data));
+    if (data) {
+        request.send(JSON.stringify(data));
+    }
+    else{
+        console.log("sending without data");
+        request.send();
+    }
+    
 }
 
 // sends url enconded request using XMLHttpRequest (ajax did not work with redirects with all browsers)
@@ -110,28 +140,23 @@ function http_url_encoded(method, url, data, callbacks){
     request.send(params);
 }
 
-// function to download result from a query 
-function downloadObj(obj, filename, format){ 
-    //TODO: check if there are limits in the size of data for encodeURIComponent
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
-    var dlElem = document.getElementById('downloadAnchorElem');
-    dlElem.setAttribute("href", dataStr);
-    dlElem.setAttribute("download", filename);
-    dlElem.click();
-}
-
 //Saves an object to dropbox
 function saveObjToDropbox( obj, filename, format){
     var client = new Dropbox.Client({ key: dropbox_key });
     // Try to finish OAuth authorization.
     client.authenticate({interactive: true}, function (error) {
-        if(error)append_error(error);
+        if(error){
+            console.log(error);
+            return error;
+       }
+        
     });
     client.writeFile(filename, formatResults( obj, format) , function (error) {
         if (error) {
-            append_error('Could not save ' + filename  + ' , erro:' + error);
+            console.log('Could not save ' + filename  + ' , error:' + error);
         } else {
-            append_alert('File ' + filename  + ' saved in your dropbox');
+            console.log('File ' + filename  + ' saved in your dropbox');
+
         }
     });
 }

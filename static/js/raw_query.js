@@ -25,11 +25,20 @@ function post_query(editor, jsonEditor){
     // otherwise send the query.
     setIndicatorLabel("Running...");
     console.log("sending query", query);
-    send_query( query, {
+    // number of rows to get from the  query 
+    var rows =1000;
+    query_start( query, rows, {
             success: function(data){
-                queryResults = data.output;
+                var token = data.token;
+                if (data.hasMore){
+                    set_get_next_data(token, jsonEditor, rows);
+                    set_get_all(query, jsonEditor);
+                }
+                else{
+                    $('#get_next').prop('disabled', true);
+                    $('#get_all').prop('disabled', true);
+                }
                 ongoing = false;
-
                 // what to do with these results
                 if(editor.getValue() != lastQuery) {
                     // if the editor content changed to another query
@@ -38,20 +47,12 @@ function post_query(editor, jsonEditor){
                     post_query(editor, jsonEditor);
                 }
                 else {
-                    // else update plots and data displays
-                    setIndicatorLabel("Ready")
-                    jsonEditor.set(data.output);
-                    redraw_graph( data.output);
+                    set_results(data.data, jsonEditor);
                 }
             },
             error : function(request, status, error) {
-                
-                console.log("request", request);
-                console.log("Error", error);
-                console.log("status", status);
-                ongoing = false;
-                setIndicatorLabel("Error");
-
+                // see if this has to go inside the if block
+                set_error();
                 //if the query changed in the mean time resend
                 if(editor.getValue() != lastQuery){
                     post_query(editor, jsonEditor);
@@ -75,6 +76,88 @@ function post_query(editor, jsonEditor){
     );
     ongoing = true;
     lastQuery = query;
+}
+
+function set_get_next_data(token, jsonEditor, rows){
+    $('#get_next').prop('disabled', false);
+    document.getElementById('get_next').onclick = function(){
+        if(ongoing == true) return;
+        setIndicatorLabel("Running...");
+        ongoing = true;
+        query_next(token, rows, {
+            success: function(data){
+                    set_results(data.data, jsonEditor);
+                    if(!data.hasMore){
+                        $('#get_next').prop('disabled', true);
+                        $('#get_all').prop('disabled', true);
+                    }
+                },
+            error: function(request, status, error){
+                    set_error();
+                }
+        });
+   }
+}
+
+
+function set_get_all(query, jsonEditor){
+    $('#get_all').prop('disabled', false);
+    document.getElementById('get_all').onclick = function(){
+        if(ongoing == true) return;
+        $('#get_next').prop('disabled', true);
+        $('#get_all').prop('disabled', true);
+        setIndicatorLabel("Running...");
+        ongoing = true;
+        send_query(query, {
+            success: function(data){
+                    set_results(data.output, jsonEditor)
+                },
+            error: function(request, status, error){
+                    set_error();
+                }
+        });
+   }
+}
+function set_results(results, jsonEditor){
+    queryResults = results;
+   //update plots and graphs
+    setIndicatorLabel("Ready")
+    jsonEditor.set(queryResults);
+    redraw_graph( queryResults);
+    ongoing = false;
+}
+
+function set_error(){
+    setIndicatorLabel("Error");
+    ongoing = false;
+    $('#get_all').prop('disabled', true);
+    $('#get_next').prop('disabled', true);
+}
+
+//Will get the schemas and update the UI
+function list_schemas(){
+    get_schema_list(  {
+        success: function(data) {
+            $("#schemas").empty();
+            var tree =[];
+            function node_exists(name){
+                for (n in tree){
+                    if (name == tree[n].text) return true;
+                }
+                return false;
+            }
+            for(n in data.schemas){
+                var node = {text : data.schemas[n] };
+                //TODO: check for a better way to find out if it is an internal extent 
+                tree.push(node);
+            }
+            $('#schema_tree').treeview({data: tree });
+        },
+        error : function(response, status, error) {
+            console.log(response);
+            append_error(response.responseText);
+        }
+     });
 }
 
 
@@ -128,6 +211,7 @@ function handleServerError(request, error, editor){
         addErrorMarkers(editor, errors);
     }
     else{
+        console.log(error);
         throw ("Unknown error type" + error.exceptionType);
     }
 }
@@ -370,6 +454,16 @@ function add_from_url(url, name, type) {
     register_file(f, upload_alerts);
 }
 
+// function to download result from a query 
+function downloadObj(obj, filename, format){ 
+    //TODO: check if there are limits in the size of data for encodeURIComponent
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
+    var dlElem = document.getElementById('downloadAnchorElem');
+    dlElem.setAttribute("href", dataStr);
+    dlElem.setAttribute("download", filename);
+    dlElem.click();
+}
+
 //will add items to select name and file type for the files selected in the dialog
 // returns an array of objects with the ids of the inputs added {name, type}
 function add_files_to_dialog(files){
@@ -447,31 +541,6 @@ function append_error(msg){
          '</div>').appendTo("#alerts");
 }
 
-//Will get the schemas and update the UI
-function list_schemas(){
-    get_schema_list(  {
-        success: function(data) {
-            $("#schemas").empty();
-            var tree =[];
-            function node_exists(name){
-                for (n in tree){
-                    if (name == tree[n].text) return true;
-                }
-                return false;
-            }
-            for(n in data.schemas){
-                var node = {text : data.schemas[n] };
-                //TODO: check for a better way to find out if it is an internal extent 
-                tree.push(node);
-            }
-            $('#schema_tree').treeview({data: tree });
-        },
-        error : function(response, status, error) {
-            console.log(response);
-            append_error(response.responseText);
-        }
-     });
-}
 
 function load_dataset(what) {
     var datasets = {

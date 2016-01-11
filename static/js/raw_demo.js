@@ -9,6 +9,14 @@ $(document).ready(function(){
         // initializes credentials using dropbox
         ini_credentials({dropbox:true});
     }
+    else if ( params['user'] && params['password']){
+        ini_credentials({
+            basic_auth : true,
+            user: params.user,
+            password : params.password
+            
+        });
+    }
 
     document.getElementById('list_schemas').onclick = function() {list_schemas()};
 

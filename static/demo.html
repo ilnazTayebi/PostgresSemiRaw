@@ -1,6 +1,5 @@
-<!--!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"-->
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
 	<head>
 
 		<meta charset="utf-8"/>
@@ -21,6 +20,7 @@
 		<link rel="stylesheet" type="text/css" href="css/d3_graphs.css"/>
 		<link rel="stylesheet" href="css/BootSideMenu.css"/>
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
+<<<<<<< HEAD
 
                 <script>
                   var n = location.href.indexOf("://demo.raw-labs.com");
@@ -34,6 +34,22 @@
                      ga('send', 'pageview');
                      }
                 </script>
+=======
+		<script>
+		 
+		  if ( location.href == "https://demo.raw-labs.com"){
+              console.log("connecting from", location.href, "enabling google analytics");
+              (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+              m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+              })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+              ga('create', 'UA-70403824-3', 'auto');
+              ga('send', 'pageview');
+          }
+
+        </script>		
+>>>>>>> sniff-server
 		<style type="text/css" media="screen">
 #editor {
 	height: 600px;
@@ -213,7 +229,13 @@
 				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h3 class="panel-title">Answer</h3>
+							<h3 class="panel-title">
+							    Answer
+                                <div class="pull-right btn-group" role="group" id="next_group">
+                                    <button type="button" class="btn btn-default btn-xs" id="get_next" > get next</button>
+                                    <button type="button" class="btn btn-default btn-xs" id="get_all">get all</button>
+                                </div>
+							</h3>							
 						</div>
 						<div class="panel-body">
 							<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
@@ -229,40 +251,40 @@
 											<span class="glyphicon glyphicon-th"></span>
 										</button>
 										<div class="dropdown" style="float:left">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="2d_dropdown">
 												<span class="caret"></span>
 												<span class="glyphicon glyphicon-stats"></span>
 											</button>
 											<ul class="dropdown-menu" >
-												<li><a href="#" id="draw_pie">Pie Chart</a></li>
-												<li><a href="#" id="draw_bar">Bar Chart</a></li>
-												<li><a href="#" id="draw_line">Line Chart</a></li>
-												<li><a href="#" id="draw_scatter">XY Scatter</a></li>
-												<li><a href="#" id="draw_histogram">Histogram</a></li>
+												<li id="draw_pie"><a href="#" >Pie Chart</a></li>
+												<li id="draw_bar"><a href="#" >Bar Chart</a></li>
+												<li id="draw_line"><a href="#">Line Chart</a></li>
+												<li id="draw_scatter"><a href="#" >XY Scatter</a></li>
+												<li id="draw_histogram"><a href="#" >Histogram</a></li>
 											</ul>
 										</div>
 										<div class="dropdown" style="float:left" aria-label="...">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="3d_dropdown">
 												<span class="caret"></span>
 												<span class="glyphicon glyphicon-dashboard"></span>
 											</button>
-											<ul class="dropdown-menu" >
-												<li><a href="#" id="draw_3dsurface">3D surface</a></li>
-												<li><a href="#" id="draw_3dbars">3D Bars</a></li>
-												<li><a href="#" id="draw_heatmap">Heatmap</a></li>
+											<ul class="dropdown-menu">
+												<li id="draw_3dsurface"><a href="#" >3D surface</a></li>
+												<li id="draw_3dbars"><a href="#" >3D Bars</a></li>
+												<li id="draw_heatmap"><a href="#">Heatmap</a></li>
 											</ul>
 										</div>
 										<div class="dropdown" style="float:left">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="hierarchy_dropdown">
 												<span class="caret"></span>
 												<span class="glyphicon glyphicon-object-align-horizontal"></span>
 											</button>
 											<ul class="dropdown-menu" >
-												<li><a href="#" id="draw_tree">Tree</a></li>
-												<li><a href="#" id="draw_sunburst">Sunburst graph</a></li>
-												<li><a href="#" id="draw_circle_pack">Circle packing</a></li>
-												<li><a href="#" id="draw_treemap">Tree Map</a></li>
-												<li><a href="#" id="draw_bubblechart">Bubble Plot</a></li>
+												<li id="draw_tree"><a href="#" >Tree</a></li>
+												<li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
+												<li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
+												<li id="draw_treemap"><a href="#" >Tree Map</a></li>
+												<li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
 											</ul>
 										</div>
 										<button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" style="float:left">
