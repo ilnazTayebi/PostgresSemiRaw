@@ -25,7 +25,7 @@ function post_query(editor, jsonEditor){
     // otherwise send the query.
     setIndicatorLabel("Running...");
     console.log("sending query", query);
-    // number of rowa to get from the  query 
+    // number of rows to get from the  query 
     var rows =1000;
     query_start( query, rows, {
             success: function(data){
