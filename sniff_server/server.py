@@ -27,7 +27,7 @@ def append_msg( msg_type, msg):
     last_info.append(dict(type=msg_type,msg=msg,date=datetime.datetime.now()))
 
 def registerfile(path):
-  # extracts name and type from the filename 
+    # extracts name and type from the filename 
     logging.info("Registering file %s" % path )
     basename = os.path.basename(path)
     parts = os.path.splitext(basename)
