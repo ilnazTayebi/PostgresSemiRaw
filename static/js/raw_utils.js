@@ -4,6 +4,11 @@
 // like this I can get arrays types and all of that
 function getType(obj)  { 
 	if (typeof obj == "undefined") return "undefined";
+    if (obj == null) {
+        console.log("null type!");
+        return "null";
+   }
+    
 	var funcNameRegex = /function (.{1,})\(/;
 	var results = (funcNameRegex).exec((obj).constructor.toString());
 	var type =  (results && results.length > 1) ? results[1] : "";
@@ -31,6 +36,9 @@ function getObjValue(obj){
 		case "date":
 		case "string":
 			return obj;
+        case "null":
+             console.log("null value!");
+            return 0;
 		default:
 			return objToString(obj);
 	}
