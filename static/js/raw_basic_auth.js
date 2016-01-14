@@ -17,8 +17,13 @@ $(document).ready(function(){
         ini_credentials({
             basic_auth : true,
             user: params.user,
-            password : params.password
-            
+            password : params.password,
+            user_info: function (error, info){
+                console.log('Dropbox name: ' + info.name);            
+                $('<ul class="nav navbar-nav navbar-right">\
+                    <li><a>Hello ' + info.name.capitalize() + '!</a></li> \
+                 </ul>').appendTo('.navbar-collapse');
+             }
         });
     }
 
