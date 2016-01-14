@@ -1,4 +1,10 @@
 
+// this is to add capitalization for strings as seen on
+// http://stackoverflow.com/questions/2332811/capitalize-words-in-string/7592235#7592235
+String.prototype.capitalize = function() {
+    return this.replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+};
+
 // this function was adapted from :
 //http://stackoverflow.com/questions/332422/how-do-i-get-the-name-of-an-objects-type-in-javascript
 // like this I can get arrays types and all of that

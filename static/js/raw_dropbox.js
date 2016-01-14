@@ -1,4 +1,3 @@
-
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
@@ -7,7 +6,15 @@ $(document).ready(function(){
     $('#get_all').prop('disabled', true);
 
     // initializes credentials using dropbox
-    ini_credentials({dropbox:true});
+    ini_credentials({
+        dropbox:true,
+        user_info: function (error, info){
+            console.log('Dropbox name: ' + info.name);            
+            $('<ul class="nav navbar-nav navbar-right">\
+                <li><a>Hello ' + info.name.capitalize() + '!</a></li> \
+             </ul>').appendTo('.navbar-collapse');
+        }
+    });
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
 

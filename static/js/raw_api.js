@@ -18,12 +18,19 @@ function ini_credentials(options){
             credentials.type = 'dropbox';
             console.log("got credentials", credentials);
         }
+        if (options['user_info']){
+            client.getAccountInfo(options['user_info']);
+        }
+
     }
     else if ( options && options['basic_auth'] == true){
         credentials = {
             type : 'basic auth',
             user : options.user,
             password : options.password
+        }
+        if (options['user_info']){
+            options['user_info'](false, {name : options.user})
         }
     }
     console.log("initallized credentials", credentials)
@@ -45,7 +52,6 @@ function query_next(token, n_results, callbacks){
 
     http_json_request('POST', '/query-next' , data , callbacks)
 }
-
 
 //function to send a query to the query service
 // arg: query, the query string
