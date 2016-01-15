@@ -33,13 +33,13 @@ var draw_functions  = {
         visualization.draw(t);
     },    
     pieChart : function(){ 
-        draw_data.last_draw = "pieChart"
+        draw_data.last_draw = "pieChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.PieChart(graph_div);
         visualization.draw(t);
     },
     scatterChart : function(){
-        draw_data.last_draw = "scatterChart"
+        draw_data.last_draw = "scatterChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.ScatterChart(graph_div);
         visualization.draw(t);
@@ -221,7 +221,7 @@ function check_compatible_graphs(data){
     }
     if (type == "array"){
         type = getType(data[0]);
-        console.log("sub type", type)
+        console.log("sub type", type);
         console.log("all_numeric 0" , all_numeric(data[0], 0));
         console.log("all_numeric 1" , all_numeric(data[0], 1));
 
@@ -261,7 +261,7 @@ function check_compatible_graphs(data){
 
     }
 
-    enable(to_enable)
+    enable(to_enable);
 }
 
 // assigns the callbacks to all the elements

@@ -41,7 +41,7 @@ function query_start(query, n_results, callbacks){
         query : query,
         resultsPerPage: n_results
     };
-    http_json_request('POST', '/query-start' , data , callbacks)
+    http_json_request('POST', '/query-start' , data , callbacks);
 }
 
 function query_next(token, n_results, callbacks){
@@ -50,7 +50,7 @@ function query_next(token, n_results, callbacks){
         resultsPerPage: n_results
     };
 
-    http_json_request('POST', '/query-next' , data , callbacks)
+    http_json_request('POST', '/query-next' , data , callbacks);
 }
 
 //function to send a query to the query service
@@ -62,12 +62,12 @@ function send_query(query, callbacks){
     var data = {
         query : query
     };
-    http_json_request('POST', '/query' , data , callbacks)
+    http_json_request('POST', '/query' , data , callbacks);
 }
 
 //registers file for querying 
 function register_file(options, callbacks){
-    http_json_request("POST", '/register-file', options, callbacks)
+    http_json_request("POST", '/register-file', options, callbacks);
 }
 
 //sends the request to list the schemas
@@ -103,11 +103,16 @@ function http_json_request(method, url, data, callbacks){
     request.onreadystatechange=function(){
         if (request.readyState==4) {
             if (request.status==200){
-                var reponse_data = JSON.parse( request.response )
+                console.log(request);
+                // here the response is empty
+                var response_data=undefined;
+                if (request.response){
+                    reponse_data = JSON.parse( request.response );
+                }                
                 callbacks.success(reponse_data);
             }
             else{
-                callbacks.error( request, request.status, request.responseText)
+                callbacks.error( request, request.status, request.responseText);
             }
        }
     }
@@ -139,7 +144,7 @@ function http_url_encoded(method, url, data, callbacks){
                 callbacks.success(data);
             }
             else{
-                callbacks.error( request, request.status, request.responseText)
+                callbacks.error( request, request.status, request.responseText);
             }
        }
     }

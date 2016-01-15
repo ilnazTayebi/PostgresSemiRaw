@@ -379,10 +379,9 @@ function get_dropbox_options(selection){
         options.name = options.name.replace(/[ \.~-]/g,'_')
         switch(extension){
             case 'json':
-                options.type = 'json';
-                break;
             case 'csv' :
-                options.type = 'csv';
+            case 'hjson':
+                options.type = extension;
                 break;
             default:
                 options.type = 'text';
@@ -395,15 +394,20 @@ function get_dropbox_options(selection){
 
 var upload_alerts = {
         success: function(data) {
-           console.log(data);
-           append_alert('File ' + data.name  + ' registered');
+            console.log(data);
+            if(data && data.name){
+                append_alert('File ' + data.name  + ' registered');
+            }
+            else{
+                append_alert('File registered');
+            }
             // list the schemas again 
-           list_schemas();
+            list_schemas();
         },
         error : function(request, status, error) {
             console.log("error", request, status, error);
             var response = JSON.parse(request.responseText);
-            append_error("Error registering file '" + response.name + "' : "+ response.output);
+            append_error("Error registering file '" + response.exceptionType + "' : "+ response.message);
         }
      }
 
@@ -426,7 +430,7 @@ function add_from_dropbox(){
                     /* checks if the name is ok*/
                     f.type = $("#"+inputs[n].type).val();
                     //if (f.type == null) ok = false;
-                    files.push(f)
+                    files.push(f);
                 }
                 if(ok){
                     for (n in files){
@@ -486,6 +490,7 @@ function add_files_to_dialog(files){
                     <select class="form-control" id="'+ i.type +'">\
                     <option value="csv">CSV</option>\
                     <option value="json">JSON</option>\
+                    <option value="hjson">HJSON</option>\
                     <option value="text">TEXT</option>\
                     </select>\
                 </div>\
