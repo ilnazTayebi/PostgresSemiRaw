@@ -21,12 +21,11 @@ $(document).ready(function(){
     });
 
     client = credentials.client;
-
-    document.getElementById('add_dropbox').onclick = add_from_dropbox;
-    document.getElementById('add_dropbox2').onclick = add_from_dropbox;
+    $("#add_dropbox").on("click", function(e){ add_from_dropbox();  });
+    $("#add_dropbox2").on("click", function(e){ add_from_dropbox();  });
 
     //save to dropbox
-    document.getElementById('save_to_dropbox').onclick = function(){
+    $('#save_to_dropbox').on( "click", function(e){
         //downloadJsonObj(queryResults, "data.json");
         $("#download_dialog").modal('show');
         document.getElementById('download_json').onclick = function () {
@@ -41,14 +40,14 @@ $(document).ready(function(){
             //saveObjToDropbox(  queryResults, "results.xls", "excel");
             //$("#download_dialog").modal('hide');
         };
-    };
+    });
 
-    document.getElementById('list_schemas').onclick = function() {list_schemas()};
+    $('#list_schemas').on("click", function(e) {list_schemas()});
 
     //$('#download_excel').prop('disabled', true);
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
-    document.getElementById('download_results').onclick = function(){
+    $('#download_results').on("click", function(){
         //downloadJsonObj(queryResults, "data.json");
         $("#download_dialog").modal('show');
         document.getElementById('download_json').onclick = function () {
@@ -61,7 +60,7 @@ $(document).ready(function(){
         };
         document.getElementById('download_excel').onclick = function () {
         };
-    };
+    });
 
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;
@@ -95,21 +94,21 @@ $(document).ready(function(){
 
     editor_set_autoexecute(true);
 
-    document.getElementById('execute_btn').onclick = function(){ 
+    $('#execute_btn').on('click', function(){ 
         console.log("editor", editor);
         post_query(editor, jsonEditor);
-    };
+    });
 
-    document.getElementById('auto_query').onchange = function(){
+    $('#auto_query').on( "change", function(e){
         if (document.getElementById("auto_query").checked){
             editor_set_autoexecute(true);
         }
         else{
             editor_set_autoexecute(false);
         }
-    }
+    });
 
-    document.getElementById('save_query').onclick = function(){    
+    $('#save_query').on("click", function(){    
         var dialog = $("#save_query_dialog");
 
         $("#query_save_button").on("click", function(e) {
@@ -123,9 +122,9 @@ $(document).ready(function(){
             dialog.modal('hide');
         });
         dialog.modal('show');
-    }
+    });
 
-    document.getElementById('load_query').onclick = function(){
+    $('#load_query').on( "click", function(){
         var dialog = $("#load_query_dialog");
 
         $("#query_load_button").on("click", function(e) {
@@ -144,7 +143,8 @@ $(document).ready(function(){
         
         });
         dialog.modal('show');
-    };
+    });
+
     // starts listing the schemas
     list_schemas();
     init_session();
@@ -157,7 +157,6 @@ function load_query(path, editor, jsonEditor){
         console.log('file', content, stat);
         var saved_query = JSON.parse(content);
         set_selected_graph(saved_query.vis);
-
         editor.setValue(saved_query.query);
         //TODO: only do this if auto query is not selected
         post_query(editor, jsonEditor);
