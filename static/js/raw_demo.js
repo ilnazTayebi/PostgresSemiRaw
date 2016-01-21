@@ -18,7 +18,7 @@ $(document).ready(function(){
         });
     }
 
-    document.getElementById('list_schemas').onclick = function() {list_schemas()};
+    $('#list_schemas').on('click', function(e){ list_schemas()});
 
     //$('#download_excel').prop('disabled', true);
     $("[rel=tooltip]").tooltip({ placement: 'right'});
@@ -72,7 +72,7 @@ $(document).ready(function(){
 
     editor_set_autoexecute(true);
     console.log(editor);
-    document.getElementById('execute_btn').onclick = function(){ post_query(editor, jsonEditor)};
+    $('#execute_btn').on('click', function(e){ function(){ post_query(editor, jsonEditor)}()});
 
     document.getElementById('auto_query').onchange = function(){
         if (document.getElementById("auto_query").checked){

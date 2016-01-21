@@ -27,13 +27,13 @@ $(document).ready(function(){
         });
     }
 
-    //document.getElementById('add_data').onclick = add_from_local;
-    document.getElementById('list_schemas').onclick = function() {list_schemas()};
+    //$('#add_data').on('click', function(e){ add_from_local()});
+    $('#list_schemas').on('click', function(e){ list_schemas()});
 
     //$('#download_excel').prop('disabled', true);
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
-    document.getElementById('download_results').onclick = function(){
+    $('#download_results').on('click', function(e){
         //downloadJsonObj(queryResults, "data.json");
         $("#download_dialog").modal('show');
         document.getElementById('download_json').onclick = function () {
@@ -47,7 +47,7 @@ $(document).ready(function(){
         document.getElementById('download_excel').onclick = function () {
             
         };
-    };
+    });
 
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;

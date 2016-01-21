@@ -282,22 +282,22 @@ function check_compatible_graphs(data){
 }
 
 // assigns the callbacks to all the elements
-document.getElementById('draw_table_btn').onclick = draw_functions['table'];
+$('#draw_table_btn').on('click', draw_functions['table']);
 // 2d graphs
-document.getElementById('draw_pie').onclick = draw_functions['pieChart'];
-document.getElementById('draw_bar').onclick = draw_functions['columnChart'];
-document.getElementById('draw_histogram').onclick = draw_functions['histogram'];
-document.getElementById('draw_scatter').onclick = draw_functions['scatterChart'];
-document.getElementById('draw_line').onclick = draw_functions['line_chart'];
+$('#draw_pie').on('click', draw_functions['pieChart']);
+$('#draw_bar').on('click', draw_functions['columnChart']);
+$('#draw_histogram').on('click', draw_functions['histogram']);
+$('#draw_scatter').on('click', draw_functions['scatterChart']);
+$('#draw_line').on('click', draw_functions['line_chart']);
 //geo graphs
-document.getElementById('draw_geo').onclick = draw_functions['geo_world'];
+$('#draw_geo').on('click', draw_functions['geo_world']);
 // hierarchy graphs
-document.getElementById('draw_sunburst').onclick =  draw_functions['sunburts'];
-document.getElementById('draw_tree').onclick =  draw_functions['tree'];
-document.getElementById('draw_circle_pack').onclick =  draw_functions['circle_pack'];
-document.getElementById('draw_treemap').onclick =  draw_functions['treemap'];
-document.getElementById('draw_bubblechart').onclick =  draw_functions['bubble_chart'];
+$('#draw_sunburst').on('click', draw_functions['sunburts']);
+$('#draw_tree').on('click', draw_functions['tree']);
+$('#draw_circle_pack').on('click', draw_functions['circle_pack']);
+$('#draw_treemap').on('click', draw_functions['treemap']);
+$('#draw_bubblechart').on('click', draw_functions['bubble_chart']);
 
-document.getElementById('draw_3dsurface').onclick =  draw_functions['surface_3d'];
-document.getElementById('draw_3dbars').onclick =  draw_functions['bars_3d'];
-document.getElementById('draw_heatmap').onclick =  draw_functions['heatmap'];
+$('#draw_3dsurface').on('click', draw_functions['surface_3d']);
+$('#draw_3dbars').on('click', draw_functions['bars_3d']);
+$('#draw_heatmap').on('click', draw_functions['heatmap']);

@@ -21,25 +21,25 @@ $(document).ready(function(){
     });
 
     client = credentials.client;
-    $("#add_dropbox").on("click", function(e){ add_from_dropbox();  });
-    $("#add_dropbox2").on("click", function(e){ add_from_dropbox();  });
+    $("#add_dropbox").on("click", function(e){ add_from_dropbox();});
+    $("#add_dropbox2").on("click", function(e){ add_from_dropbox();});
 
     //save to dropbox
     $('#save_to_dropbox').on( "click", function(e){
         //downloadJsonObj(queryResults, "data.json");
         $("#download_dialog").modal('show');
-        document.getElementById('download_json').onclick = function () {
+        $('#download_json').on('click', function(e){
             saveObjToDropbox(  queryResults, "results.json", "json");
             $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_csv').onclick = function () {
+        });
+        $('#download_csv').on('click', function () {
             saveObjToDropbox(  queryResults, "results.csv", "csv");
             $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_excel').onclick = function () {
+        });
+        $('download_excel').on('click', function () {
             //saveObjToDropbox(  queryResults, "results.xls", "excel");
             //$("#download_dialog").modal('hide');
-        };
+        });
     });
 
     $('#list_schemas').on("click", function(e) {list_schemas()});
