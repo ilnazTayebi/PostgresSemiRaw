@@ -160,6 +160,23 @@ function redraw_graph(new_data){
 
 }
 
+function get_selected_graph(){
+    if (tab_selected != "graph_li" ) return 'json_editor';
+    else return draw_data.last_draw;
+}
+
+
+function set_selected_graph(graph){
+    if (graph == 'json_editor'){
+        $('#vis_tab a[href="#values"]').tab('show');
+    }
+    else{
+        $('#vis_tab a[href="#graph_tab"]').tab('show');
+        draw_data.last_draw = graph;
+    }
+}
+
+
 // checks if all keys are numeric starting from start
 // This is useful to check the compatibility of certain graphs
 function all_numeric(data, start){

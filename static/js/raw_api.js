@@ -16,12 +16,12 @@ function ini_credentials(options){
             // Client is authenticated. Display UI.
             credentials = client._credentials;
             credentials.type = 'dropbox';
-            console.log("got credentials", credentials);
         }
         if (options['user_info']){
             client.getAccountInfo(options['user_info']);
         }
 
+        credentials.client = client;
     }
     else if ( options && options['basic_auth'] == true){
         credentials = {
@@ -34,6 +34,7 @@ function ini_credentials(options){
         }
     }
     console.log("initallized credentials", credentials)
+    return credentials;
 }
 
 function query_start(query, n_results, callbacks){

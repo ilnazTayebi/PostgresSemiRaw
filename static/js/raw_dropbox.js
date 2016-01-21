@@ -1,3 +1,7 @@
+//the dropbox client
+var client = undefined;
+var RawSessionFolder = "RawSession";
+
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
@@ -6,7 +10,7 @@ $(document).ready(function(){
     $('#get_all').prop('disabled', true);
 
     // initializes credentials using dropbox
-    ini_credentials({
+    var credentials = ini_credentials({
         dropbox:true,
         user_info: function (error, info){
             console.log('Dropbox name: ' + info.name);            
@@ -15,6 +19,9 @@ $(document).ready(function(){
              </ul>').appendTo('.navbar-collapse');
         }
     });
+
+    client = credentials.client;
+
     document.getElementById('add_dropbox').onclick = add_from_dropbox;
     document.getElementById('add_dropbox2').onclick = add_from_dropbox;
 
@@ -102,7 +109,83 @@ $(document).ready(function(){
         }
     }
 
+    document.getElementById('save_query').onclick = function(){    
+        var dialog = $("#save_query_dialog");
+
+        $("#query_save_button").on("click", function(e) {
+            e.preventDefault();
+            var query = {
+                query : editor.getValue() ,
+                vis : get_selected_graph()
+            } 
+            var path = RawSessionFolder + "/" + $("#query_name").val();
+            saveObjToDropbox(query, path, "json");
+            dialog.modal('hide');
+        });
+        dialog.modal('show');
+    }
+
+    document.getElementById('load_query').onclick = function(){
+        var dialog = $("#load_query_dialog");
+
+        $("#query_load_button").on("click", function(e) {
+            e.preventDefault();
+            var q = $('#load_query_sel').val();
+            console.log("selected query " , q[0]);
+            load_query(RawSessionFolder + "/" + q[0], editor, jsonEditor);
+            dialog.modal('hide');
+        });
+
+        client.stat( RawSessionFolder, {readDir : true} , function (error, file, files) {
+            $('#load_query_sel').empty();
+            for (var n = 0 ; n < files.length ; n++){
+                $('<option>' + files[n].name +' </option>').appendTo('#load_query_sel');
+            }
+        
+        });
+        dialog.modal('show');
+    };
     // starts listing the schemas
     list_schemas();
-
+    init_session();
 });
+
+function load_query(path, editor, jsonEditor){
+    console.log('loading query', path);
+    var options = {};
+    client.readFile(path, options, function(error, content, stat){
+        console.log('file', content, stat);
+        var saved_query = JSON.parse(content);
+        set_selected_graph(saved_query.vis);
+
+        editor.setValue(saved_query.query);
+        //TODO: only do this if auto query is not selected
+        post_query(editor, jsonEditor);
+    });
+}
+
+function init_session(){
+    var options = {readDir : true};
+    // list root folder
+    client.stat("/", options , function (error, file, files) {
+        if (error) {
+            throw 'Could not list dropbox folder, error:' + error ;
+        } 
+
+        var f = files.find( function (f,index, array){
+           return  f.name == RawSessionFolder ;
+        });
+
+        if( f && f.isFolder == false){
+            // TODO: this is conflict and we have to do something about it
+        }
+        else if( f && f.isFolder ){
+            console.log("Folder already exists, not doing anything");
+        }
+        else{
+            console.log("creating session folder");
+            client.mkdir(RawSessionFolder);
+        }
+
+    });
+}

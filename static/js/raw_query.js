@@ -512,8 +512,6 @@ function add_files_to_dialog(files){
         }
         $("#"+i.name).val(f.name);
         $("#"+i.type).val(f.type);
-
-
    }
 
     // adds the button at the end
