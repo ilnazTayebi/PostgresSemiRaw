@@ -168,10 +168,12 @@ function get_selected_graph(){
 
 function set_selected_graph(graph){
     if (graph == 'json_editor'){
+        console.log('enabling values tab')
         $('#vis_tab a[href="#values"]').tab('show');
     }
     else{
         $('#vis_tab a[href="#graph_tab"]').tab('show');
+        console.log('enabling graph tab')
         draw_data.last_draw = graph;
     }
 }

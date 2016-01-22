@@ -71,17 +71,21 @@ $(document).ready(function(){
     }
 
     editor_set_autoexecute(true);
-    console.log(editor);
-    $('#execute_btn').on('click', function(e){ post_query(editor, jsonEditor)});
 
-    document.getElementById('auto_query').onchange = function(){
+    $('#execute_btn').on('click', function(e){ 
+        console.log("editor", editor);
+        post_query(editor, jsonEditor);
+    });
+
+    $('#auto_query').on( "change", function(e){
         if (document.getElementById("auto_query").checked){
             editor_set_autoexecute(true);
         }
         else{
             editor_set_autoexecute(false);
         }
-    }
+    });
+
     // init demo stuff, pointing it to the editor
     demo_init(editor);
     demo_start(params["section"]);

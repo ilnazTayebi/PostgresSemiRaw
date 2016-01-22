@@ -94,7 +94,7 @@ $(document).ready(function(){
 
     editor_set_autoexecute(true);
 
-    $('#execute_btn').on('click', function(){ 
+    $('#execute_btn').on('click', function(e){ 
         console.log("editor", editor);
         post_query(editor, jsonEditor);
     });
