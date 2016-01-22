@@ -151,16 +151,14 @@ var draw_functions  = {
 
 // There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
 //like this it will only draw when the graph tab is selected
-/*var tab_selected = "";
+var tab_selected = "";
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		//show selected tab / active
 		tab_selected =  $(e.target).attr('id');
-        console.log($(e.target));
-        console.log('selected tab', tab_selected);
-		if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
+		//if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
         
 });
-*/
+
 // function that redraws the graph
 function redraw_graph(new_data){
 	draw_data.data=new_data;
@@ -285,9 +283,7 @@ function check_compatible_graphs(data){
             console.log('enabling heatmap');
             to_enable.push('3d_dropdown', 'draw_heatmap');
         }
-
     }
-
     enable(to_enable);
 
 }

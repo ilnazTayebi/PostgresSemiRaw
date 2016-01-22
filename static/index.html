@@ -7,7 +7,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<meta name="description" content=""/>
 		<meta name="author" content=""/>
-		<link rel="icon" href="../../favicon.ico"/>
+		<!--		<link rel="icon" href="../../favicon.ico"/>-->
 
 		<title>RAW demo</title>
 
@@ -19,11 +19,12 @@
 		<link rel="stylesheet" type="text/css" href="css/d3_graphs.css"/>
 		<link rel="stylesheet" href="css/BootSideMenu.css"/>
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
+		<link rel="stylesheet" href="css/tabs.css"/>
 		<style type="text/css" media="screen">
-        #editor {
-	        height: 600px;
-	        font-size: 18px;
-        }
+#editor {
+	height: 600px;
+	font-size: 18px;
+}
 
 	    #demoBox {
 		    height: 0px;
@@ -53,14 +54,14 @@
 	    }
 
 	    #values {
-		    height: 540px;
+		    height: 600px;
 		    font-size: 18px;
 	    }
-
 	    #graph_tab{
-		    height: 540px;
+		    height: 600px;
 		    font-size: 18px;        
 	    }
+
 	    .navbar-brand,
 	    .navbar-nav li a {
 		    line-height: 65px;
@@ -133,7 +134,7 @@
 					Auto Query
 				</label>
 			</div>
-		</div><!-- /side panel -->
+		</div> <!-- /side panel -->
 
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container-fluid">
@@ -151,10 +152,10 @@
 						<li id="load_query"><a >Load</a></li>
 						<li id="save_query"><a>Save</a></li>
 						<li><a href="http://blog.raw-labs.com/">Learn More</a></li>
-					</ul>					
+					</ul>
 				</div>
 			</div>
-		</div><!-- /nav bar -->
+		</div> <!--nav bar-->
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-lg-6">
@@ -170,7 +171,7 @@
 							<div id="editor" class="col-lg-12" style="height:600px">Write your query here...</div>
 						</div>
 					</div>
-				</div> <!--/Query panel -->
+				</div> <!-- Query panel-->
 				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
@@ -183,70 +184,69 @@
 							</h3>
 						</div>
 						<div class="panel-body">
-							<ul id="vis_tab" class="nav nav-tabs" data-tabs="tabs">
-								<li><a href="#values" data-toggle="tab" id="values_li">Values</a></li>
-								<li><a href="#graph_tab" data-toggle="tab" id="graph_li">Graphs</a></li>
-							</ul>
-							<div id="my-tab-content" class="tab-content">
-								<div class="tab-pane active" id="values"></div>
-								<div class="tab-pane" id="graph_tab">
-									<div class="btn-group" role="group">
-										<button class="btn btn-primary dropdown-toggle" id="draw_table_btn" type="button" >
+							<div class="tabbable">
+								<ul id="vis_tab" class="nav nav-pills nav-stacked col-md-3" style="width:15%"> <!-- style="width:15%"-->
+									<li><a href="#values" data-toggle="tab" id="values_li">values</a></li>
+									<li id="draw_table_btn" >
+										<a href="#graph_tab" data-toggle="tab" id="table_li" > 
 											<span class="glyphicon glyphicon-th"></span>
-										</button>
-                                        <div class="btn-group" role="group">
-										    <div class="dropdown" >
-											    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="2d_dropdown">
-												    <span class="caret"></span>
-												    <span class="glyphicon glyphicon-stats"></span>
-											    </button>
-											    <ul class="dropdown-menu" >
-												    <li id="draw_pie"><a href="#" >Pie Chart</a></li>
-												    <li id="draw_bar"><a href="#" >Bar Chart</a></li>
-												    <li id="draw_line"><a href="#">Line Chart</a></li>
-												    <li id="draw_scatter"><a href="#" >XY Scatter</a></li>
-												    <li id="draw_histogram"><a href="#" >Histogram</a></li>
-											    </ul>
-										    </div>
-										</div>
-                                        <div class="btn-group" role="group">
-										    <div class="dropdown" aria-label="...">
-											    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="3d_dropdown">
-												    <span class="caret"></span>
-												    <span class="glyphicon glyphicon-dashboard"></span>
-											    </button>
-											    <ul class="dropdown-menu">
-												    <li id="draw_3dsurface"><a href="#" >3D surface</a></li>
-												    <li id="draw_3dbars"><a href="#" >3D Bars</a></li>
-												    <li id="draw_heatmap"><a href="#">Heatmap</a></li>
-											    </ul>
-										    </div>
-                                        </div>
-                                        <div class="btn-group" role="group">
-										    <div class="dropdown" >
-											    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="hierarchy_dropdown">
-												    <span class="caret"></span>
-												    <span class="glyphicon glyphicon-object-align-horizontal"></span>
-											    </button>
-											    <ul class="dropdown-menu" >
-												    <li id="draw_tree"><a href="#" >Tree</a></li>
-												    <li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
-												    <li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
-												    <li id="draw_treemap"><a href="#" >Tree Map</a></li>
-												    <li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
-											    </ul>
-										    </div>
-                                        </div> 
-										<button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" >
+										</a>
+									</li>
+									<li id="2d_dropdown">
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="2d_li">
+											<span class="glyphicon glyphicon-stats"></span>
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu" >
+											<li id="draw_pie"><a href="#" >Pie Chart</a></li>
+											<li id="draw_bar"><a href="#" >Bar Chart</a></li>
+											<li id="draw_line"><a href="#">Line Chart</a></li>
+											<li id="draw_scatter"><a href="#" >XY Scatter</a></li>
+											<li id="draw_histogram"><a href="#" >Histogram</a></li>
+										</ul>
+									</li>
+									<li class = "dropdown" id="3d_dropdown" >
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="3d_li">
+											<span class="glyphicon glyphicon-dashboard"></span>
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu">
+											<li id="draw_3dsurface"><a href="#" >3D surface</a></li>
+											<li id="draw_3dbars"><a href="#" >3D Bars</a></li>
+											<li id="draw_heatmap"><a href="#">Heatmap</a></li>
+										</ul>
+									</li>
+									<li class = "dropdown"  id="hierarchy_dropdown">
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button"  ref="#graph_tab" id="tree_li">
+											<span class="glyphicon glyphicon-object-align-horizontal"></span>
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu" >
+											<li id="draw_tree"><a href="#" >Tree</a></li>
+											<li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
+											<li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
+											<li id="draw_treemap"><a href="#" >Tree Map</a></li>
+											<li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
+										</ul>
+									</li>
+									<li id="draw_geo">
+										<a href="#graph_tab" data-toggle="tab" id="geo_li"> 
 											<span class="glyphicon glyphicon-globe"></span>
-										</button>
-									</div> <!-- /graph selection button group -->
-									<div class="container" id="graph" style="height: 95%; width: 95%;float:right;"></div>
-								</div> <!-- /graph tab -->
-							</div> <!-- /tab content -->
-						</div>
+										</a>
+									</li>
+								</ul>
+								<div class="tab-content col-md-9" style="width:85%">
+									<div class="tab-pane active" id="values">
+										<div id="json_editor  style="height: 100%; width: 100%;float:right;"></div>
+									</div>
+									<div class="tab-pane" id="graph_tab">
+										<div class="container" id="graph" style="height: 95%; width: 95%;float:right;"></div>
+									</div>
+								</div> <!--/tab content -->
+							</div> <!-- /tabbable -->
+						</div> <!-- /query panel body -->
 					</div>
-				</div> <!-- /answer panel -->
+				</div> <!-- /Answer panel-->
 			</div>
 			<div class="col-lg-12 panel-body" id="alerts"></div>
 			<!-- Modal Panel after dropbox selection-->
@@ -271,17 +271,17 @@
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
 							<h4 id="modal_header"> Save results as</h4>
 						</div>
-				        <div class="modal-body" style="padding:40px 50px;" >
-					        <button type="submit" class="btn btn-default btn-lg" id = "download_json">
-						        <img src="images/mimetype_json_blue.png" alt="json" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-					        </button>
-					        <button type="submit" class="btn btn-default btn-lg" id = "download_csv" >
-						        <img src="images/csv-xxl.png" alt="csv" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-					        </button>
-						        <button class="btn btn-default btn-lg " id = "download_excel" rel="tooltip" title="coming soon">
-							        <img src="images/xls.png" alt="excel" style="width:70px;height:50px;float:left; " />
-					        </button>
-				        </div>
+				<div class="modal-body" style="padding:40px 50px;" >
+					<button type="submit" class="btn btn-default btn-lg" id = "download_json">
+						<img src="images/mimetype_json_blue.png" alt="json" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
+					</button>
+					<button type="submit" class="btn btn-default btn-lg" id = "download_csv" >
+						<img src="images/csv-xxl.png" alt="csv" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
+					</button>
+						<button class="btn btn-default btn-lg " id = "download_excel" rel="tooltip" title="coming soon">
+							<img src="images/xls.png" alt="excel" style="width:70px;height:50px;float:left; " />
+						</button>
+				</div>
 					</div>
 				</div>
 			</div>
@@ -293,17 +293,17 @@
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
 							<h4 id="modal_header"> Save query as</h4>
 						</div>
-				        <div class="modal-body " >
-                            <form class="form" role="form">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="query_name" placeholder="query name" >
-                                </div>
-                                <button type="submit" class="btn btn-success" id = "query_save_button">
-                                    <span class="glyphicon glyphicon-ok-sign"></span>
-                                    Save!
-                                </button>
-                            </form>
-				        </div>
+						<div class="modal-body " >
+							<form class="form" role="form">
+								<div class="form-group">
+									<input type="text" class="form-control" id="query_name" placeholder="query name" >
+								</div>
+									<button type="submit" class="btn btn-success" id = "query_save_button">
+										<span class="glyphicon glyphicon-ok-sign"></span>
+										Save!
+									</button>
+							</form>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -315,17 +315,17 @@
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
 							<h4 id="modal_header"> Select query to load</h4>
 						</div>
-				        <div class="modal-body"  >
-                            <form class="form" role="form">
-                                <div class="form-group">
-                                    <select multiple class="form-control" id="load_query_sel"></select>
-                                </div>
-                                <button type="submit" class="btn btn-success" id = "query_load_button">
-                                    <span class="glyphicon glyphicon-ok-sign"></span>
-                                    Load!
-                                </button>
-                            </form>
-				        </div>
+				<div class="modal-body"  >
+					<form class="form" role="form">
+						<div class="form-group">
+							<select multiple class="form-control" id="load_query_sel"></select>
+						</div>
+						<button type="submit" class="btn btn-success" id = "query_load_button">
+							<span class="glyphicon glyphicon-ok-sign"></span>
+							Load!
+						</button>
+					</form>
+				</div>
 					</div>
 				</div>
 			</div>
@@ -356,5 +356,13 @@
 		</div>
 	</body>
 </html>
+
+
+
+
+
+
+
+
 
 

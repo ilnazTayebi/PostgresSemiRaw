@@ -83,11 +83,12 @@ $(document).ready(function(){
             editor.getSession().on('change', function(e) { 
                 if (document.getElementById("auto_query").checked){
                     removeAllErrors(editor);
+                    console.log("posting query after change of text");
                     post_query(editor, jsonEditor);
                 }
             });
         } else {
-            editor.getSession().on('change', function(e) {});
+            editor.getSession().off('change');
             btn.style.visibility = 'visible';
         }
     }
@@ -95,7 +96,7 @@ $(document).ready(function(){
     editor_set_autoexecute(true);
 
     $('#execute_btn').on('click', function(e){ 
-        console.log("editor", editor);
+        console.log("posting query after button press");
         post_query(editor, jsonEditor);
     });
 
@@ -108,32 +109,30 @@ $(document).ready(function(){
         }
     });
 
+    $("#query_save_button").on("click", function(e) {
+        e.preventDefault();
+        var query = {
+            query : editor.getValue() ,
+            vis : get_selected_graph()
+        } 
+        var path = RawSessionFolder + "/" + $("#query_name").val();
+        saveObjToDropbox(query, path, "json");
+        $("#save_query_dialog").modal('hide');
+    });
     $('#save_query').on("click", function(e){    
-        var dialog = $("#save_query_dialog");
+        $("#save_query_dialog").modal('show');
+    });
 
-        $("#query_save_button").on("click", function(e) {
-            e.preventDefault();
-            var query = {
-                query : editor.getValue() ,
-                vis : get_selected_graph()
-            } 
-            var path = RawSessionFolder + "/" + $("#query_name").val();
-            saveObjToDropbox(query, path, "json");
-            dialog.modal('hide');
-        });
-        dialog.modal('show');
+    $("#query_load_button").on("click", function(e) {
+        e.preventDefault();
+        var q = $('#load_query_sel').val();
+        console.log("selected query " , q[0]);
+        load_query(RawSessionFolder + "/" + q[0], editor, jsonEditor);
+        $("#load_query_dialog").modal('hide');
     });
 
     $('#load_query').on( "click", function(e){
         var dialog = $("#load_query_dialog");
-
-        $("#query_load_button").on("click", function(e) {
-            e.preventDefault();
-            var q = $('#load_query_sel').val();
-            console.log("selected query " , q[0]);
-            load_query(RawSessionFolder + "/" + q[0], editor, jsonEditor);
-            dialog.modal('hide');
-        });
 
         client.stat( RawSessionFolder, {readDir : true} , function (error, file, files) {
             $('#load_query_sel').empty();
@@ -155,12 +154,16 @@ function load_query(path, editor, jsonEditor){
     console.log('loading query', path);
     var options = {};
     client.readFile(path, options, function(error, content, stat){
-        console.log('file', content, stat);
+        console.log('loaded query', content, stat);
         var saved_query = JSON.parse(content);
         set_selected_graph(saved_query.vis);
         editor.setValue(saved_query.query);
         //TODO: only do this if auto query is not selected
-        post_query(editor, jsonEditor);
+        if (document.getElementById("auto_query").checked == false){
+            console.log("posting query after load");
+            post_query(editor, jsonEditor);
+        }
+
     });
 }
 
