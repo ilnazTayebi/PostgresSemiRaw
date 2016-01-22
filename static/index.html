@@ -191,48 +191,54 @@
 								<!-- check how to do this relative to the size-->
 								<div class="tab-pane active" id="values"></div>
 								<div class="tab-pane" id="graph_tab">
-									<div class="btn-group" role="toolbar">
-										<button class="btn btn-primary dropdown-toggle" id="draw_table_btn" type="button" style="float:left">
+									<div class="btn-group" role="group">
+										<button class="btn btn-primary dropdown-toggle" id="draw_table_btn" type="button" >
 											<span class="glyphicon glyphicon-th"></span>
 										</button>
-										<div class="dropdown" style="float:left">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="2d_dropdown">
-												<span class="caret"></span>
-												<span class="glyphicon glyphicon-stats"></span>
-											</button>
-											<ul class="dropdown-menu" >
-												<li id="draw_pie"><a href="#" >Pie Chart</a></li>
-												<li id="draw_bar"><a href="#" >Bar Chart</a></li>
-												<li id="draw_line"><a href="#">Line Chart</a></li>
-												<li id="draw_scatter"><a href="#" >XY Scatter</a></li>
-												<li id="draw_histogram"><a href="#" >Histogram</a></li>
-											</ul>
+                                        <div class="btn-group" role="group">
+										    <div class="dropdown" >
+											    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="2d_dropdown">
+												    <span class="caret"></span>
+												    <span class="glyphicon glyphicon-stats"></span>
+											    </button>
+											    <ul class="dropdown-menu" >
+												    <li id="draw_pie"><a href="#" >Pie Chart</a></li>
+												    <li id="draw_bar"><a href="#" >Bar Chart</a></li>
+												    <li id="draw_line"><a href="#">Line Chart</a></li>
+												    <li id="draw_scatter"><a href="#" >XY Scatter</a></li>
+												    <li id="draw_histogram"><a href="#" >Histogram</a></li>
+											    </ul>
+										    </div>
 										</div>
-										<div class="dropdown" style="float:left" aria-label="...">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="3d_dropdown">
-												<span class="caret"></span>
-												<span class="glyphicon glyphicon-dashboard"></span>
-											</button>
-											<ul class="dropdown-menu">
-												<li id="draw_3dsurface"><a href="#" >3D surface</a></li>
-												<li id="draw_3dbars"><a href="#" >3D Bars</a></li>
-												<li id="draw_heatmap"><a href="#">Heatmap</a></li>
-											</ul>
-										</div>
-										<div class="dropdown" style="float:left">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="hierarchy_dropdown">
-												<span class="caret"></span>
-												<span class="glyphicon glyphicon-object-align-horizontal"></span>
-											</button>
-											<ul class="dropdown-menu" >
-												<li id="draw_tree"><a href="#" >Tree</a></li>
-												<li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
-												<li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
-												<li id="draw_treemap"><a href="#" >Tree Map</a></li>
-												<li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
-											</ul>
-										</div>
-										<button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" style="float:left">
+                                        <div class="btn-group" role="group">
+										    <div class="dropdown" aria-label="...">
+											    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="3d_dropdown">
+												    <span class="caret"></span>
+												    <span class="glyphicon glyphicon-dashboard"></span>
+											    </button>
+											    <ul class="dropdown-menu">
+												    <li id="draw_3dsurface"><a href="#" >3D surface</a></li>
+												    <li id="draw_3dbars"><a href="#" >3D Bars</a></li>
+												    <li id="draw_heatmap"><a href="#">Heatmap</a></li>
+											    </ul>
+										    </div>
+                                        </div>
+                                        <div class="btn-group" role="group">
+										    <div class="dropdown" >
+											    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="hierarchy_dropdown">
+												    <span class="caret"></span>
+												    <span class="glyphicon glyphicon-object-align-horizontal"></span>
+											    </button>
+											    <ul class="dropdown-menu" >
+												    <li id="draw_tree"><a href="#" >Tree</a></li>
+												    <li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
+												    <li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
+												    <li id="draw_treemap"><a href="#" >Tree Map</a></li>
+												    <li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
+											    </ul>
+										    </div>
+                                        </div> <!-- /button group -->
+										<button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" >
 											<span class="glyphicon glyphicon-globe"></span>
 										</button>
 									</div> <!-- /button group -->
