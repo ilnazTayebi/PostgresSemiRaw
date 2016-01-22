@@ -19,48 +19,56 @@ var draw_functions  = {
 	    visualization.draw(t,
             {showRowNumber: true, width: '100%', height: '100%'}
         );
+        correct_enabled_tab(draw_data.last_draw);
     },
     columnChart : function(e){ 
         draw_data.last_draw = "columnChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.ColumnChart(graph_div);
         visualization.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },
     barChart : function(e){ 
         draw_data.last_draw = "barChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.BarChart(graph_div);
         visualization.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },    
     pieChart : function(e){ 
         draw_data.last_draw = "pieChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.PieChart(graph_div);
         visualization.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },
     scatterChart : function(e){
         draw_data.last_draw = "scatterChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.ScatterChart(graph_div);
         visualization.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },
     areaChart : function(e){ 
         draw_data.last_draw = "areaChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.AreaChart(graph_div);
         visualization.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },
     histogram: function(e){
         draw_data.last_draw = "histogram";
         var t = dataToTable(draw_data.data);
         var chart = new google.visualization.Histogram(graph_div);
         chart.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },
     line_chart: function(e){
         draw_data.last_draw = "line_chart";
         var chart = new google.visualization.LineChart(graph_div);
         var t = dataToTable(draw_data.data);
         chart.draw(t);
+        correct_enabled_tab(draw_data.last_draw);
     },
     geo_world: function(e){
         // this is because google maps screws the css
@@ -74,31 +82,37 @@ var draw_functions  = {
         }
         var t = dataToTable(draw_data.data);
         chart.draw(t, options);
+        correct_enabled_tab(draw_data.last_draw);
     },
     sunburts: function(e){
         draw_data.last_draw = "sunburts";
         d = dataToHierarchy(draw_data.data);
         draw_sunburst(d, graph_div);
+        correct_enabled_tab(draw_data.last_draw);
     },
     tree: function(e){
         draw_data.last_draw = "tree";
         d = dataToHierarchy(draw_data.data);
         draw_tree(d, graph_div);
+        correct_enabled_tab(draw_data.last_draw);
     },
     circle_pack: function(e){
         draw_data.last_draw = "circle_pack";
         d = dataToHierarchy(draw_data.data);
         draw_circle_packing(d, graph_div);
+        correct_enabled_tab(draw_data.last_draw);
     },
     treemap: function(e){
         draw_data.last_draw = "treemap";
         d = dataToHierarchy(draw_data.data);
         draw_treemap(d, graph_div);
+        correct_enabled_tab(draw_data.last_draw);
     },
     bubble_chart: function(e){
         draw_data.last_draw = "bubble_chart";
         d = dataToHierarchy(draw_data.data);
         draw_bubblechart(d, graph_div);
+        correct_enabled_tab(draw_data.last_draw);
     },
     surface_3d : function(e){
         draw_data.last_draw = "surface_3d";
@@ -110,6 +124,7 @@ var draw_functions  = {
         };
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
+        correct_enabled_tab(draw_data.last_draw);
     },
     bars_3d : function(e){
         draw_data.last_draw = "bars_3d";
@@ -121,6 +136,7 @@ var draw_functions  = {
         };
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
+        correct_enabled_tab(draw_data.last_draw);
     },
     heatmap : function(e){
         draw_data.last_draw = "heatmap";
@@ -129,13 +145,13 @@ var draw_functions  = {
         //["#002","#fff" ,"#ff0", "#fa0", "#f00"]
         //["#0a0", "#6c0", "#ee0", "#eb4", "#eb9", "#fff"]
         draw_heatmap(d, graph_div, {colors :["#002","#88f","#4f4","#ff4","#f80" ,"#f00"]});
+        correct_enabled_tab(draw_data.last_draw);
     }
 }
 
-
 // There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
 //like this it will only draw when the graph tab is selected
-var tab_selected = "";
+/*var tab_selected = "";
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		//show selected tab / active
 		tab_selected =  $(e.target).attr('id');
@@ -144,9 +160,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
         
 });
-
-
-
+*/
 // function that redraws the graph
 function redraw_graph(new_data){
 	draw_data.data=new_data;
@@ -176,13 +190,11 @@ function set_selected_graph(graph){
     }
     else{
         $('#vis_tab a[href="#graph_tab"]').tab('show');
-        console.log('enabling graph tab')
         draw_data.last_draw = graph;
     }
 }
 
-
-// checks if all keys are numeric starting from start
+// checks if all keys are numeric starting from <start>
 // This is useful to check the compatibility of certain graphs
 function all_numeric(data, start){
     var types = [];
@@ -277,6 +289,48 @@ function check_compatible_graphs(data){
     }
 
     enable(to_enable);
+
+}
+
+function enable(e){
+    $('#vis_tab #table_li').tab('show');
+    $("#vis_tab #2d_li").tab('show');
+}
+
+function get_graph_tab(graph){
+    switch (graph){
+        case "table":
+            return "table_li";
+        case "columnChart":
+        case "barChart":
+        case "pieChart":
+        case "scatterChart":
+        case "areaChart":
+        case "histogram":
+        case "line_chart":
+            return "2d_li";
+        case "surface_3d":
+        case "bars_3d":
+        case "heatmap":
+            return "3d_li";
+        case "sunburts":
+        case "tree":
+        case "circle_pack":
+        case "treemap":
+        case "bubble_chart":
+            return "tree_li";
+        case "geo_world":
+            return "geo_li";
+        default:
+            throw "unknown graph " + graph;
+    }
+}
+
+function correct_enabled_tab(graph){
+    var tab = get_graph_tab(graph);
+    console.log(tab);
+    $("#vis_tab #table_li").tab('show');
+    $("#vis_tab #"+tab).tab('show');
 }
 
 // assigns the callbacks to all the elements

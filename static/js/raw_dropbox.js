@@ -108,7 +108,7 @@ $(document).ready(function(){
         }
     });
 
-    $('#save_query').on("click", function(){    
+    $('#save_query').on("click", function(e){    
         var dialog = $("#save_query_dialog");
 
         $("#query_save_button").on("click", function(e) {
@@ -124,7 +124,7 @@ $(document).ready(function(){
         dialog.modal('show');
     });
 
-    $('#load_query').on( "click", function(){
+    $('#load_query').on( "click", function(e){
         var dialog = $("#load_query_dialog");
 
         $("#query_load_button").on("click", function(e) {
@@ -148,6 +148,7 @@ $(document).ready(function(){
     // starts listing the schemas
     list_schemas();
     init_session();
+
 });
 
 function load_query(path, editor, jsonEditor){
