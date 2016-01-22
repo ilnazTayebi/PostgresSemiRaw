@@ -23,22 +23,22 @@ $(document).ready(function(){
     //$('#download_excel').prop('disabled', true);
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
-    document.getElementById('download_results').onclick = function(){
+    $('#download_results').on("click", function(e){
         //downloadJsonObj(queryResults, "data.json");
         $("#download_dialog").modal('show');
-        document.getElementById('download_json').onclick = function () {
+        $('#download_json').on( "click", function (e) {
             downloadObj( queryResults, "results.json", "json");
             $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_csv').onclick = function () {
+        });
+        $('#download_csv').on( 'click', function (e) {
             downloadObj( queryResults, "results.csv", "csv");
             $("#download_dialog").modal('hide');
-        };
-        document.getElementById('download_excel').onclick = function () {
+        });
+        $('#download_excel').on( 'click', function (e) {
 //            downloadObj( queryResults, "download", "excel");
 //            $("#download_dialog").modal('hide');
-        };
-    };
+        });
+    });
 
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;
@@ -72,7 +72,7 @@ $(document).ready(function(){
 
     editor_set_autoexecute(true);
     console.log(editor);
-    $('#execute_btn').on('click', function(e){ function(){ post_query(editor, jsonEditor)}()});
+    $('#execute_btn').on('click', function(e){ post_query(editor, jsonEditor)});
 
     document.getElementById('auto_query').onchange = function(){
         if (document.getElementById("auto_query").checked){
