@@ -189,6 +189,5 @@ function init_session(){
             console.log("creating session folder");
             client.mkdir(RawSessionFolder);
         }
-
     });
 }

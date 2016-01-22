@@ -157,7 +157,6 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		//show selected tab / active
 		tab_selected =  $(e.target).attr('id');
 		//if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
-        
 });
 
 // function that redraws the graph
@@ -208,7 +207,7 @@ function all_numeric(data, start){
 
 function check_compatible_graphs(data){
     var enable = function(enabled ) {
-        elements = ['draw_table_btn',
+        elements = ['draw_table',
                     'draw_pie',
                     'draw_bar',
                     'draw_histogram',
@@ -226,7 +225,6 @@ function check_compatible_graphs(data){
                     '2d_dropdown',
                     '3d_dropdown',
                     'hierarchy_dropdown'];
-
         console.log('enabling', enabled);
         for(var n in elements){
             $('#'+elements[n]).addClass('disabled');
@@ -246,7 +244,7 @@ function check_compatible_graphs(data){
                         'draw_circle_pack',
                         'draw_treemap',
                         'draw_bubblechart',
-                        'draw_table_btn',
+                        'draw_table',
                         'hierarchy_dropdown');
     }
     if (type == "array"){
@@ -331,7 +329,7 @@ function correct_enabled_tab(graph){
 }
 
 // assigns the callbacks to all the elements
-$('#draw_table_btn').on('click', draw_functions['table']);
+$('#draw_table').on('click', draw_functions['table']);
 // 2d graphs
 $('#draw_pie').on('click', draw_functions['pieChart']);
 $('#draw_bar').on('click', draw_functions['columnChart']);
