@@ -23,24 +23,24 @@ var draw_functions  = {
     },
     columnChart : function(e){ 
         draw_data.last_draw = "columnChart";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.ColumnChart(graph_div);
         visualization.draw(t);
-        correct_enabled_tab(draw_data.last_draw);
     },
     barChart : function(e){ 
         draw_data.last_draw = "barChart";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.BarChart(graph_div);
         visualization.draw(t);
-        correct_enabled_tab(draw_data.last_draw);
     },    
     pieChart : function(e){ 
         draw_data.last_draw = "pieChart";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.PieChart(graph_div);
         visualization.draw(t);
-        correct_enabled_tab(draw_data.last_draw);
     },
     scatterChart : function(e){
         draw_data.last_draw = "scatterChart";
@@ -51,30 +51,31 @@ var draw_functions  = {
     },
     areaChart : function(e){ 
         draw_data.last_draw = "areaChart";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.AreaChart(graph_div);
         visualization.draw(t);
-        correct_enabled_tab(draw_data.last_draw);
     },
     histogram: function(e){
         draw_data.last_draw = "histogram";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToTable(draw_data.data);
         var chart = new google.visualization.Histogram(graph_div);
         chart.draw(t);
-        correct_enabled_tab(draw_data.last_draw);
     },
     line_chart: function(e){
         draw_data.last_draw = "line_chart";
+        correct_enabled_tab(draw_data.last_draw);
         var chart = new google.visualization.LineChart(graph_div);
         var t = dataToTable(draw_data.data);
         chart.draw(t);
-        correct_enabled_tab(draw_data.last_draw);
     },
     geo_world: function(e){
         // this is because google maps screws the css
         // by inserting a div just for drawing at least does not screw up other graphs
         graph_div.innerHTML = '<div id="map_canvas" style="height: 100%; width: 100%;"></div>';
         draw_data.last_draw = "geo_world";
+        correct_enabled_tab(draw_data.last_draw);
         var chart = new google.visualization.Map(document.getElementById('map_canvas'));
         options = {
             mapType : 'normal',
@@ -82,40 +83,41 @@ var draw_functions  = {
         }
         var t = dataToTable(draw_data.data);
         chart.draw(t, options);
-        correct_enabled_tab(draw_data.last_draw);
+
     },
     sunburts: function(e){
         draw_data.last_draw = "sunburts";
+        correct_enabled_tab(draw_data.last_draw);
         d = dataToHierarchy(draw_data.data);
         draw_sunburst(d, graph_div);
-        correct_enabled_tab(draw_data.last_draw);
     },
     tree: function(e){
         draw_data.last_draw = "tree";
+        correct_enabled_tab(draw_data.last_draw);
         d = dataToHierarchy(draw_data.data);
         draw_tree(d, graph_div);
-        correct_enabled_tab(draw_data.last_draw);
     },
     circle_pack: function(e){
         draw_data.last_draw = "circle_pack";
+        correct_enabled_tab(draw_data.last_draw);
         d = dataToHierarchy(draw_data.data);
         draw_circle_packing(d, graph_div);
-        correct_enabled_tab(draw_data.last_draw);
     },
     treemap: function(e){
         draw_data.last_draw = "treemap";
+        correct_enabled_tab(draw_data.last_draw);
         d = dataToHierarchy(draw_data.data);
         draw_treemap(d, graph_div);
-        correct_enabled_tab(draw_data.last_draw);
     },
     bubble_chart: function(e){
         draw_data.last_draw = "bubble_chart";
+        correct_enabled_tab(draw_data.last_draw);
         d = dataToHierarchy(draw_data.data);
         draw_bubblechart(d, graph_div);
-        correct_enabled_tab(draw_data.last_draw);
     },
     surface_3d : function(e){
         draw_data.last_draw = "surface_3d";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToPointTable(draw_data.data);
         var options = { 
             style: "surface",
@@ -124,10 +126,10 @@ var draw_functions  = {
         };
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
-        correct_enabled_tab(draw_data.last_draw);
     },
     bars_3d : function(e){
         draw_data.last_draw = "bars_3d";
+        correct_enabled_tab(draw_data.last_draw);
         var t = dataToPointTable(draw_data.data);
         var options = { 
             style: "bar",
@@ -136,16 +138,15 @@ var draw_functions  = {
         };
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
-        correct_enabled_tab(draw_data.last_draw);
     },
     heatmap : function(e){
         draw_data.last_draw = "heatmap";
+        correct_enabled_tab(draw_data.last_draw);
         d = dataToMatrix(draw_data.data);
         //["#f00", "#f80", "#ff0", "#fff", "#002"]
         //["#002","#fff" ,"#ff0", "#fa0", "#f00"]
         //["#0a0", "#6c0", "#ee0", "#eb4", "#eb9", "#fff"]
         draw_heatmap(d, graph_div, {colors :["#002","#88f","#4f4","#ff4","#f80" ,"#f00"]});
-        correct_enabled_tab(draw_data.last_draw);
     }
 }
 
