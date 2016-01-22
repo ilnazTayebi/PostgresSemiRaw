@@ -11,58 +11,58 @@ var draw_data = {
 
 //data structure with functions to visualize the data
 var draw_functions  = {
-    table : function(){
+    table : function(e){
 	    draw_data.last_draw = "table";
 	    //graph_div.empty();
 	    var t = dataToTable(draw_data.data);
 	    var visualization = new google.visualization.Table(graph_div);
 	    visualization.draw(t,
-            {showRowNumber: true, width: '70%', height: '100%'}
+            {showRowNumber: true, width: '100%', height: '100%'}
         );
     },
-    columnChart : function(){ 
+    columnChart : function(e){ 
         draw_data.last_draw = "columnChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.ColumnChart(graph_div);
         visualization.draw(t);
     },
-    barChart : function(){ 
+    barChart : function(e){ 
         draw_data.last_draw = "barChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.BarChart(graph_div);
         visualization.draw(t);
     },    
-    pieChart : function(){ 
+    pieChart : function(e){ 
         draw_data.last_draw = "pieChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.PieChart(graph_div);
         visualization.draw(t);
     },
-    scatterChart : function(){
+    scatterChart : function(e){
         draw_data.last_draw = "scatterChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.ScatterChart(graph_div);
         visualization.draw(t);
     },
-    areaChart : function (){ 
+    areaChart : function(e){ 
         draw_data.last_draw = "areaChart";
         var t = dataToTable(draw_data.data);
         var visualization = new google.visualization.AreaChart(graph_div);
         visualization.draw(t);
     },
-    histogram: function(){
+    histogram: function(e){
         draw_data.last_draw = "histogram";
         var t = dataToTable(draw_data.data);
         var chart = new google.visualization.Histogram(graph_div);
         chart.draw(t);
     },
-    line_chart: function(){
+    line_chart: function(e){
         draw_data.last_draw = "line_chart";
         var chart = new google.visualization.LineChart(graph_div);
         var t = dataToTable(draw_data.data);
         chart.draw(t);
     },
-    geo_world: function(){
+    geo_world: function(e){
         // this is because google maps screws the css
         // by inserting a div just for drawing at least does not screw up other graphs
         graph_div.innerHTML = '<div id="map_canvas" style="height: 100%; width: 100%;"></div>';
@@ -75,32 +75,32 @@ var draw_functions  = {
         var t = dataToTable(draw_data.data);
         chart.draw(t, options);
     },
-    sunburts: function(){
+    sunburts: function(e){
         draw_data.last_draw = "sunburts";
         d = dataToHierarchy(draw_data.data);
         draw_sunburst(d, graph_div);
     },
-    tree: function(){
+    tree: function(e){
         draw_data.last_draw = "tree";
         d = dataToHierarchy(draw_data.data);
         draw_tree(d, graph_div);
     },
-    circle_pack: function(){
+    circle_pack: function(e){
         draw_data.last_draw = "circle_pack";
         d = dataToHierarchy(draw_data.data);
         draw_circle_packing(d, graph_div);
     },
-    treemap: function(){
+    treemap: function(e){
         draw_data.last_draw = "treemap";
         d = dataToHierarchy(draw_data.data);
         draw_treemap(d, graph_div);
     },
-    bubble_chart: function(){
+    bubble_chart: function(e){
         draw_data.last_draw = "bubble_chart";
         d = dataToHierarchy(draw_data.data);
         draw_bubblechart(d, graph_div);
     },
-    surface_3d : function(){
+    surface_3d : function(e){
         draw_data.last_draw = "surface_3d";
         var t = dataToPointTable(draw_data.data);
         var options = { 
@@ -111,7 +111,7 @@ var draw_functions  = {
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
     },
-    bars_3d : function(){
+    bars_3d : function(e){
         draw_data.last_draw = "bars_3d";
         var t = dataToPointTable(draw_data.data);
         var options = { 
@@ -122,7 +122,7 @@ var draw_functions  = {
         var chart = new links.Graph3d(graph_div);
         chart.draw(t, options);
     },
-    heatmap : function(){
+    heatmap : function(e){
         draw_data.last_draw = "heatmap";
         d = dataToMatrix(draw_data.data);
         //["#f00", "#f80", "#ff0", "#fff", "#002"]
@@ -139,16 +139,19 @@ var tab_selected = "";
 $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		//show selected tab / active
 		tab_selected =  $(e.target).attr('id');
+        console.log($(e.target));
+        console.log('selected tab', tab_selected);
+		if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
+        
+});
 
-		if (tab_selected == "graph_li" ) redraw_graph(draw_data.data);
 
-		});
 
 // function that redraws the graph
 function redraw_graph(new_data){
 	draw_data.data=new_data;
     check_compatible_graphs(new_data);
-	if (tab_selected != "graph_li" ) return;
+	if (tab_selected == "values_li" ) return;
 
 	if (draw_data.last_draw != ""){
 		console.log("redrawing " + draw_data.last_draw);
@@ -193,7 +196,6 @@ function all_numeric(data, start){
 }
 
 function check_compatible_graphs(data){
-    console.log("checking compatible graphs") ;
     var enable = function(enabled ) {
         elements = ['draw_table_btn',
                     'draw_pie',
@@ -225,10 +227,9 @@ function check_compatible_graphs(data){
 
     var type = getType(data);
     var to_enable= [];
-    console.log('type', type);
+
     // hierarchical stuff 
     if (type != "undefined" || ( type == "array" && data.length >= 0)){
-        console.log('enabling hierarchy graphs');
         to_enable.push ('draw_sunburst',
                         'draw_tree',
                         'draw_circle_pack',
@@ -236,14 +237,9 @@ function check_compatible_graphs(data){
                         'draw_bubblechart',
                         'draw_table_btn',
                         'hierarchy_dropdown');
-
     }
     if (type == "array"){
         type = getType(data[0]);
-        console.log("sub type", type);
-        console.log("all_numeric 0" , all_numeric(data[0], 0));
-        console.log("all_numeric 1" , all_numeric(data[0], 1));
-
         if (type == "object" ){
             keys = Object.keys(data[0]);
             // at least one non numeric value

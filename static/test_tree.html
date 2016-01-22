@@ -185,15 +185,15 @@
 						</div>
 						<div class="panel-body">
 							<div class="tabbable">
-								<ul class="nav nav-pills nav-stacked col-md-3" style="width:15%"> <!-- style="width:15%"-->
-									<li><a href="#values" data-toggle="tab">values</a></li>
+								<ul id="vis_tab" class="nav nav-pills nav-stacked col-md-3" style="width:15%"> <!-- style="width:15%"-->
+									<li><a href="#values" data-toggle="tab" id="values_li">values</a></li>
 									<li id="draw_table_btn" >
-										<a href="#graph_tab" data-toggle="tab"> 
+										<a href="#graph_tab" data-toggle="tab" id="table_li" > 
 											<span class="glyphicon glyphicon-th"></span>
 										</a>
 									</li>
 									<li class = "dropdown" role="presentation" id="2d_dropdown">
-										<a class="dropdown-toggle" data-toggle="dropdown" role="button">
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="2d_li">
 											<span class="glyphicon glyphicon-stats"></span>
 											<span class="caret"></span>
 										</a>
@@ -206,7 +206,7 @@
 										</ul>
 									</li>
 									<li class = "dropdown" id="3d_dropdown" >
-										<a id="2d_dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button">
+										<a id="2d_dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button" id="3d_li">
 											<span class="glyphicon glyphicon-dashboard"></span>
 											<span class="caret"></span>
 										</a>
@@ -217,7 +217,7 @@
 										</ul>
 									</li>
 									<li class = "dropdown"  >
-										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="hierarchy_dropdown" ref="#graph_tab">
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="hierarchy_dropdown" ref="#graph_tab" id="tree_li">
 											<span class="glyphicon glyphicon-object-align-horizontal"></span>
 											<span class="caret"></span>
 										</a>
@@ -230,7 +230,7 @@
 										</ul>
 									</li>
 									<li id="draw_geo">
-										<a href="#graph_tab" data-toggle="tab"> 
+										<a href="#graph_tab" data-toggle="tab" id="geo_li"> 
 											<span class="glyphicon glyphicon-globe"></span>
 										</a>
 									</li>
