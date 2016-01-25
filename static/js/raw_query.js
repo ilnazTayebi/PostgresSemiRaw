@@ -442,13 +442,11 @@ function add_from_dropbox(){
                }
                 
             }
-
             $("#register_dialog").modal('show');
         },
         cancel: function() { },
         multiselect: true //selection of multiple files
     };
-
     Dropbox.choose(options);
 }
 

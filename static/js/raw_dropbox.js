@@ -1,5 +1,6 @@
 //the dropbox client
 var client = undefined;
+//the folder where all the queries are stored
 var RawSessionFolder = "RawSession";
 
 // here initializes the slide panel and the callbacks in it 
