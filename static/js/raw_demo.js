@@ -18,6 +18,9 @@ $(document).ready(function(){
         });
     }
 
+    $('#get_next').prop('disabled', true);
+    $('#get_all').prop('disabled', true);
+
     $('#list_schemas').on('click', function(e){ list_schemas()});
 
     //$('#download_excel').prop('disabled', true);
