@@ -259,6 +259,20 @@ function check_compatible_graphs(data){
 
 }
 
+// this will make the nav-bar for visualization and the content to have a fixed size
+function set_vis_size(){
+    var w =  $("#vis_tab").width();
+    var nav_w = 65;
+    var vis_w = w-nav_w-60;
+    console.log("vis-nav w", nav_w, "vis_content",  vis_w);
+    $("#vis_nav").width(nav_w);
+    $("#vis_content").width(vis_w);
+}
+
+set_vis_size();
+$(window).on("resize", function(e){
+    set_vis_size();
+});
 
 function correct_enabled_tab(graph){
 

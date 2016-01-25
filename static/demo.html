@@ -224,14 +224,15 @@
 							</h3>
 						</div>
 						<div class="panel-body">
-							<div class="tabbable">
-								<ul id="vis_tab" class="nav nav-pills nav-stacked col-md-3 pull-left" style="width:15%"> <!--the tab pane has to be put to 85%-->
+							<div class="tabbable" id="vis_tab">
+								<ul class="nav nav-pills nav-stacked col-md-3 pull-left" style="width:12%" id="vis_nav"> <!--the tab pane has to be put to 100%-width-->
 									<li><a href="#values" data-toggle="tab" id="values_li">values</a></li>
 									<li id="draw_table" >
 										<a href="#graph_tab" data-toggle="tab" id="table_li" > 
 											<span class="glyphicon glyphicon-th"></span>
 										</a>
 									</li>
+                                    <li role="separator" class="divider"></li>
 									<li id="2d_dropdown">
 										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="2d_li" href="#">
 											<span class="glyphicon glyphicon-stats"></span>
@@ -275,7 +276,7 @@
 										</a>
 									</li>
 								</ul> <!--/nav-pils (graph selection pane)-->
-								<div class="tab-content col-md-9 pull-right" style="width:85%"><!--Here we are assigning 85% and 15% the selection pane-->
+								<div class="tab-content col-md-9 pull-right" style="width:88%" id="vis_content"><!--The selection pane has to 100% -width this (12%)-->
 									<div class="tab-pane active" id="values">
 										<div id="json_editor" class = "container" style="height: 98%; width: 100%;float:right;"></div>
 									</div>

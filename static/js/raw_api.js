@@ -104,7 +104,6 @@ function http_json_request(method, url, data, callbacks){
     request.onreadystatechange=function(){
         if (request.readyState==4) {
             if (request.status==200){
-                console.log(request);
                 // here the response is empty
                 var response_data=undefined;
                 if (request.response){

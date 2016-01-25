@@ -158,6 +158,7 @@ $(document).ready(function(){
     // inits the dropbox sessions for loading queries
     init_session();
 
+
 });
 
 function load_query(path, editor, jsonEditor){
