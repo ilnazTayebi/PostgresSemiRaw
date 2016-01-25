@@ -44,7 +44,6 @@ $(document).ready(function(){
         saveQueryResults( saveObjToDropbox );
     });
 
-    //$('#download_excel').prop('disabled', true);
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
     $('#download_results').on("click", function(){
@@ -100,8 +99,7 @@ $(document).ready(function(){
         }
     });
 
-    $("#query_save_button").on("click", function(e) {
-        e.preventDefault();
+    function save_query_modal(){
         console.log("selected graph", get_selected_graph());
         var query = {
             query : editor.getValue() ,
@@ -110,7 +108,20 @@ $(document).ready(function(){
         var path = RawSessionFolder + "/" + $("#query_name").val();
         saveObjToDropbox(query, path, "json");
         $("#save_query_dialog").modal('hide');
+    };
+
+    $("#query_save_button").on("click", function(e) {
+        // this is because the default for  btn-success will reload the page
+        e.preventDefault();
+        save_query_modal();
     });
+
+    $("#query_name").on("keypress", function(e){
+       if(e.which == 13) {
+            save_query_modal();
+        }
+    });
+
     $('#save_query').on("click", function(e){    
         $("#save_query_dialog").modal('show');
     });
@@ -118,7 +129,6 @@ $(document).ready(function(){
     $("#query_load_button").on("click", function(e) {
         e.preventDefault();
         var q = $('#load_query_sel').val();
-        console.log("selected query " , q[0]);
         load_query(RawSessionFolder + "/" + q[0], editor, jsonEditor);
         $("#load_query_dialog").modal('hide');
     });
@@ -129,7 +139,13 @@ $(document).ready(function(){
         client.stat( RawSessionFolder, {readDir : true} , function (error, file, files) {
             $('#load_query_sel').empty();
             for (var n = 0 ; n < files.length ; n++){
-                $('<option>' + files[n].name +' </option>').appendTo('#load_query_sel');
+                var option = $('<option>' + files[n].name +' </option>');
+                // add the double click to the option
+                option.on('dblclick', function(e){
+                    load_query(RawSessionFolder + "/" +$(this).val(), editor, jsonEditor);
+                    $("#load_query_dialog").modal('hide');
+                } );
+                option.appendTo('#load_query_sel');
             }
         
         });
@@ -138,10 +154,10 @@ $(document).ready(function(){
 
     // starts listing the schemas
     list_schemas();
+    // inits the dropbox sessions for loading queries
     init_session();
 
 });
-
 
 function load_query(path, editor, jsonEditor){
     console.log('loading query', path);

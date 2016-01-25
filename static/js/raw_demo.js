@@ -23,7 +23,6 @@ $(document).ready(function(){
 
     $('#list_schemas').on('click', function(e){ list_schemas()});
 
-    //$('#download_excel').prop('disabled', true);
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
     $('#download_results').on("click", function(e){
