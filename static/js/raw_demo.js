@@ -50,7 +50,7 @@ $(document).ready(function(){
     editor.session.setOption("useWorker", false);
     editor.session.setUseWrapMode(true);
 
-    var container = document.getElementById("values");
+    var container = document.getElementById("json_editor");
     var options = { mode: 'view' };
     var jsonEditor = new JSONEditor(container, options);
 

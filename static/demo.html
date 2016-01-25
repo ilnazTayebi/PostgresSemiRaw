@@ -68,14 +68,16 @@
 	    }
 
 	    #values {
-		    height: 540px;
+		    height: 600px;
 		    font-size: 18px;
 	    }
-
 	    #graph_tab{
-		    height: 540px;
+		    height: 600px;
 		    font-size: 18px;        
 	    }
+        #editor {
+            height:600px;
+        }
 	    .navbar-brand,
 	    .navbar-nav li a {
 		    line-height: 65px;
@@ -141,16 +143,16 @@
 					Auto Query
 				</label>
 			</div>
-		</div>
+		</div><!-- /side panel -->
 
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed"
-			   data-toggle="collapse" data-target=".navbar-collapse">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 						<span class="sr-only">Toggle navigation</span> 
-						<span class="icon-bar"></span> <span class="icon-bar"></span> <span
-					   class="icon-bar"></span>
+						<span class="icon-bar"></span> 
+                        <span class="icon-bar"></span> 
+                        <span class="icon-bar"></span>
 					</button>
 					<a class="navbar-brand" href="http://www.raw-labs.com/"><img src="logo.png"/></a>
 				</div>
@@ -161,7 +163,7 @@
 					</ul>
 				</div>
 			</div>
-		</div>
+		</div><!--/navbar-->
 		<div class="container-fluid">
 			<div id="demoBox" class="row hidden" >
 				<div class="panel-body" style="height:160px">
@@ -206,7 +208,7 @@
 						</div>
 
 						<div class="panel-body">
-							<div id="editor" class="col-lg-12" style="height:600px">Write your query here...</div>
+							<div id="editor" class="col-lg-12" >Write your query here...</div>
 						</div>
 					</div>
 				</div>
@@ -219,68 +221,72 @@
                                     <button type="button" class="btn btn-default btn-xs" id="get_next" > get next</button>
                                     <button type="button" class="btn btn-default btn-xs" id="get_all">get all</button>
                                 </div>
-							</h3>							
+							</h3>
 						</div>
 						<div class="panel-body">
-							<ul id="vis_tab" class="nav nav-tabs" data-tabs="tabs">
-								<li><a href="#values" data-toggle="tab" id="values_li">Values</a></li>
-								<li><a href="#graph_tab" data-toggle="tab" id="graph_li">Graph</a></li>
-							</ul>
-							<div id="my-tab-content" class="tab-content">
-								<!-- check how to do this relative to the size-->
-								<div class="tab-pane active" id="values"></div>
-								<div class="tab-pane" id="graph_tab">
-									<div class="btn-group" role="toolbar">
-										<button class="btn btn-primary dropdown-toggle" id="draw_table_btn" type="button" style="float:left">
+							<div class="tabbable">
+								<ul id="vis_tab" class="nav nav-pills nav-stacked col-md-3 pull-left" style="width:15%"> <!--the tab pane has to be put to 85%-->
+									<li><a href="#values" data-toggle="tab" id="values_li">values</a></li>
+									<li id="draw_table" >
+										<a href="#graph_tab" data-toggle="tab" id="table_li" > 
 											<span class="glyphicon glyphicon-th"></span>
-										</button>
-										<div class="dropdown" style="float:left">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="2d_dropdown">
-												<span class="caret"></span>
-												<span class="glyphicon glyphicon-stats"></span>
-											</button>
-											<ul class="dropdown-menu" >
-												<li id="draw_pie"><a href="#" >Pie Chart</a></li>
-												<li id="draw_bar"><a href="#" >Bar Chart</a></li>
-												<li id="draw_line"><a href="#">Line Chart</a></li>
-												<li id="draw_scatter"><a href="#" >XY Scatter</a></li>
-												<li id="draw_histogram"><a href="#" >Histogram</a></li>
-											</ul>
-										</div>
-										<div class="dropdown" style="float:left" aria-label="...">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="3d_dropdown">
-												<span class="caret"></span>
-												<span class="glyphicon glyphicon-dashboard"></span>
-											</button>
-											<ul class="dropdown-menu">
-												<li id="draw_3dsurface"><a href="#" >3D surface</a></li>
-												<li id="draw_3dbars"><a href="#" >3D Bars</a></li>
-												<li id="draw_heatmap"><a href="#">Heatmap</a></li>
-											</ul>
-										</div>
-										<div class="dropdown" style="float:left">
-											<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" id="hierarchy_dropdown">
-												<span class="caret"></span>
-												<span class="glyphicon glyphicon-object-align-horizontal"></span>
-											</button>
-											<ul class="dropdown-menu" >
-												<li id="draw_tree"><a href="#" >Tree</a></li>
-												<li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
-												<li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
-												<li id="draw_treemap"><a href="#" >Tree Map</a></li>
-												<li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
-											</ul>
-										</div>
-										<button class="btn btn-primary dropdown-toggle" id="draw_geo" type="button" style="float:left">
+										</a>
+									</li>
+									<li id="2d_dropdown">
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="2d_li" href="#">
+											<span class="glyphicon glyphicon-stats"></span>
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu" >
+											<li id="draw_pie"><a href="#" >Pie Chart</a></li>
+											<li id="draw_bar"><a href="#" >Bar Chart</a></li>
+											<li id="draw_line"><a href="#">Line Chart</a></li>
+											<li id="draw_scatter"><a href="#" >XY Scatter</a></li>
+											<li id="draw_histogram"><a href="#" >Histogram</a></li>
+										</ul>
+									</li>
+									<li class = "dropdown" id="3d_dropdown" >
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button" id="3d_li" href="#"> 
+											<span class="glyphicon glyphicon-dashboard"></span>
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu">
+											<li id="draw_3dsurface"><a href="#" >3D surface</a></li>
+											<li id="draw_3dbars"><a href="#" >3D Bars</a></li>
+											<li id="draw_heatmap"><a href="#">Heatmap</a></li>
+										</ul>
+									</li>
+									<li class = "dropdown"  id="hierarchy_dropdown">
+										<a class="dropdown-toggle" data-toggle="dropdown" role="button"  ref="#" id="tree_li">
+											<span class="glyphicon glyphicon-object-align-horizontal"></span>
+											<span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu" >
+											<li id="draw_tree"><a href="#" >Tree</a></li>
+											<li id="draw_sunburst"><a href="#" >Sunburst graph</a></li>
+											<li id="draw_circle_pack"><a href="#" >Circle packing</a></li>
+											<li id="draw_treemap"><a href="#" >Tree Map</a></li>
+											<li id="draw_bubblechart"><a href="#" >Bubble Plot</a></li>
+										</ul>
+									</li>
+									<li id="draw_geo">
+										<a href="#graph_tab" data-toggle="tab" id="geo_li"> 
 											<span class="glyphicon glyphicon-globe"></span>
-										</button>
+										</a>
+									</li>
+								</ul> <!--/nav-pils (graph selection pane)-->
+								<div class="tab-content col-md-9 pull-right" style="width:85%"><!--Here we are assigning 85% and 15% the selection pane-->
+									<div class="tab-pane active" id="values">
+										<div id="json_editor" class = "container" style="height: 98%; width: 100%;float:right;"></div>
 									</div>
-									<div class="container" id="graph" style="height: 95%; width: 95%;float:right;"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+									<div class="tab-pane" id="graph_tab">
+										<div class="container" id="graph" style="height: 98%; width: 100%;float:right;"></div>
+									</div>
+								</div> <!--/tab content -->
+							</div> <!-- /tabbable -->
+						</div> <!-- /panel body -->
+					</div> <!--/panel pane-->
+				</div> <!-- /Answer panel-->
 			</div>
 			<div class="col-lg-12 panel-body" id="alerts"></div>
 			<!--
