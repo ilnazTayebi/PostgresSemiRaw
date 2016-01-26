@@ -21,10 +21,10 @@
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
 		<link rel="stylesheet" href="css/tabs.css"/>
 		<style type="text/css" media="screen">
-#editor {
-	height: 600px;
-	font-size: 18px;
-}
+        #editor {
+	        height: 600px;
+	        font-size: 18px;
+        }
 
 	    #demoBox {
 		    height: 0px;
@@ -131,6 +131,10 @@
 						</div>
 					</div>
 				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading"> <h3 class="panel-title">Query times</h3> </div>
+					<div class="panel-body" id="exec_time"></div>
+				</div>
 				<label class="checkbox-inline" for="checkboxes-0">
 					<input type="checkbox" name="checkboxes" id="auto_query" checked="true"/>
 					Auto Query
@@ -161,7 +165,7 @@
 		</div> <!--nav bar-->
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-lg-6">
+				<div class="col-lg-6"><!-- Query panel-->
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title">
@@ -175,7 +179,7 @@
 						</div>
 					</div>
 				</div> <!-- /Query panel-->
-				<div class="col-lg-6">
+				<div class="col-lg-6"> <!--Data visualization panel-->
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title">
@@ -187,7 +191,7 @@
 							</h3>
 						</div>
 						<div class="panel-body">
-							<div class="tabbable" id="vis_tab">
+							<div class="tabbable" id="vis_tab"> <!--data vis tab-->
 								<ul class="nav nav-pills nav-stacked col-md-3 pull-left" style="width:12%" id="vis_nav"><!--the tab pane has to be put to 100%-width-->
 									<li><a href="#values" data-toggle="tab" id="values_li">values</a></li>
 									<li id="draw_table" >
@@ -247,10 +251,10 @@
 										<div class="container pull-right" id="graph" style="height: 98%; width: 100%;"></div>
 									</div>
 								</div> <!--/tab content -->
-							</div> <!-- /tabbable -->
+							</div> <!-- /data vis tab--> 
 						</div> <!-- /panel body -->
 					</div> <!--/panel pane-->
-				</div> <!-- /Answer panel-->
+				</div> <!--/Data visualization panel-->
 			</div>
 			<div class="col-lg-12 panel-body" id="alerts"></div>
 			<!-- Modal Panel after dropbox selection-->
@@ -322,7 +326,7 @@
 				<div class="modal-body"  >
 					<form class="form" role="form">
 						<div class="form-group">
-							<select multiple class="form-control" id="load_query_sel"></select>
+							<select multiple class="form-control" id="load_query_sel" style="height:200px;"></select>
 						</div>
 						<button type="submit" class="btn btn-success" id = "query_load_button">
 							<span class="glyphicon glyphicon-ok-sign"></span>

@@ -47,7 +47,8 @@ function post_query(editor, jsonEditor){
                     post_query(editor, jsonEditor);
                 }
                 else {
-                    set_results(data.data, jsonEditor);
+                    console.log("data", data);
+                    set_results(data.data, jsonEditor, data.executionTime);
                 }
             },
             error : function(request, status, error) {
@@ -86,7 +87,8 @@ function set_get_next_data(token, jsonEditor, rows){
         ongoing = true;
         query_next(token, rows, {
             success: function(data){
-                    set_results(data.data, jsonEditor);
+                    console.log("data",data);
+                    set_results(data.data, jsonEditor, data.executionTime);
                     if(!data.hasMore){
                         $('#get_next').prop('disabled', true);
                         $('#get_all').prop('disabled', true);
@@ -110,7 +112,8 @@ function set_get_all(query, jsonEditor){
         ongoing = true;
         send_query(query, {
             success: function(data){
-                    set_results(data.output, jsonEditor)
+                    console.log("data", data);
+                    set_results(data.output, jsonEditor, data.executionTime)
                 },
             error: function(request, status, error){
                     set_error();
@@ -118,13 +121,15 @@ function set_get_all(query, jsonEditor){
         });
    }
 }
-function set_results(results, jsonEditor){
+function set_results(results, jsonEditor, executionTime){
     queryResults = results;
    //update plots and graphs
     setIndicatorLabel("Ready")
     jsonEditor.set(queryResults);
     redraw_graph( queryResults);
     ongoing = false;
+    $('#exec_time').empty();
+    $('#exec_time').append('<li >Execution time: '+ executionTime + ' (ms)</li>');
 }
 
 function set_error(){

@@ -14,7 +14,6 @@ $(document).ready(function(){
             basic_auth : true,
             user: params.user,
             password : params.password
-            
         });
     }
 
