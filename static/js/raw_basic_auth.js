@@ -47,6 +47,18 @@ $(document).ready(function(){
         };
     });
 
+    $("#add_data").on("click", function(e){ 
+        $("#register_url_dialog").modal('show');
+    });
+    $("#register_url_dialog .btn-success").on( "click",  function(e){
+        var url = $("#url_text").val();
+        var name = $("#url_name").val();
+        var type = $("#url_type").val();
+        add_from_url(url, name, type);
+        //closes the dialog
+        $("#register_url_dialog").modal('hide');
+    });
+
     var editor = ace.edit("editor");
     editor.$blockScrolling = Infinity;
 
@@ -102,50 +114,6 @@ $(document).ready(function(){
     }
 
 });
-
-function handleFileSelect(evt) {
-    var files = evt.target.files; // FileList object
-
-    // files is a FileList of File objects. List some properties.
-    var output = [];
-    for (var i = 0, f; f = files[i]; i++) {
-        console.log(i,"file" ,f);
-    }
-
-    var options = get_dropbox_options(files);
-    var inputs = add_files_to_dialog(options);
-    document.getElementById("register_button").onclick = function(){
-        var ok = true;
-        var files = [];
-        for(n in options){
-            var f = options[n];
-            f.name = $("#"+inputs[n].name).val();
-            f.type = $("#"+inputs[n].type).val();
-            //if (f.type == null) ok = false;
-            files.push(f)
-        }
-        if(ok){
-            for (n in files){
-                console.log("registering file ", files[n]);
-                register_file(files[n], upload_alerts);
-            }
-            //closes the dialog
-            $("#register_dialog").modal('hide');
-       }
-        
-    }
-
-    $("#register_dialog").modal('show');
-}
-
-function append_alert(msg, level){
-
-	var m = $('<div class="col-lg-12 alert ">'+
-            msg + '</div>')
-            .appendTo("#alerts");
-
-	m.addClass(level);
-}
 
 
 function refresh_info(){
