@@ -91,7 +91,6 @@ function arrayToTable(data){
 }
 
 function dataToPointTable(data){
-
     var type = getType(data[0]);
     switch(type){
         case "object":
@@ -103,8 +102,8 @@ function dataToPointTable(data){
             table.addColumn( "number", "y");
             table.addColumn( "number", "z");
             
-            for (x in data){
-                for (y in data[x]){
+            for (var x = 0; x < data.length; x++ ){
+                for (var y = 0 ;  y < data[x].length ; y++){
                     var z = parseFloat(data[x][y]);
                     table.addRow([x,y,z]);
                 }

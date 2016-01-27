@@ -251,8 +251,10 @@ function check_compatible_graphs(data){
             to_enable.push('draw_geo');
         }
         else if (type == "array"){
-            console.log('enabling heatmap');
-            to_enable.push('3d_dropdown', 'draw_heatmap');
+            to_enable.push('3d_dropdown', 
+                           'draw_heatmap',
+                           'draw_3dsurface', 
+                           'draw_3dbars');
         }
     }
     enable(to_enable);
