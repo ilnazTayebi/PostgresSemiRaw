@@ -133,8 +133,8 @@ function set_results(results, jsonEditor, times){
     ongoing = false;
     if (times){        
         $('#exec_time').empty();
-        $('<li >Exec. time: '+ times.executionTime + ' (ms)</li>\
-           <li >Comp. time: '+ times.compilationTime + ' (ms)</li>').appendTo('#exec_time');
+        $('<li class="list-group-item" >Exec. time: '+ times.executionTime + ' (ms)</li>\
+           <li class="list-group-item" >Comp. time: '+ times.compilationTime + ' (ms)</li>').appendTo('#exec_time');
    }
 }
 
@@ -149,20 +149,10 @@ function set_error(){
 function list_schemas(){
     get_schema_list(  {
         success: function(data) {
-            $("#schemas").empty();
-            var tree =[];
-            function node_exists(name){
-                for (n in tree){
-                    if (name == tree[n].text) return true;
-                }
-                return false;
-            }
+            $("#schema_tree").empty();
             for(n in data.schemas){
-                var node = {text : data.schemas[n] };
-                //TODO: check for a better way to find out if it is an internal extent 
-                tree.push(node);
+                 $('<li class="list-group-item" >' +data.schemas[n]+'</li>').appendTo('#schema_tree');
             }
-            $('#schema_tree').treeview({data: tree });
         },
         error : function(response, status, error) {
             console.log(response);
