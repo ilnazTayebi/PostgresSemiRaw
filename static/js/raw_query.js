@@ -48,7 +48,10 @@ function post_query(editor, jsonEditor){
                 }
                 else {
                     console.log("data", data);
-                    set_results(data.data, jsonEditor, data.executionTime);
+                    set_results(data.data, jsonEditor, {
+                        executionTime: data.executionTime,
+                        compilationTime: data.compilationTime
+                    });
                 }
             },
             error : function(request, status, error) {
@@ -88,7 +91,7 @@ function set_get_next_data(token, jsonEditor, rows){
         query_next(token, rows, {
             success: function(data){
                     console.log("data",data);
-                    set_results(data.data, jsonEditor, data.executionTime);
+                    set_results(data.data, jsonEditor);
                     if(!data.hasMore){
                         $('#get_next').prop('disabled', true);
                         $('#get_all').prop('disabled', true);
@@ -113,7 +116,7 @@ function set_get_all(query, jsonEditor){
         send_query(query, {
             success: function(data){
                     console.log("data", data);
-                    set_results(data.output, jsonEditor, data.executionTime)
+                    set_results(data.output, jsonEditor)
                 },
             error: function(request, status, error){
                     set_error();
@@ -121,15 +124,18 @@ function set_get_all(query, jsonEditor){
         });
    }
 }
-function set_results(results, jsonEditor, executionTime){
+function set_results(results, jsonEditor, times){
     queryResults = results;
    //update plots and graphs
     setIndicatorLabel("Ready")
     jsonEditor.set(queryResults);
     redraw_graph( queryResults);
     ongoing = false;
-    $('#exec_time').empty();
-    $('#exec_time').append('<li >Execution time: '+ executionTime + ' (ms)</li>');
+    if (times){        
+        $('#exec_time').empty();
+        $('<li >Exec. time: '+ times.executionTime + ' (ms)</li>\
+           <li >Comp. time: '+ times.compilationTime + ' (ms)</li>').appendTo('#exec_time');
+   }
 }
 
 function set_error(){
