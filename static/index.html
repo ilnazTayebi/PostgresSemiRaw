@@ -103,53 +103,6 @@
 		<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="f64lfu3jyw86z4t"></script>
 	</head>
 	<body>
-		<div id="side_panel">
-			<div class="container-fluid">
-				<div class="panel panel-default">
-					<div class="panel-heading"> <h3 class="panel-title">My data</h3> </div>
-					<div class="panel-body">
-						<div class="btn-group btn-group-vertical">
-							<button class="btn btn-default" id="add_dropbox2">
-								<span class="glyphicon glyphicon-plus"> Add data</span> 
-							</button>
-							<button type="button" class="btn btn-default" id="list_schemas">
-								<span class="glyphicon glyphicon-refresh"> Ref. sources </span>
-							</button>
-						</div>
-						<div id="schema_tree"></div>
-					</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading"> <h3 class="panel-title">Save Results</h3> </div>
-					<div class="panel-body">
-						<div class="btn-group btn-group-vertical">
-							<button class="btn btn-default" id="download_results">
-								<span class="glyphicon glyphicon-download-alt"> Download</span> 
-							</button>
-							<button class="btn btn-default" id = "save_to_dropbox">
-								<img src="images/dropbox.png" alt="dropbox" style="width:32px;height:24px;float:left; padding-right: 10px; padding-left: 10px;" />
-								Save to Dropbox
-							</button>
-							<button class="btn btn-default" id="start_tutorial">
-								Tutorial
-							</button>								
-						</div>
-					</div>
-				</div>
-				<div class="panel panel-default">
-					<div class="panel-heading"> <h3 class="panel-title">Query times</h3> </div>
-					<div class="panel-body" id="exec_time">
-                        <li class="list-group-item" >Exec. time:----(ms)</li>
-                        <li class="list-group-item" >Comp. time:----(ms)</li>
-                    </div>
-				</div>
-				<label class="checkbox-inline" for="checkboxes-0">
-					<input type="checkbox" name="checkboxes" id="auto_query" checked="true"/>
-					Auto Query
-				</label>
-			</div>
-		</div> <!-- /side panel -->
-
 		<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
@@ -198,14 +151,60 @@
                             </h3>
                         </div>
                         <div class="panel-body">
-                            <div id="vis-container"></div>
+                            <div id="vis-container"></div><!--Data visualization panel the content will be loaded from vis_tab.html-->
                         </div>
                     </div>
-				</div> <!--Data visualization panel the content will be loaded from vis_tab.html-->
+				</div> 
 			</div>
 			<div class="col-lg-12 panel-body" id="alerts"></div>
 			<div id="forms-container"></div>
 		</div>
+		<div id="side_panel">
+			<div class="container-fluid">
+				<div class="panel panel-default">
+					<div class="panel-heading"> <h3 class="panel-title">My data</h3> </div>
+					<div class="panel-body">
+						<div class="btn-group btn-group-vertical">
+							<button class="btn btn-default" id="add_dropbox2">
+								<span class="glyphicon glyphicon-plus"> Add data</span> 
+							</button>
+							<button type="button" class="btn btn-default" id="list_schemas">
+								<span class="glyphicon glyphicon-refresh"> Ref. sources </span>
+							</button>
+						</div>
+						<div id="schema_tree"></div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading"> <h3 class="panel-title">Save Results</h3> </div>
+					<div class="panel-body">
+						<div class="btn-group btn-group-vertical">
+							<button class="btn btn-default" id="download_results">
+								<span class="glyphicon glyphicon-download-alt"> Download</span> 
+							</button>
+							<button class="btn btn-default" id = "save_to_dropbox">
+								<img src="images/dropbox.png" alt="dropbox" style="width:32px;height:24px;float:left; padding-right: 10px; padding-left: 10px;" />
+								Save to Dropbox
+							</button>
+							<button class="btn btn-default" id="start_tutorial">
+								Tutorial
+							</button>								
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading"> <h3 class="panel-title">Query times</h3> </div>
+					<div class="panel-body" id="exec_time">
+                        <li class="list-group-item" >Exec. time:----(ms)</li>
+                        <li class="list-group-item" >Comp. time:----(ms)</li>
+                    </div>
+				</div>
+				<label class="checkbox-inline" for="checkboxes-0">
+					<input type="checkbox" name="checkboxes" id="auto_query" checked="true"/>
+					Auto Query
+				</label>
+			</div>
+		</div> <!-- /side panel -->
 	</body>
 	<!--This is just so to download query results -->
 	<a id="downloadAnchorElem" style="display:none"></a>

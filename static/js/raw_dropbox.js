@@ -216,16 +216,19 @@ function tutorial(){
         {
             content : 
             '<p>Looks like it is the first time you are trying to run this live demo.</p>\
-                    Its is very easy byt maybe we should just go through an overview'
+            let me just give you an overview',
+            size: {width: 700, height: 300 } 
         },
         {
             content: 
             '<div class="row">\
-                <div class="col-lg-9">\
-                    <img src="images/editor2.gif" alt="editor" style="width:500px;height:200px;" />\
+                <div class="col-lg-6">\
+                    <img src="images/editor2.gif" alt="editor" style="width:100%;" />\
                 </div>\
-                <div class="col-lg-3">\
-                    in the text editor on the right you can type your queries\
+                <div class="col-lg-6">\
+                    Use the editor on right side to type your queries.\
+                    while you type your commands are send to automatically to the server.<br> \
+                    The indicator on the top left of that pane tells you the state of the query.\
                 </div>\
             <div>',
             size: {width: 900, height: 300 }       
@@ -235,15 +238,29 @@ function tutorial(){
             content: 
             '<div class="row">\
                 <div class="col-lg-6">\
-                    The panel on your right you can see the query results\
-                     or select a type of visualization \
+                    On the panel on your right you can see the query results.\
+                    Click on the buttons to select different types of visualization\
+                    They are grouped in graph types, so from top to bottom:\
+                    <li>Values</li>\
+                    <li>Table</li>\
+                    <li>2D graphs</li>\
+                    <li>3D graphs</li>\
+                    <li>Hierarchical graphs</li>\
                 </div>\
                 <div class="col-lg-6">\
-                    <img src="images/vis.gif" alt="editor" style="width:300px;height:300px;" />\
+                    <img src="images/vis.gif" alt="editor" style="width:100%" />\
                 </div>\
             <div>',
             size: {width: 900, height: 400 }   
+        },
+        {
+            content: 
+            'You can find a tutorial on the query language \
+            <a href="demo.html">Here</a>.<br>\
+            Have  fun!',
+            size: {width: 600, height: 300 }   
         }
+
     ]
     
     function load_next(pos){
