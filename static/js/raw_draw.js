@@ -36,7 +36,6 @@ $('#vis-container').load('vis_tab.html #visualization', function(){
     
 });
 
-
 // loads the forms
 $('#forms-container').load('forms.html #forms');
 

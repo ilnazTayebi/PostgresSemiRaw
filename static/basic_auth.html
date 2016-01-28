@@ -157,7 +157,7 @@
 			</div>
 		</div><!--nav bar-->
 		<div class="container-fluid">
-			<div class="row">
+			<div class="row"><!--Query panel-->
 				<div class="col-lg-6">
 					<div class="panel panel-default">
 						<div class="panel-heading">
@@ -166,15 +166,29 @@
 								<button class="btn btn-info btn-xs"  style="float:right;" id="execute_btn">execute</button>
 							</h3>
 						</div>
-
 						<div class="panel-body">
-							<div id="editor" class="col-lg-12" style="height:600px">Write your query here...</div>
+							<div id="editor" class="col-lg-12">Write your query here...</div>
 						</div>
 					</div>
-				</div>
-				<!--Data visualization panel the content will be loaded from vis_tab.html-->
-				<div class="col-lg-6" id="vis-container"></div> 
-			</div>
+				</div><!--/Query panel-->
+                <div class="col-lg-6" > <!--Answer panel-->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Answer
+                                <div class="pull-right btn-group" role="group" id="next_group">
+                                    <button type="button" class="btn btn-default btn-xs" id="get_next" > get next</button>
+                                    <button type="button" class="btn btn-default btn-xs" id="get_all">get all</button>
+                                </div>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <!--Data visualization panel the content will be loaded from vis_tab.html-->
+                            <div id="vis-container" class="col-lg-12"></div>
+                        </div>
+                    </div>
+				</div>  
+			</div><!--/Answer panel-->
 		    <!--This is just so to download query results -->
 		    <a id="downloadAnchorElem" style="display:none"></a>
 			<div id="forms-container"></div>	
