@@ -212,9 +212,10 @@ function tutorial(){
     var steps = [
         {   header: 'Some info',
             content : 
-            '<p>Looks like it is the first time you are trying to run this live demo.</p>\
-            let me just give you an overview',
-            size: {width: 700, height: 300 } 
+            'If it\'s the first time you are landing on this page, \
+            let me help you getting an overview <br>\
+            You can close this window by clicking on the cross on the top right corner.',
+            size: {width: 600, height: 300 } 
         },
         {
             header: 'Query pane',
@@ -224,7 +225,7 @@ function tutorial(){
                     <img src="images/editor2.gif" alt="editor" style="width:100%;" />\
                 </div>\
                 <div class="col-lg-6">\
-                    Use the editor on right to type your queries.\
+                    Use the editor on left to type your queries.\
                     Your commands are send to automatically to the server while you type.<br> \
                     The indicator on the top left of that pane tells you the state of the query.\
                 </div>\
@@ -248,12 +249,28 @@ function tutorial(){
             <div>',
             size: {width: 900, height: 400 }   
         },
+,
+        {
+            header: 'Adding data',
+            content: 
+            '<div class="row">\
+                <div class="col-lg-3">\
+                    <img src="images/dropbox.png" alt="editor" style="width:100%;" />\
+                </div>\
+                <div class="col-lg-9">\
+                    You can register adicional files from your dropbox by clicking the\
+                     "Add Data" on the menu on the top.\
+                </div>\
+            <div>'
+            ,
+            size: {width: 500, height: 300 }   
+        },
         {
             header: 'Query language',
             content: 
-            'We use an SQL like language that is fully hierarchicak and can do some neat things.\
+            'We use an SQL like language that is fully hierarchical and can do some neat things.\
             You can find a tutorial on the query language <a href="demo.html">Here</a>.',
-            size: {width: 600, height: 300 }   
+            size: {width: 500, height: 300 }   
         }
     ]
     var pos = 0;
