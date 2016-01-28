@@ -318,7 +318,7 @@ function draw_graph( graph, e){
     draw_functions[graph]();
 }
 
-
+$('#forms-container').load('forms.html #forms');
 
 // assigns the callbacks to all the elements
 $('#draw_table').on('click', function (e){ draw_graph('table',e)});

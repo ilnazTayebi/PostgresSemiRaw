@@ -263,112 +263,33 @@
 				</div> <!--/Data visualization panel-->
 			</div>
 			<div class="col-lg-12 panel-body" id="alerts"></div>
-			<!-- Modal Panel after dropbox selection-->
-			<div class="modal fade" id="register_dialog" role="dialog">
-				<div class="modal-dialog">
-					<!-- Modal content-->
-					<div class="modal-content">
-						<div class="modal-header" style="padding:35px 50px;">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<img src="images/dropbox.png" alt="dropbox" style="width:50px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-							<h4 id="modal_header"> Register Files</h4>
-						</div>
-						<div class="modal-body" style="padding:40px 50px;" id = "modal_body"></div>
-					</div>
-				</div>
-			</div>
-			<!-- Modal Panel for downloading data-->
-			<div class="modal fade" id="download_dialog" role="dialog" >
-				<div class="modal-dialog download-div" >
-					<div class="modal-content">
-						<div class="modal-header" >
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 id="modal_header"> Save results as</h4>
-						</div>
-				<div class="modal-body" style="padding:40px 50px;" >
-					<button type="submit" class="btn btn-default btn-lg" id = "download_json">
-						<img src="images/mimetype_json_blue.png" alt="json" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-					</button>
-					<button type="submit" class="btn btn-default btn-lg" id = "download_csv" >
-						<img src="images/csv-xxl.png" alt="csv" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-					</button>
-						<button class="btn btn-default btn-lg " id = "download_excel" rel="tooltip" title="coming soon">
-							<img src="images/xls.png" alt="excel" style="width:70px;height:50px;float:left; " />
-						</button>
-				</div>
-					</div>
-				</div>
-			</div>
-			<!-- Modal Panel for saving a query -->
-			<div class="modal fade" id="save_query_dialog" role="dialog" >
-				<div class="modal-dialog download-div" >
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 id="modal_header"> Save query as</h4>
-						</div>
-						<div class="modal-body " >
-							<form class="form" role="form">
-								<div class="form-group">
-									<input type="text" class="form-control" id="query_name" placeholder="query name" >
-								</div>
-									<button type="submit" class="btn btn-success" id = "query_save_button">
-										<span class="glyphicon glyphicon-ok-sign"></span>
-										Save!
-									</button>
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- Modal Panel for loading queries -->
-			<div class="modal fade" id="load_query_dialog" role="dialog" >
-				<div class="modal-dialog download-div" >
-					<div class="modal-content">
-						<div class="modal-header" >
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 id="modal_header"> Select query to load</h4>
-						</div>
-				<div class="modal-body"  >
-					<form class="form" role="form">
-						<div class="form-group">
-							<select multiple class="form-control" id="load_query_sel"></select>
-						</div>
-						<button type="submit" class="btn btn-success" id = "query_load_button">
-							<span class="glyphicon glyphicon-ok-sign"></span>
-							Load!
-						</button>
-					</form>
-				</div>
-					</div>
-				</div>
-			</div>
-			<!--This is just so to download query results -->
-			<a id="downloadAnchorElem" style="display:none"></a>
-			<!--Slide menu -->
-			<script src="js/BootSideMenu.js"></script>
-			<script src="js/bootstrap-treeview.js"></script>
-			<script type="text/javascript" src="js/graph3d-min.js"></script>
-
-			<!-- Ace editor -->
-			<script type="text/javascript" src="js/ace-builds/src-min-noconflict/ace.js"></script>
-			<script type="text/javascript" src="js/ace-builds/src-min-noconflict/theme-ambiance.js"></script>
-			<script type="text/javascript" src="js/ace-builds/src-min-noconflict/mode-sql.js"></script>
-			<script type="text/javascript" src="js/mode-qrawl.js"></script>
-
-			<!-- JSON Editor -->
-			<script src="js/jsoneditor/dist/jsoneditor.min.js"></script>
-			<!--our own drawing libraries -->
-			<script type="text/javascript" src="js/raw_utils.js"></script>
-			<script type="text/javascript" src="js/draw_functions.js"></script>
-			<script type="text/javascript" src="js/raw_draw.js"></script>
-			<script type="text/javascript" src="js/raw_walkthrough_steps.js"></script>
-			<script type="text/javascript" src="js/raw_api.js"></script>
-			<script type="text/javascript" src="js/raw_query.js"></script>
-			<script type="text/javascript" src="js/raw_walkthrough.js"></script>
-			<script type="text/javascript" src="js/raw_dropbox.js"></script>
+			<div id="forms-container"></div>
 		</div>
 	</body>
+	<!--This is just so to download query results -->
+	<a id="downloadAnchorElem" style="display:none"></a>
+	<!--Slide menu -->
+	<script src="js/BootSideMenu.js"></script>
+	<script src="js/bootstrap-treeview.js"></script>
+	<script type="text/javascript" src="js/graph3d-min.js"></script>
+
+	<!-- Ace editor -->
+	<script type="text/javascript" src="js/ace-builds/src-min-noconflict/ace.js"></script>
+	<script type="text/javascript" src="js/ace-builds/src-min-noconflict/theme-ambiance.js"></script>
+	<script type="text/javascript" src="js/ace-builds/src-min-noconflict/mode-sql.js"></script>
+	<script type="text/javascript" src="js/mode-qrawl.js"></script>
+
+	<!-- JSON Editor -->
+	<script src="js/jsoneditor/dist/jsoneditor.min.js"></script>
+	<!--our own drawing libraries -->
+	<script type="text/javascript" src="js/raw_utils.js"></script>
+	<script type="text/javascript" src="js/draw_functions.js"></script>
+	<script type="text/javascript" src="js/raw_draw.js"></script>
+	<script type="text/javascript" src="js/raw_walkthrough_steps.js"></script>
+	<script type="text/javascript" src="js/raw_api.js"></script>
+	<script type="text/javascript" src="js/raw_query.js"></script>
+	<script type="text/javascript" src="js/raw_walkthrough.js"></script>
+	<script type="text/javascript" src="js/raw_dropbox.js"></script>	
 </html>
 
 
