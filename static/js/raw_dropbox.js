@@ -229,7 +229,7 @@ function tutorial(){
                     Your commands are send to automatically to the server while you type.<br> \
                     The indicator on the top left of that pane tells you the state of the query.\
                 </div>\
-            <div>',
+            </div>',
             size: {width: 1000, height: 300 }       
         },
         {
@@ -246,7 +246,7 @@ function tutorial(){
                 <div class="col-lg-6">\
                     <img src="images/vis.gif" alt="editor" style="width:100%" />\
                 </div>\
-            <div>',
+            </div>',
             size: {width: 900, height: 400 }   
         },
 ,
@@ -261,16 +261,23 @@ function tutorial(){
                     You can register adicional files from your dropbox by clicking the\
                      "Add Data" on the menu on the top.\
                 </div>\
-            <div>'
+            </div>'
             ,
             size: {width: 500, height: 300 }   
         },
         {
             header: 'Query language',
-            content: 
-            'We use an SQL like language that is fully hierarchical and can do some neat things.\
-            You can find a tutorial on the query language <a href="demo.html">Here</a>.',
-            size: {width: 500, height: 300 }   
+            content:
+            '<div class="row">\
+                <div class="col-lg-6">\
+                    <img src="images/tree.png" alt="editor" style="width:200px;" />\
+                </div>\
+                <div class="col-lg-6">\
+                    We use an SQL like language that is fully hierarchical and can do some neat things.<br>\
+                    You can find a tutorial on the query language <a href="demo.html">Here</a>.\
+                </div>\
+            </div>',
+            size: {width: 600, height: 300 }   
         }
     ]
     var pos = 0;
