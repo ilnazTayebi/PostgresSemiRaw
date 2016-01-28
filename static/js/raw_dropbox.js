@@ -224,7 +224,7 @@ function tutorial(){
                     <img src="images/editor2.gif" alt="editor" style="width:100%;" />\
                 </div>\
                 <div class="col-lg-6">\
-                    Use the editor on right side to type your queries.\
+                    Use the editor on right to type your queries.\
                     Your commands are send to automatically to the server while you type.<br> \
                     The indicator on the top left of that pane tells you the state of the query.\
                 </div>\
