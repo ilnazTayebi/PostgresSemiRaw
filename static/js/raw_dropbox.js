@@ -166,7 +166,6 @@ $(document).ready(function(){
     tutorial();
 });
 
-
 function load_query(path, editor, jsonEditor){
     console.log('loading query', path);
     var options = {};
@@ -209,17 +208,16 @@ function init_session(){
     });
 }
 
-
 function tutorial(){
-    var pos = 0;
     var steps = [
-        {
+        {   header: 'Some info',
             content : 
             '<p>Looks like it is the first time you are trying to run this live demo.</p>\
             let me just give you an overview',
             size: {width: 700, height: 300 } 
         },
         {
+            header: 'Query pane',
             content: 
             '<div class="row">\
                 <div class="col-lg-6">\
@@ -227,25 +225,22 @@ function tutorial(){
                 </div>\
                 <div class="col-lg-6">\
                     Use the editor on right side to type your queries.\
-                    while you type your commands are send to automatically to the server.<br> \
+                    Your commands are send to automatically to the server while you type.<br> \
                     The indicator on the top left of that pane tells you the state of the query.\
                 </div>\
             <div>',
-            size: {width: 900, height: 300 }       
+            size: {width: 1000, height: 300 }       
         },
-        
         {
+            header: 'Visualization Pane',
             content: 
             '<div class="row">\
                 <div class="col-lg-6">\
                     On the panel on your right you can see the query results.\
-                    Click on the buttons to select different types of visualization\
-                    They are grouped in graph types, so from top to bottom:\
-                    <li>Values</li>\
-                    <li>Table</li>\
-                    <li>2D graphs</li>\
-                    <li>3D graphs</li>\
-                    <li>Hierarchical graphs</li>\
+                    Click on the buttons to select different types of visualization.\
+                    They are grouped in graph types, if the data output is not compatible\
+                    with a certain graph, the button will be grayed out.<br>\
+                    Try it out!\
                 </div>\
                 <div class="col-lg-6">\
                     <img src="images/vis.gif" alt="editor" style="width:100%" />\
@@ -254,18 +249,18 @@ function tutorial(){
             size: {width: 900, height: 400 }   
         },
         {
+            header: 'Query language',
             content: 
-            'You can find a tutorial on the query language \
-            <a href="demo.html">Here</a>.<br>\
-            Have  fun!',
+            'We use an SQL like language that is fully hierarchicak and can do some neat things.\
+            You can find a tutorial on the query language <a href="demo.html">Here</a>.',
             size: {width: 600, height: 300 }   
         }
-
     ]
-    
+    var pos = 0;
     function load_next(pos){
         
         var data = steps[pos];
+        $('#tutorial_header').text(data.header);
         $('#tutorial_content').empty();
         $('#tutorial_content').append(data.content);
         if (data.size){
