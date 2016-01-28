@@ -1,13 +1,44 @@
-google.load("visualization", "1", {packages:["corechart", "table", "geochart", "map"]});
-
 // the div used in all the drawing functions
-var graph_div = document.getElementById('graph');
+var graph_div =undefined;
 
 // global variable that holds the data to be plotted
 var draw_data = {
     data: undefined,
     last_draw : ""
 }
+
+google.load("visualization", "1", {packages:["corechart", "table", "geochart", "map"]});
+
+$('#vis-container').load('vis_tab.html #visualization', function(){
+    // assigning the div after loading
+    graph_div = $('#graph')[0];
+    
+    // assigns the callbacks to all the elements
+    $('#draw_table').on('click', function (e){ draw_graph('table',e)});
+    // 2d graphs
+    $('#draw_pie').on('click', function (e){ draw_graph('pieChart',e)});
+    $('#draw_bar').on('click', function (e){ draw_graph('columnChart',e)});
+    $('#draw_histogram').on('click', function (e){ draw_graph('histogram',e)});
+    $('#draw_scatter').on('click', function (e){ draw_graph('scatterChart',e)});
+    $('#draw_line').on('click', function (e){ draw_graph('line_chart',e)});
+    //geo graphs
+    $('#draw_geo').on('click', function (e){ draw_graph('geo_world',e)});
+    // hierarchy graphs
+    $('#draw_sunburst').on('click', function (e){ draw_graph('sunburts',e)});
+    $('#draw_tree').on('click', function (e){ draw_graph('tree',e)});
+    $('#draw_circle_pack').on('click', function (e){ draw_graph('circle_pack',e)});
+    $('#draw_treemap').on('click', function (e){ draw_graph('treemap',e)});
+    $('#draw_bubblechart').on('click', function (e){ draw_graph('bubble_chart',e)});
+    //3D grpahs
+    $('#draw_3dsurface').on('click', function (e){ draw_graph('surface_3d',e)});
+    $('#draw_3dbars').on('click', function (e){ draw_graph('bars_3d',e)});
+    $('#draw_heatmap').on('click', function (e){ draw_graph('heatmap',e)});
+    
+});
+
+
+// loads the forms
+$('#forms-container').load('forms.html #forms');
 
 //data structure with functions to visualize the data
 var draw_functions  = {
@@ -120,14 +151,6 @@ var draw_functions  = {
     }
 }
 
-// There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
-//like this it will only draw when the graph tab is selected
-var tab_selected = "";
-$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		//show selected tab / active
-		tab_selected =  $(e.target).attr('id');
-		//if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
-});
 
 // function that redraws the graph
 function redraw_graph(new_data){
@@ -276,6 +299,16 @@ $(window).on("resize", function(e){
     set_vis_size();
 });
 
+
+// There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
+//like this it will only draw when the graph tab is selected
+var tab_selected = "";
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		//show selected tab / active
+		tab_selected =  $(e.target).attr('id');
+		//if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
+});
+
 function correct_enabled_tab(graph){
 
     function get_graph_tab(graph){
@@ -313,30 +346,10 @@ function correct_enabled_tab(graph){
 }
 
 function draw_graph( graph, e){
+    console.log("graph div", graph_div);
+
     correct_enabled_tab(graph);
     draw_data.last_draw = graph;
     draw_functions[graph]();
 }
 
-$('#forms-container').load('forms.html #forms');
-
-// assigns the callbacks to all the elements
-$('#draw_table').on('click', function (e){ draw_graph('table',e)});
-// 2d graphs
-$('#draw_pie').on('click', function (e){ draw_graph('pieChart',e)});
-$('#draw_bar').on('click', function (e){ draw_graph('columnChart',e)});
-$('#draw_histogram').on('click', function (e){ draw_graph('histogram',e)});
-$('#draw_scatter').on('click', function (e){ draw_graph('scatterChart',e)});
-$('#draw_line').on('click', function (e){ draw_graph('line_chart',e)});
-//geo graphs
-$('#draw_geo').on('click', function (e){ draw_graph('geo_world',e)});
-// hierarchy graphs
-$('#draw_sunburst').on('click', function (e){ draw_graph('sunburts',e)});
-$('#draw_tree').on('click', function (e){ draw_graph('tree',e)});
-$('#draw_circle_pack').on('click', function (e){ draw_graph('circle_pack',e)});
-$('#draw_treemap').on('click', function (e){ draw_graph('treemap',e)});
-$('#draw_bubblechart').on('click', function (e){ draw_graph('bubble_chart',e)});
-
-$('#draw_3dsurface').on('click', function (e){ draw_graph('surface_3d',e)});
-$('#draw_3dbars').on('click', function (e){ draw_graph('bars_3d',e)});
-$('#draw_heatmap').on('click', function (e){ draw_graph('heatmap',e)});
