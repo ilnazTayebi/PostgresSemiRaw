@@ -153,13 +153,19 @@ $(document).ready(function(){
         dialog.modal('show');
     });
 
+    $('#start_tutorial').on('click', function(e) {
+        $("#tutorial_dialog").modal('show');
+    });
+    
     // starts listing the schemas
     list_schemas();
     // inits the dropbox sessions for loading queries
     init_session();
 
-
+     
+    tutorial();
 });
+
 
 function load_query(path, editor, jsonEditor){
     console.log('loading query', path);
@@ -201,4 +207,71 @@ function init_session(){
             client.mkdir(RawSessionFolder);
         }
     });
+}
+
+
+function tutorial(){
+    var pos = 0;
+    var steps = [
+        {
+            content : 
+            '<p>Looks like it is the first time you are trying to run this live demo.</p>\
+                    Its is very easy byt maybe we should just go through an overview'
+        },
+        {
+            content: 
+            '<div class="row">\
+                <div class="col-lg-9">\
+                    <img src="images/editor2.gif" alt="editor" style="width:500px;height:200px;" />\
+                </div>\
+                <div class="col-lg-3">\
+                    in the text editor on the right you can type your queries\
+                </div>\
+            <div>',
+            size: {width: 900, height: 300 }       
+        },
+        
+        {
+            content: 
+            '<div class="row">\
+                <div class="col-lg-6">\
+                    The panel on your right you can see the query results\
+                     or select a type of visualization \
+                </div>\
+                <div class="col-lg-6">\
+                    <img src="images/vis.gif" alt="editor" style="width:300px;height:300px;" />\
+                </div>\
+            <div>',
+            size: {width: 900, height: 400 }   
+        }
+    ]
+    
+    function load_next(pos){
+        
+        var data = steps[pos];
+        $('#tutorial_content').empty();
+        $('#tutorial_content').append(data.content);
+        if (data.size){
+            $('#tutorial_dialog .modal-dialog').width(data.size.width);
+            $('#tutorial_dialog .modal-dialog').height(data.size.height);
+        }
+                
+        $('#tutorial_dialog .btn-next').prop('disabled', false);
+        $('#tutorial_dialog .btn-previous').prop('disabled', false);        
+        if(pos == 0){
+            $('#tutorial_dialog .btn-previous').prop('disabled', true);
+        }
+        else if (pos == steps.length -1){
+            $('#tutorial_dialog .btn-next').prop('disabled', true);
+        }
+    }
+    
+    load_next(pos)
+    $('#tutorial_dialog .btn-next').on('click', function(){        
+        load_next(++pos);
+    });
+    $('#tutorial_dialog .btn-previous').on('click', function(){        
+        load_next(--pos);
+    });
+    $("#tutorial_dialog").modal('show');
 }

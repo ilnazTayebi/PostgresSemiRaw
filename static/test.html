@@ -132,7 +132,7 @@
 							</button>
 							<button class="btn btn-default" id="start_tutorial">
 								Tutorial
-							</button>								
+							</button>							
 						</div>
 					</div>
 				</div>
@@ -230,7 +230,14 @@
 	<script type="text/javascript" src="js/raw_api.js"></script>
 	<script type="text/javascript" src="js/raw_query.js"></script>
 	<script type="text/javascript" src="js/raw_walkthrough.js"></script>
-	<script type="text/javascript" src="js/raw_dropbox.js"></script>	
+	<script type="text/javascript" src="js/raw_dropbox.js"></script>
+	<script>
+	$(document).ready(function(){
+	    $('#start_tutorial').on('click', function(e) {
+            $("#tutorial_dialog").modal('show');
+	    });
+	});
+	</script>
 </html>
 
 
