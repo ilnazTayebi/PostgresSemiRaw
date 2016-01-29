@@ -2,6 +2,7 @@
 var client = undefined;
 //the folder where all the queries are stored
 var RawSessionFolder = "RawSession";
+var SessionInfoFile = '.raw_session';
 
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
@@ -163,9 +164,10 @@ $(document).ready(function(){
     init_session();
 
      
-    tutorial();
+
 });
 
+//will load a query from dropbox
 function load_query(path, editor, jsonEditor){
     console.log('loading query', path);
     var options = {};
@@ -183,6 +185,7 @@ function load_query(path, editor, jsonEditor){
     });
 }
 
+//initializes a session
 function init_session(){
     var options = {readDir : true};
     // list root folder
@@ -191,10 +194,14 @@ function init_session(){
             throw 'Could not list dropbox folder, error:' + error ;
         } 
 
-        var f = files.find( function (f,index, array){
-           return  f.name == RawSessionFolder ;
-        });
-
+        function find_file(filename){
+            var f = files.find( function (f,index, array){
+               return  f.name == filename ;
+            });
+            return f;
+        }
+        
+        var f = find_file(RawSessionFolder);
         if( f && f.isFolder == false){
             // TODO: this is conflict and we have to do something about it
         }
@@ -205,10 +212,46 @@ function init_session(){
             console.log("creating session folder");
             client.mkdir(RawSessionFolder);
         }
+        // will check the session file
+        f = find_file(SessionInfoFile);
+        if (!f){
+            console.log("initializing session file");
+            var options={
+                welcome_pane:true
+            }
+            write_session_info(options);
+             welcome_pane();
+        }
+        else{
+            read_session_info(function(info){
+                if( info.welcome_pane){
+                    welcome_pane();
+                }
+            });
+        }
+    });
+
+
+}
+
+
+function read_session_info(callback){
+    var options = {};
+    client.readFile(SessionInfoFile, options, function(error, content, stat){
+        if (error) {
+            throw 'Could not read session file, error:' + error ;
+        }
+        console.log('session info', content, stat);
+        var session_info = JSON.parse(content);
+        callback(session_info);
     });
 }
 
-function tutorial(){
+function write_session_info(obj){
+    saveObjToDropbox(obj, SessionInfoFile, "json");
+}
+
+function welcome_pane(){
     var steps = [
         {   header: 'Some info',
             content : 
@@ -241,7 +284,7 @@ function tutorial(){
                     Click on the buttons to select different types of visualization.\
                     They are grouped in graph types, if the data output is not compatible\
                     with a certain graph, the button will be grayed out.<br>\
-                    Try it out!\
+                    There are some hierarchical and 3D graphs, try them out!\
                 </div>\
                 <div class="col-lg-6">\
                     <img src="images/vis.gif" alt="editor" style="width:100%" />\
@@ -280,7 +323,7 @@ function tutorial(){
             size: {width: 600, height: 300 }   
         }
     ]
-    var pos = 0;
+
     function load_next(pos){
         
         var data = steps[pos];
@@ -301,12 +344,22 @@ function tutorial(){
             $('#tutorial_dialog .btn-next').prop('disabled', true);
         }
     }
-    
+
+    $("#do_not_show").on( "change", function(e){
+        read_session_info(function(info){
+            var val = document.getElementById("do_not_show").checked;
+            console.log("do not show again ", val);
+            info.welcome_pane = !val;
+            write_session_info(info);
+        });
+    });
+
+    var pos = 0;
     load_next(pos)
-    $('#tutorial_dialog .btn-next').on('click', function(){        
+    $('#tutorial_dialog .btn-next').on('click', function(){
         load_next(++pos);
     });
-    $('#tutorial_dialog .btn-previous').on('click', function(){        
+    $('#tutorial_dialog .btn-previous').on('click', function(){
         load_next(--pos);
     });
     $("#tutorial_dialog").modal('show');
