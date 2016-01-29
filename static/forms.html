@@ -23,20 +23,28 @@
 				    <h4 id="modal_header"> Save results as</h4>
 			    </div>
 	    <div class="modal-body" style="padding:40px 50px;" >
-		    <button type="submit" class="btn btn-default btn-lg" id = "download_json">
-			    <img src="images/mimetype_json_blue.png" alt="json" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-		    </button>
-		    <button type="submit" class="btn btn-default btn-lg" id = "download_csv" >
-			    <img src="images/csv-xxl.png" alt="csv" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
-		    </button>
-			    <button class="btn btn-default btn-lg " id = "download_excel" rel="tooltip" title="coming soon">
-				    <img src="images/xls.png" alt="excel" style="width:70px;height:50px;float:left; " />
-			    </button>
+            <div class="row">
+			    <div class="form-group">
+                    <label for="download_name">File Name</label>
+				    <input type="text" class="form-control" id="download_name" placeholder="results" >
+			    </div>
+            </div>
+            <div class="row">
+		        <button type="submit" class="btn btn-default btn-lg" id = "download_json">
+			        <img src="images/mimetype_json_blue.png" alt="json" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
+		        </button>
+		        <button type="submit" class="btn btn-default btn-lg" id = "download_csv" >
+			        <img src="images/csv-xxl.png" alt="csv" style="width:70px;height:50px;float:left; padding-right: 10px; padding-left: 10px;" />
+		        </button>
+	            <button class="btn btn-default btn-lg " id = "download_excel" rel="tooltip" title="coming soon">
+		            <img src="images/xls.png" alt="excel" style="width:70px;height:50px;float:left; " />
+	            </button>
+            </div>
 	    </div>
 		    </div>
 	    </div>
     </div>
-    
+
     <!-- Modal Panel for saving a query -->
     <div class="modal fade" id="save_query_dialog" role="dialog" >
 	    <div class="modal-dialog download-div" >
@@ -50,10 +58,10 @@
 					    <div class="form-group">
 						    <input type="text" class="form-control" id="query_name" placeholder="query name" >
 					    </div>
-						    <button type="submit" class="btn btn-success" id = "query_save_button">
-							    <span class="glyphicon glyphicon-ok-sign"></span>
-							    Save!
-						    </button>
+					    <button type="submit" class="btn btn-success" id = "query_save_button">
+						    <span class="glyphicon glyphicon-ok-sign"></span>
+						    Save!
+					    </button>
 				    </form>
 			    </div>
 		    </div>

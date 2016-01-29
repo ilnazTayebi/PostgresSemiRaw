@@ -26,14 +26,16 @@ $(document).ready(function(){
     $("#add_dropbox , #add_dropbox2").on("click", function(e){ add_from_dropbox();});
 
     function saveQueryResults(save_function){
-         //downloadJsonObj(queryResults, "data.json");
+        var filename = $("#download_name").val();
+        console.log(filename);
+
         $("#download_dialog").modal('show');
         document.getElementById('download_json').onclick = function () {
-            save_function( queryResults, "results.json", "json");
+            save_function( queryResults, filename+".json", "json");
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_csv').onclick = function () {
-            save_function( queryResults, "results.csv", "csv");
+            save_function( queryResults, filename+".csv", "csv");
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
@@ -42,12 +44,14 @@ $(document).ready(function(){
 
     //save to dropbox
     $('.query-save, #save_side').on( "click", function(e){
+        $("#download_name").val('Results');
         saveQueryResults( saveObjToDropbox );
     });
 
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
     $('.query-download, #download').on("click", function(){
+        $("#download_name").val('Results');
         saveQueryResults( downloadObj );
     });
 

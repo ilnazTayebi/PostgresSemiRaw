@@ -4,8 +4,9 @@ var graph_div =undefined;
 // global variable that holds the data to be plotted
 var draw_data = {
     data: undefined,
-    last_draw : ""
+    last_draw : "json_editor"
 }
+
 
 google.load("visualization", "1", {packages:["corechart", "table", "geochart", "map"]});
 
@@ -33,6 +34,9 @@ $('#vis-container').load('vis_tab.html #visualization', function(){
     $('#draw_3dsurface').on('click', function (e){ draw_graph('surface_3d',e)});
     $('#draw_3dbars').on('click', function (e){ draw_graph('bars_3d',e)});
     $('#draw_heatmap').on('click', function (e){ draw_graph('heatmap',e)});
+    $('#values_li').on('click', function(e){
+        draw_data.last_draw = "json_editor";
+    });
     
 });
 
@@ -155,7 +159,7 @@ var draw_functions  = {
 function redraw_graph(new_data){
 	draw_data.data=new_data;
     check_compatible_graphs(new_data);
-	if (tab_selected == "values_li" ) return;
+	if (draw_data.last_draw == "json_editor" ) return;
 
 	if (draw_data.last_draw != ""){
 		console.log("redrawing " + draw_data.last_draw);
@@ -168,20 +172,20 @@ function redraw_graph(new_data){
 }
 // returns the current selected graph (for saving queries)
 function get_selected_graph(){
-    console.log('tab_selected', tab_selected);
-    if (tab_selected == "values_li" ) return 'json_editor';
-    else return draw_data.last_draw;
+    return draw_data.last_draw;
 }
 
 // sets the current selecte graph (for loading queries)
 function set_selected_graph(graph){
+    draw_data.last_draw = graph;
+
     if (graph == 'json_editor'){
         console.log('enabling values tab')
         $('#vis_tab a[href="#values"]').tab('show');
+
     }
     else{
         $('#vis_tab a[href="#graph_tab"]').tab('show');
-        draw_data.last_draw = graph;
     }
 }
 
@@ -280,7 +284,6 @@ function check_compatible_graphs(data){
         }
     }
     enable(to_enable);
-
 }
 
 // this will make the nav-bar for visualization and the content to have a fixed size
@@ -298,15 +301,6 @@ $(window).on("resize", function(e){
     set_vis_size();
 });
 
-
-// There is a bug with when drawing tables, so if the tab is not selected it takes the full height, 
-//like this it will only draw when the graph tab is selected
-var tab_selected = "";
-$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		//show selected tab / active
-		tab_selected =  $(e.target).attr('id');
-		//if (tab_selected != "values_li" ) redraw_graph(draw_data.data);
-});
 
 function correct_enabled_tab(graph){
 
@@ -334,13 +328,17 @@ function correct_enabled_tab(graph){
                 return "tree_li";
             case "geo_world":
                 return "geo_li";
+            case 'json_editor':
+                return 'values_li';
             default:
                 throw "unknown graph " + graph;
         }
     }
     var tab = get_graph_tab(graph);
     console.log( "showing tab", tab);
-    $("#vis_tab #table_li").tab('show');
+    if (tab != 'values_li'){
+        $("#vis_tab #table_li").tab('show');
+    }
     $("#vis_tab #"+tab).tab('show');
 }
 
