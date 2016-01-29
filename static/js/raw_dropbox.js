@@ -353,9 +353,10 @@ function welcome_pane(){
 
     var pos = 0;
     load_next(pos)
-    $('#tutorial_dialog .btn-next').on('click', function(){
-        if($('#next_text').text() == "close"){
+    $('#tutorial_dialog .btn-next').on('click', function(e){
+        if(pos == steps.length-1){
             $('#tutorial_dialog').modal('hide');
+            return;
         }
         load_next(++pos);
     });
