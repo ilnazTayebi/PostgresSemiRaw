@@ -107,9 +107,9 @@ function http_json_request(method, url, data, callbacks){
                 // here the response is empty
                 var response_data=undefined;
                 if (request.response){
-                    reponse_data = JSON.parse( request.response );
+                    response_data = JSON.parse( request.response );
                 }                
-                callbacks.success(reponse_data);
+                callbacks.success(response_data);
             }
             else{
                 callbacks.error( request, request.status, request.responseText);
