@@ -246,38 +246,38 @@ function write_session_info(obj){
 
 function welcome_pane(){
     var steps = [
-        {   header: 'Some info',
+        {   header: 'Welcome to RAW!',
             content : 
-            'If it\'s the first time you are landing on this page, \
-            let me help you getting an overview <br>\
-            You can close this window by clicking on the cross on the top right corner.',
+            'As it\'s the first time you are landing on this page, \
+            let\'s go through a quick overview.<br>\
+            (You can skip this by clicking on the cross on the top right corner.)',
             size: {width: 600, height: 300 } 
         },
         {
-            header: 'Query pane',
+            header: 'Writing Queries',
             content: 
             '<div class="row">\
                 <div class="col-lg-6">\
                     <img src="images/editor2.gif" alt="editor" style="width:100%;" />\
                 </div>\
                 <div class="col-lg-6">\
-                    Use the editor on left to type your queries.\
-                    Your commands are send to automatically to the server while you type.<br> \
-                    The indicator on the top left of that pane tells you the state of the query.\
+                    Use the editor on left-hand side to type your queries.\
+                    Your queries are send to automatically to the server while you type.<br> \
+                    The indicator on the top left of the pane tells you the state of the query.\
                 </div>\
             </div>',
             size: {width: 1000, height: 300 }       
         },
         {
-            header: 'Visualization Pane',
+            header: 'Viewing Query Results',
             content: 
             '<div class="row">\
                 <div class="col-lg-6">\
-                    On the panel on your right you can see the query results.\
-                    Click on the buttons to select different types of visualization.\
-                    They are grouped in graph types, if the data output is not compatible\
-                    with a certain graph, the button will be grayed out.<br>\
-                    There are some hierarchical and 3D graphs, try them out!\
+                    On the panel to your right, you can see the query results.\
+                    Click on the buttons to choose different types of visualizations.\
+                    These are grouped per type. If the output is not compatible\
+                    with a certain plot, the button will be grayed out.<br>\
+                    There are hierarchical and 3D graphs, try them out!\
                 </div>\
                 <div class="col-lg-6">\
                     <img src="images/vis.gif" alt="editor" style="width:100%" />\
@@ -286,30 +286,30 @@ function welcome_pane(){
             size: {width: 900, height: 400 }   
         },
         {
-            header: 'Adding data',
+            header: 'Querying Your Data',
             content: 
             '<div class="row">\
                 <div class="col-lg-3">\
                     <img src="images/dropbox.png" alt="editor" style="width:100%;" />\
                 </div>\
                 <div class="col-lg-9">\
-                    You can register adicional files from your dropbox by clicking the\
-                     "Add Data" on the menu on the top.\
+                    You can choose files to query directly from your Dropbox account by\
+                    clicking "Add Data" on the menu at the top.\
                 </div>\
             </div>'
             ,
             size: {width: 500, height: 300 }   
         },
         {
-            header: 'Query language',
+            header: 'The RAW Query Language',
             content:
             '<div class="row">\
                 <div class="col-lg-6">\
                     <img src="images/tree.png" alt="editor" style="width:200px;" />\
                 </div>\
                 <div class="col-lg-6">\
-                    We use an SQL like language that is fully hierarchical and can do some neat things.<br>\
-                    You can find a tutorial on the query language <a href="demo.html">Here</a>.\
+                    We use a richer SQL language that is fully hierarchical and can do some neat things.<br>\
+                    You can find a tutorial on the query language <a href="demo.html">here</a>.\
                 </div>\
             </div>',
             size: {width: 600, height: 300 }   
@@ -328,7 +328,7 @@ function welcome_pane(){
         $('#tutorial_dialog .btn-previous').prop('disabled', false);
         $('#tutorial_dialog .btn-next').removeClass('btn-warning');
         $('#tutorial_dialog .btn-next').html(
-            'next <span class="glyphicon glyphicon-chevron-right"></span>'
+            'Next <span class="glyphicon glyphicon-chevron-right"></span>'
         );
         
         if(pos == 0){
@@ -336,7 +336,7 @@ function welcome_pane(){
         }
         else if (pos == steps.length -1){
             $('#tutorial_dialog .btn-next').html(
-                'close <span class="glyphicon glyphicon-ok"></span>'
+                'Close <span class="glyphicon glyphicon-ok"></span>'
             );
             // remove this to not change the color to orange
             $('#tutorial_dialog .btn-next').addClass('btn-warning');
