@@ -320,23 +320,28 @@ function welcome_pane(){
         
         var data = steps[pos];
         $('#tutorial_header').text(data.header);
-        $('#tutorial_content').empty();
-        $('#tutorial_content').append(data.content);
+        $('#tutorial_content').html(data.content);
         if (data.size){
             $('#tutorial_dialog .modal-dialog').width(data.size.width);
             $('#tutorial_dialog .modal-dialog').height(data.size.height);
         }
-                
-        $('#tutorial_dialog .btn-previous').prop('disabled', false);
-        $('#tutorial_dialog .btn-next').removeClass('btn-danger');
-        $('#next_text').text('next');
 
+        $('#tutorial_dialog .btn-previous').prop('disabled', false);
+        $('#tutorial_dialog .btn-next').removeClass('btn-warning');
+        $('#tutorial_dialog .btn-next').html(
+            'next <span class="glyphicon glyphicon-chevron-right"></span>'
+        );
+        
         if(pos == 0){
             $('#tutorial_dialog .btn-previous').prop('disabled', true);
         }
         else if (pos == steps.length -1){
-            $('#tutorial_dialog .btn-next').addClass('btn-danger');
-            $('#next_text').text('close');
+            $('#tutorial_dialog .btn-next').html(
+                'close <span class="glyphicon glyphicon-ok"></span>'
+            );
+            // remove this to not change the color to orange
+            $('#tutorial_dialog .btn-next').addClass('btn-warning');
+
         }
     }
 
