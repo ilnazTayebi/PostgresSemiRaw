@@ -23,8 +23,7 @@ $(document).ready(function(){
     });
 
     client = credentials.client;
-    $("#add_dropbox").on("click", function(e){ add_from_dropbox();});
-    $("#add_dropbox2").on("click", function(e){ add_from_dropbox();});
+    $("#add_dropbox , #add_dropbox2").on("click", function(e){ add_from_dropbox();});
 
     function saveQueryResults(save_function){
          //downloadJsonObj(queryResults, "data.json");
@@ -42,13 +41,13 @@ $(document).ready(function(){
     }
 
     //save to dropbox
-    $('#save_to_dropbox').on( "click", function(e){
+    $('.query-save, #save_side').on( "click", function(e){
         saveQueryResults( saveObjToDropbox );
     });
 
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
-    $('#download_results').on("click", function(){
+    $('.query-download, #download').on("click", function(){
         saveQueryResults( downloadObj );
     });
 
@@ -317,7 +316,6 @@ function welcome_pane(){
     ]
 
     function load_next(pos){
-        
         var data = steps[pos];
         $('#tutorial_header').text(data.header);
         $('#tutorial_content').html(data.content);
@@ -341,7 +339,6 @@ function welcome_pane(){
             );
             // remove this to not change the color to orange
             $('#tutorial_dialog .btn-next').addClass('btn-warning');
-
         }
     }
 
