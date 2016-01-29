@@ -47,7 +47,7 @@ $(document).ready(function(){
 
     $("[rel=tooltip]").tooltip({ placement: 'right'});
     //download results
-    $('.query-download, #download').on("click", function(){
+    $('.query-download, #download_side').on("click", function(){
         $("#download_name").val('results');
         saveQueryResults( downloadObj );
     });
