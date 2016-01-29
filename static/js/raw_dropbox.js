@@ -154,10 +154,6 @@ $(document).ready(function(){
         dialog.modal('show');
     });
 
-    $('#start_tutorial').on('click', function(e) {
-        $("#tutorial_dialog").modal('show');
-    });
-    
     // starts listing the schemas
     list_schemas();
     // inits the dropbox sessions for loading queries
@@ -230,10 +226,7 @@ function init_session(){
             });
         }
     });
-
-
 }
-
 
 function read_session_info(callback){
     var options = {};
@@ -292,7 +285,6 @@ function welcome_pane(){
             </div>',
             size: {width: 900, height: 400 }   
         },
-,
         {
             header: 'Adding data',
             content: 
@@ -335,13 +327,16 @@ function welcome_pane(){
             $('#tutorial_dialog .modal-dialog').height(data.size.height);
         }
                 
-        $('#tutorial_dialog .btn-next').prop('disabled', false);
-        $('#tutorial_dialog .btn-previous').prop('disabled', false);        
+        $('#tutorial_dialog .btn-previous').prop('disabled', false);
+        $('#tutorial_dialog .btn-next').removeClass('btn-danger');
+        $('#next_text').text('next');
+
         if(pos == 0){
             $('#tutorial_dialog .btn-previous').prop('disabled', true);
         }
         else if (pos == steps.length -1){
-            $('#tutorial_dialog .btn-next').prop('disabled', true);
+            $('#tutorial_dialog .btn-next').addClass('btn-danger');
+            $('#next_text').text('close');
         }
     }
 
@@ -357,6 +352,9 @@ function welcome_pane(){
     var pos = 0;
     load_next(pos)
     $('#tutorial_dialog .btn-next').on('click', function(){
+        if($('#next_text').text() == "close"){
+            $('#tutorial_dialog').modal('hide');
+        }
         load_next(++pos);
     });
     $('#tutorial_dialog .btn-previous').on('click', function(){
