@@ -318,23 +318,26 @@ function welcome_pane(){
         $('#tutorial_content').empty();
         if(data.image){
             var img= data.image;
-            $('<div class="col-lg-'+img.col_size+'" id="welcome_img"/>').appendTo('#tutorial_content');                        
+            $('<div id="welcome_img"/>').appendTo('#tutorial_content'); 
+            // sets the col size
+            $('#welcome_img').addClass('col-lg-'+img.col_size);                      
             if(img.position == 'right') $('#welcome_img').addClass('pull-right');          
             $('#welcome_img').append('<img src="'+img.src+'" style="'+img.style+'"/>');            
-            $('<div id="welcome_text" class="col-lg-'+(12-img.col_size)+'"/>').appendTo('#tutorial_content');
+            $('<div id="welcome_text"/>').appendTo('#tutorial_content');
+            $('#welcome_text').addClass('col-lg-'+(12-img.col_size));
             $('#welcome_text').html(data.text);
         }
         else{
             $('#tutorial_content').html(data.text);               
         }
-        
+
         if(pos == 0){
             $('#tutorial_dialog .btn-previous').prop('disabled', true);
         }
         else{
             $('#tutorial_dialog .btn-previous').prop('disabled', false);
         }
-        
+
         if (pos == steps.length -1){
             $('#tutorial_dialog .btn-next').html(
                 'Close <span class="glyphicon glyphicon-ok"></span>'
