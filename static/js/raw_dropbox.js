@@ -157,10 +157,7 @@ $(document).ready(function(){
     // starts listing the schemas
     list_schemas();
     // inits the dropbox sessions for loading queries
-    init_session();
-
-     
-
+    init_session();    
 });
 
 //will load a query from dropbox
@@ -216,7 +213,7 @@ function init_session(){
                 welcome_pane:true
             }
             write_session_info(options);
-             welcome_pane();
+            welcome_pane();
         }
         else{
             read_session_info(function(info){
@@ -317,6 +314,7 @@ function welcome_pane(){
             $('#tutorial_dialog .modal-dialog').width(data.size.width);
             $('#tutorial_dialog .modal-dialog').height(data.size.height);
         }
+        
         $('#tutorial_content').empty();
         if(data.image){
             var img= data.image;
