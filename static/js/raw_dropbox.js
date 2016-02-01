@@ -247,7 +247,7 @@ function write_session_info(obj){
 function welcome_pane(){
     var steps = [
         {   header: 'Welcome to RAW!',
-            content : 
+            text : 
             'As it\'s the first time you are landing on this page, \
             let\'s go through a quick overview.<br>\
             (You can skip this by clicking on the cross on the top right corner.)',
@@ -255,63 +255,57 @@ function welcome_pane(){
         },
         {
             header: 'Writing Queries',
-            content: 
-            '<div class="row">\
-                <div class="col-lg-6">\
-                    <img src="images/editor2.gif" alt="editor" style="width:100%;" />\
-                </div>\
-                <div class="col-lg-6">\
-                    Use the editor on left-hand side to type your queries.\
-                    Your queries are send to automatically to the server while you type.<br> \
-                    The indicator on the top left of the pane tells you the state of the query.\
-                </div>\
-            </div>',
+            text: 
+                'Use the editor on left-hand side to type your queries.\
+                Your queries are send to automatically to the server while you type.<br> \
+                The indicator on the top left of the pane tells you the state of the query.',
+            image:{ 
+                src:"images/editor2.gif", 
+                style:"width:100%;",
+                col_size: 6                    
+            },            
             size: {width: 1000, height: 300 }       
         },
         {
             header: 'Viewing Query Results',
-            content: 
-            '<div class="row">\
-                <div class="col-lg-6">\
-                    On the panel to your right, you can see the query results.\
-                    Click on the buttons to choose different types of visualizations.\
-                    These are grouped per type. If the output is not compatible\
-                    with a certain plot, the button will be grayed out.<br>\
-                    There are hierarchical and 3D graphs, try them out!\
-                </div>\
-                <div class="col-lg-6">\
-                    <img src="images/vis.gif" alt="editor" style="width:100%" />\
-                </div>\
-            </div>',
+            text: 
+                'On the panel to your right, you can see the query results.\
+                Click on the buttons to choose different types of visualizations.\
+                These are grouped per type. If the output is not compatible\
+                with a certain plot, the button will be grayed out.<br>\
+                There are hierarchical and 3D graphs, try them out!',
+            image:{ 
+                src:"images/vis.gif", 
+                position:"right", 
+                style:"width:100%;",
+                col_size: 6                    
+            },
             size: {width: 900, height: 400 }   
         },
         {
             header: 'Querying Your Data',
-            content: 
-            '<div class="row">\
-                <div class="col-lg-3">\
-                    <img src="images/dropbox.png" alt="editor" style="width:100%;" />\
-                </div>\
-                <div class="col-lg-9">\
-                    You can choose files to query directly from your Dropbox account by\
-                    clicking "Add Data" on the menu at the top.\
-                </div>\
-            </div>'
-            ,
+            image:{ 
+                src:"images/dropbox.png", 
+                position:"left", 
+                style:"width:100%;",
+                col_size: 3
+            },
+            text: 
+                'You can choose files to query directly from your Dropbox account by\
+                clicking "Add Data" on the menu at the top.',
             size: {width: 500, height: 300 }   
         },
         {
             header: 'The RAW Query Language',
-            content:
-            '<div class="row">\
-                <div class="col-lg-6">\
-                    <img src="images/tree.png" alt="editor" style="width:200px;" />\
-                </div>\
-                <div class="col-lg-6">\
-                    We use a richer SQL language that is fully hierarchical and can do some neat things.<br>\
-                    You can find a tutorial on the query language <a href="demo.html">here</a>.\
-                </div>\
-            </div>',
+            image:{ 
+                src:"images/tree.png", 
+                position:"left", 
+                style:"width:200px;",
+                col_size: 6
+            },            
+            text:
+                'We use a richer SQL language that is fully hierarchical and can do some neat things.<br>\
+                 You can find a tutorial on the query language <a href="demo.html">here</a>.',
             size: {width: 600, height: 300 }   
         }
     ]
@@ -319,27 +313,42 @@ function welcome_pane(){
     function load_next(pos){
         var data = steps[pos];
         $('#tutorial_header').text(data.header);
-        $('#tutorial_content').html(data.content);
         if (data.size){
             $('#tutorial_dialog .modal-dialog').width(data.size.width);
             $('#tutorial_dialog .modal-dialog').height(data.size.height);
         }
-
-        $('#tutorial_dialog .btn-previous').prop('disabled', false);
-        $('#tutorial_dialog .btn-next').removeClass('btn-warning');
-        $('#tutorial_dialog .btn-next').html(
-            'Next <span class="glyphicon glyphicon-chevron-right"></span>'
-        );
+        $('#tutorial_content').empty();
+        if(data.image){
+            var img= data.image;
+            $('<div class="col-lg-'+img.col_size+'" id="welcome_img"/>').appendTo('#tutorial_content');                        
+            if(img.position == 'right') $('#welcome_img').addClass('pull-right');          
+            $('#welcome_img').append('<img src="'+img.src+'" style="'+img.style+'"/>');            
+            $('<div id="welcome_text" class="col-lg-'+(12-img.col_size)+'"/>').appendTo('#tutorial_content');
+            $('#welcome_text').html(data.text);
+        }
+        else{
+            $('#tutorial_content').html(data.text);               
+        }
         
         if(pos == 0){
             $('#tutorial_dialog .btn-previous').prop('disabled', true);
         }
-        else if (pos == steps.length -1){
+        else{
+            $('#tutorial_dialog .btn-previous').prop('disabled', false);
+        }
+        
+        if (pos == steps.length -1){
             $('#tutorial_dialog .btn-next').html(
                 'Close <span class="glyphicon glyphicon-ok"></span>'
             );
             // remove this to not change the color to orange
             $('#tutorial_dialog .btn-next').addClass('btn-warning');
+        }
+        else{
+            $('#tutorial_dialog .btn-next').removeClass('btn-warning');
+            $('#tutorial_dialog .btn-next').html(
+                'Next <span class="glyphicon glyphicon-chevron-right"></span>'
+            );        
         }
     }
 
