@@ -280,7 +280,7 @@ function welcome_pane(){
                 style:"width:100%;",
                 col_size: 6                    
             },
-            size: {width: 900, height: 400 }   
+            size: {width: 850, height: 400 }   
         },
         {
             header: 'Querying Your Data',
@@ -293,20 +293,20 @@ function welcome_pane(){
             text: 
                 'You can choose files to query directly from your Dropbox account by\
                 clicking "Add Data" on the menu at the top.',
-            size: {width: 500, height: 300 }   
+            size: {width: 550, height: 300 }   
         },
         {
             header: 'The RAW Query Language',
             image:{ 
                 src:"images/tree.png", 
                 position:"left", 
-                style:"width:200px;",
+                style:"width:180px;",
                 col_size: 6
             },            
             text:
                 'We use a richer SQL language that is fully hierarchical and can do some neat things.<br>\
                  You can find a tutorial on the query language <a href="demo.html">here</a>.',
-            size: {width: 600, height: 300 }   
+            size: {width: 550, height: 300 }   
         }
     ]
 
