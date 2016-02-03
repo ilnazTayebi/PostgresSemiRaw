@@ -81,7 +81,7 @@ function append_alert(msg, level){
 var status = []
 function refresh_info(){
 
-	http_json_request("GET", "/sniff/status", undefined, {
+	http_json_request("GET", "/sniffstatus", undefined, {
 		success: function(data){
 			if (status == data.status){
 				console.log("no new data");

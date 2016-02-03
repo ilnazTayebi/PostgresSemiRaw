@@ -20,10 +20,10 @@
 		<link rel="stylesheet" href="css/BootSideMenu.css"/>
 		<link rel="stylesheet" href="css/bootstrap-treeview.css"/>
 		<style type="text/css" media="screen">
-        #editor {
-	        height: 600px;
-	        font-size: 18px;
-        }
+		#editor {
+			height: 600px;
+			font-size: 18px;
+		}
 
 	    #demoBox {
 		    height: 0px;
@@ -60,9 +60,9 @@
 		    height: 600px;
 		    font-size: 18px;        
 	    }
-        #editor {
-            height:600px;
-        }
+	    #editor {
+		    height:600px;
+	    }
 	    .navbar-brand,
 	    .navbar-nav li a {
 		    line-height: 65px;
@@ -83,11 +83,11 @@
 		    /*cursor: pointer;*/
 		    visibility:hidden;
 	    }
-        /*Load query selection element*/
-        #load_query_sel{
-            height:200px;
-        }
-        
+	    /*Load query selection element*/
+	    #load_query_sel{
+		    height:200px;
+	    }
+
 		</style>
 		<!-- jquery -->
 		<script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
@@ -109,7 +109,7 @@
 					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 						<span class="sr-only">Toggle navigation</span> 
 						<span class="icon-bar"></span> 
-                        <span class="icon-bar"></span> 
+						<span class="icon-bar"></span> 
 						<span class="icon-bar"></span>
 					</button>
 					<a class="navbar-brand" href="http://www.raw-labs.com/"><img src="logo.png"/></a>
@@ -119,21 +119,25 @@
 						<li id="add_dropbox"><a>Add Data</a></li>
 						<li id="load_query"><a >Load Query</a></li>
 						<li id="save_query"><a>Save Query</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                Export Data<span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li id="save_to_dropbox_nav" class="query-save">
-                                    <a><span> Dropbox</span></a>
-                                </li>
-                                <li id="download_results_nav" class="query-download">
-                                    <a><span> Download</span></a>
-                                </li>
-                            </ul>
-                        </li>
-<!-- 						<li><a href="http://www.raw-labs.com/">Learn More</a></li> -->
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+								Export Data<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li id="save_to_dropbox_nav" class="query-save">
+									<a><span> Dropbox</span></a>
+								</li>
+								<li id="download_results_nav" class="query-download">
+									<a><span> Download</span></a>
+								</li>
+							</ul>
+						</li>
+						<!-- <li><a href="http://www.raw-labs.com/">Learn More</a></li> -->
 					</ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a id="user_name"></a></li>
+                        <li id="sign_out" class="pull-right"><a>Sign Out</a></li>
+                    </ul>
 				</div>
 			</div>
 		</div> <!--nav bar-->
@@ -153,25 +157,25 @@
 					</div>
 				</div> <!-- /Query panel-->
 				<div class="col-lg-6" > <!--Answer panel-->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">
-                                Answer
-                                <div class="pull-right btn-group" role="group" id="next_group">
-                                    <button type="button" class="btn btn-default btn-xs" id="get_next">Get Next</button>
-                                    <button type="button" class="btn btn-default btn-xs" id="get_all">Get All</button>
-                                </div>
-                            </h3>
-                        </div>
-                        <div class="panel-body">
-                            <div id="vis-container"></div><!--Data visualization panel the content will be loaded from vis_tab.html-->
-                        </div>
-                    </div>
-				</div>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Answer
+								<div class="pull-right btn-group" role="group" id="next_group">
+									<button type="button" class="btn btn-default btn-xs" id="get_next">Get Next</button>
+									<button type="button" class="btn btn-default btn-xs" id="get_all">Get All</button>
+								</div>
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div id="vis-container"></div><!--Data visualization panel the content will be loaded from vis_tab.html-->
+						</div>
+					</div>
+				</div> <!--/Answer panel-->
 			</div>
 			<div class="col-lg-12 panel-body" id="alerts"></div>
 		</div>
-		<div id="forms-container"></div>		
+		<div id="forms-container"></div> <!--The data here will be filled with with forms.html-->
 		<div id="side_panel">
 			<div class="container-fluid">
 				<div class="panel panel-default">
@@ -205,9 +209,9 @@
 				<div class="panel panel-default">
 					<div class="panel-heading"> <h3 class="panel-title">Query times</h3> </div>
 					<div class="panel-body" id="exec_time">
-                        <li class="list-group-item" >Exec. time:----(ms)</li>
-                        <li class="list-group-item" >Comp. time:----(ms)</li>
-                    </div>
+						<li class="list-group-item" >Exec. time:----(ms)</li>
+						<li class="list-group-item" >Comp. time:----(ms)</li>
+					</div>
 				</div>
 				<label class="checkbox-inline" for="checkboxes-0">
 					<input type="checkbox" name="checkboxes" id="auto_query" checked="true"/>
@@ -241,3 +245,4 @@
 	<script type="text/javascript" src="js/raw_walkthrough.js"></script>
 	<script type="text/javascript" src="js/raw_dropbox.js"></script>	
 </html>
+

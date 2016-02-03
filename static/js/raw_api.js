@@ -29,9 +29,6 @@ function ini_credentials(options){
             user : options.user,
             password : options.password
         }
-        if (options['user_info']){
-            options['user_info'](false, {name : options.user})
-        }
     }
     console.log("initallized credentials", credentials)
     return credentials;
@@ -177,7 +174,6 @@ function parse_url_params(){
     var parts= decodeURIComponent(location.href).split('?');
     var params= [];
     if (parts.length > 1){
-        console.log("got url parameters", parts );
         params = parts[1].split('&');
     }
     var params_data = {};

@@ -12,17 +12,28 @@ $(document).ready(function(){
     $('#get_all').prop('disabled', true);
 
     // initializes credentials using dropbox
-    var credentials = ini_credentials({
-        dropbox:true,
-        user_info: function (error, info){
-            console.log('Dropbox name: ' + info.name);            
-            $('<ul class="nav navbar-nav navbar-right">\
-                <li><a>Hello ' + info.name.capitalize() + '!</a></li> \
-             </ul>').appendTo('.navbar-collapse');
-        }
-    });
+    var credentials = ini_credentials({dropbox:true });
 
     client = credentials.client;
+    // adds the drobox user name to the nav bar
+    client.getAccountInfo(function (error, info){
+        console.log('Dropbox name: ' + info.name);
+        $('#user_name').text('Hello '+info.name.capitalize()+'!');
+
+        $('#sign_out').on('click', function(e){
+            console.log('signing out from dropbox');
+            var options = {};
+            client.signOut(options, function(error){
+                if (error){
+                    throw("error signing out from dropbox " + error);
+                }
+                window.location.replace('signin.html');
+
+            });
+        });
+    });
+
+
     $("#add_dropbox , #add_dropbox2").on("click", function(e){ add_from_dropbox();});
 
     function saveQueryResults(save_function){
@@ -36,6 +47,7 @@ $(document).ready(function(){
             $("#download_dialog").modal('hide');
         };
         document.getElementById('download_excel').onclick = function () {
+            // for the time being downloading excel files is not supported
         };
     }
 
@@ -169,7 +181,7 @@ function load_query(path, editor, jsonEditor){
         var saved_query = JSON.parse(content);
         set_selected_graph(saved_query.vis);
         editor.setValue(saved_query.query);
-        //TODO: only do this if auto query is not selected
+        //if auto query is not selected then we have to send the query manually
         if (document.getElementById("auto_query").checked == false){
             console.log("posting query after load");
             post_query(editor, jsonEditor);
@@ -188,10 +200,9 @@ function init_session(){
         } 
 
         function find_file(filename){
-            var f = files.find( function (f,index, array){
+            return files.find( function (f,index, array){
                return  f.name == filename ;
             });
-            return f;
         }
         
         var f = find_file(RawSessionFolder);
@@ -367,9 +378,10 @@ function welcome_pane(){
     $('#tutorial_dialog .btn-next').on('click', function(e){
         if(pos == steps.length-1){
             $('#tutorial_dialog').modal('hide');
-            return;
         }
-        load_next(++pos);
+        else {
+            load_next(++pos);
+        }
     });
     $('#tutorial_dialog .btn-previous').on('click', function(){
         load_next(--pos);
