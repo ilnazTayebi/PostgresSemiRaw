@@ -11,7 +11,6 @@ function post_query(editor, jsonEditor){
     // request while the former one hasn't returned.
     if(ongoing == true) return;
 
-    // from here on, the server is waiting for our query.
 
     // do not send if the query is empty.
     if (query == "") {
@@ -394,23 +393,23 @@ function get_dropbox_options(selection){
 }
 
 var upload_alerts = {
-        success: function(data) {
-            console.log(data);
-            if(data && data.name){
-                append_alert('File ' + data.name  + ' registered');
-            }
-            else{
-                append_alert('File registered');
-            }
-            // list the schemas again 
-            list_schemas();
-        },
-        error : function(request, status, error) {
-            console.log("error", request, status, error);
-            var response = JSON.parse(request.responseText);
-            append_error("Error registering file '" + response.exceptionType + "' : "+ response.message);
+    success: function(data) {
+        console.log(data);
+        if(data && data.name){
+            append_alert('File ' + data.name  + ' registered');
         }
-     }
+        else{
+            append_alert('File registered');
+        }
+        // list the schemas again 
+        list_schemas();
+    },
+    error : function(request, status, error) {
+        console.log("error", request, status, error);
+        var response = JSON.parse(request.responseText);
+        append_error("Error registering file '" + response.exceptionType + "' : "+ response.message);
+    }
+};
 
 // will start the dropbox chooser and register files from dropbox
 function add_from_dropbox(){
@@ -419,31 +418,8 @@ function add_from_dropbox(){
         // Required. Called when a user selects an item in the Chooser.
         success: function (files){
             var options = get_dropbox_options(files);
-            var inputs = add_files_to_dialog(options);
-            document.getElementById("register_button").onclick = function(){
-                var ok = true;
-                var files = [];
-                for(n in options){
-                    var f = options[n];
-                    f.name = $("#"+inputs[n].name).val();
-                    //if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
+            var inputs = register_files_dialog(options);
 
-                    /* checks if the name is ok*/
-                    f.type = $("#"+inputs[n].type).val();
-                    //if (f.type == null) ok = false;
-                    files.push(f);
-                }
-                if(ok){
-                    for (n in files){
-                        console.log("registering file ", files[n]);
-                        register_file(files[n], upload_alerts);
-                    }
-                    //closes the dialog
-                    $("#register_dialog").modal('hide');
-               }
-                
-            }
-            $("#register_dialog").modal('show');
         },
         cancel: function() { },
         multiselect: true //selection of multiple files
@@ -451,25 +427,9 @@ function add_from_dropbox(){
     Dropbox.choose(options);
 }
 
-// adds a dataset from a URL
-function add_from_url(url, name, type) {
-    var f = { "name": name, "filename": name + "." + type, "url": url, "type": type, "protocol": "url" };
-    register_file(f, upload_alerts);
-}
-
-// function to download result from a query 
-function downloadObj(obj, filename, format){ 
-    //TODO: check if there are limits in the size of data for encodeURIComponent
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
-    var dlElem = document.getElementById('downloadAnchorElem');
-    dlElem.setAttribute("href", dataStr);
-    dlElem.setAttribute("download", filename);
-    dlElem.click();
-}
-
 //will add items to select name and file type for the files selected in the dialog
 // returns an array of objects with the ids of the inputs added {name, type}
-function add_files_to_dialog(files){
+function register_files_dialog(files){
     
     $("#modal_body").empty();
     $('<label>Write here the name you\'d like to use</label>').appendTo("#modal_body");
@@ -477,7 +437,7 @@ function add_files_to_dialog(files){
     for( n in files){
         var f = files[n];
         var id = f.filename.replace(/[ \.~-]/g,'_');
-        var i = {name : 'n_'+id, type : 't_'+id };
+        var i = {name : 'n_'+id, type : 't_'+id, url : 'u_'+id };
         inputs.push(i);
         console.log('adding file', f);
         $('<div class="form-group">\
@@ -493,6 +453,7 @@ function add_files_to_dialog(files){
                     <option value="text">TEXT</option>\
                     </select>\
                 </div>\
+                <input type="text" class="form-control hidden" id="' + i.url + '" placeholder="'+f.url+'" style="float:left;width:80%;">\
             </div>\
         </div>').appendTo("#modal_body");
 
@@ -511,13 +472,49 @@ function add_files_to_dialog(files){
         }
         $("#"+i.name).val(f.name);
         $("#"+i.type).val(f.type);
+        $("#"+i.url).val(f.url);
    }
 
     // adds the button at the end
     $('<button type="submit" class="btn btn btn-success" id = "register_button">\
         <span class="glyphicon glyphicon-ok-sign"></span>  Go !</button>').appendTo("#modal_body");
+
+    $("#register_button").on('click', function(e){
+        console.log($('#register_dialog .input-append'));
+        var controls =  $('#register_dialog .form-control');
+
+        for(var n = 0; n < controls.length; n+=3){
+            f.name = controls[n].value;
+            f.type = controls[n+1].value;
+            f.url =  controls[n+2].value;
+            console.log("registering file ", f );
+            register_file(f, upload_alerts);
+        }
+        //closes the dialog
+        $("#register_dialog").modal('hide');
+    });
+
+    $("#register_dialog").modal('show');
     return inputs;
 }
+
+
+// adds a dataset from a URL
+function add_from_url(url, name, type) {
+    var f = { "name": name, "filename": name + "." + type, "url": url, "type": type, "protocol": "url" };
+    register_file(f, upload_alerts);
+}
+
+// function to download result from a query 
+function downloadObj(obj, filename, format){ 
+    //TODO: check if there are limits in the size of data for encodeURIComponent
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
+    var dlElem = document.getElementById('downloadAnchorElem');
+    dlElem.setAttribute("href", dataStr);
+    dlElem.setAttribute("download", filename);
+    dlElem.click();
+}
+
 
 //function to append success message to the alert pane
 function append_alert(msg){
