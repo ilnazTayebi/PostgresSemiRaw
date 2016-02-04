@@ -482,7 +482,8 @@ function register_files_dialog(files){
     $("#register_button").on('click', function(e){
         console.log($('#register_dialog .input-append'));
         var controls =  $('#register_dialog .form-control');
-
+        // this assumes that the order retrieved in the selector will be the same as the insertion order
+        // check the docs if this true or not
         for(var n = 0; n < controls.length; n+=3){
             f.name = controls[n].value;
             f.type = controls[n+1].value;
@@ -497,7 +498,6 @@ function register_files_dialog(files){
     $("#register_dialog").modal('show');
     return inputs;
 }
-
 
 // adds a dataset from a URL
 function add_from_url(url, name, type) {
@@ -514,7 +514,6 @@ function downloadObj(obj, filename, format){
     dlElem.setAttribute("download", filename);
     dlElem.click();
 }
-
 
 //function to append success message to the alert pane
 function append_alert(msg){
@@ -539,7 +538,6 @@ function append_error(msg){
             msg + 
          '</div>').appendTo("#alerts");
 }
-
 
 function load_dataset(what) {
     var datasets = {
