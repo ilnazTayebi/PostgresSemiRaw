@@ -103,7 +103,6 @@ function set_get_next_data(token, jsonEditor, rows){
    }
 }
 
-
 function set_get_all(query, jsonEditor){
     $('#get_all').prop('disabled', false);
     document.getElementById('get_all').onclick = function(){
@@ -131,9 +130,11 @@ function set_results(results, jsonEditor, times){
     redraw_graph( queryResults);
     ongoing = false;
     if (times){        
-        $('#exec_time').empty();
-        $('<li class="list-group-item" >Exec. time: '+ times.executionTime + ' (ms)</li>\
-           <li class="list-group-item" >Comp. time: '+ times.compilationTime + ' (ms)</li>').appendTo('#exec_time');
+        $('#exec_time').html(
+            '<li class="list-group-item" >Exec. time: ' + 
+                times.executionTime + ' (ms)</li>\
+            <li class="list-group-item" >Comp. time: ' + 
+                times.compilationTime + ' (ms)</li>');
    }
 }
 
@@ -159,7 +160,6 @@ function list_schemas(){
         }
      });
 }
-
 
 //Will handle internal errors (status 500 from scala server)
 // for the time being just handling RuntimeException
@@ -357,7 +357,6 @@ function setIndicatorLabel(label){
         default:
             throw ("wrong indicator label");
     }
-    
 }
 
 //helper function that transforms an object returned from the dropbox chooser
@@ -440,6 +439,7 @@ function register_files_dialog(files){
         var i = {name : 'n_'+id, type : 't_'+id, url : 'u_'+id };
         inputs.push(i);
         console.log('adding file', f);
+        // this will add a hidden text input with the url
         $('<div class="form-group">\
             <div class="input-append">\
                 <div class="form-group has-feedback  has-success">\
@@ -474,7 +474,6 @@ function register_files_dialog(files){
         $("#"+i.type).val(f.type);
         $("#"+i.url).val(f.url);
    }
-
     // adds the button at the end
     $('<button type="submit" class="btn btn btn-success" id = "register_button">\
         <span class="glyphicon glyphicon-ok-sign"></span>  Go !</button>').appendTo("#modal_body");
@@ -521,22 +520,21 @@ function append_alert(msg){
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
-            '</button>' +  
+            '</button>' +
             msg + 
          '</div>').appendTo("#alerts");
-
     $('.alert').stop().fadeOut(5000);
 }
 
 //function to append error message to the alert pane
 function append_error(msg){
     $('<div class="col-lg-12 alert alert-danger">'+
-            '<button type="button" class="close" ' + 
-                    'data-dismiss="alert" aria-hidden="true">' + 
+            '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
             '</button>' +  
             msg + 
-         '</div>').appendTo("#alerts");
+     '</div>').appendTo("#alerts");
+    $('.alert').stop().fadeOut(5000);
 }
 
 function load_dataset(what) {
