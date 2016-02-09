@@ -1,4 +1,5 @@
 #!/bin/bash
+
 NOW=$(date +"%Y%m%d-%H%M%S")
 FILENAME=frontend-$NOW.tgz
 FULLPATH=/tmp/$FILENAME
