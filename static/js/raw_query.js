@@ -11,7 +11,6 @@ function post_query(editor, jsonEditor){
     // request while the former one hasn't returned.
     if(ongoing == true) return;
 
-    // from here on, the server is waiting for our query.
 
     // do not send if the query is empty.
     if (query == "") {
@@ -104,7 +103,6 @@ function set_get_next_data(token, jsonEditor, rows){
    }
 }
 
-
 function set_get_all(query, jsonEditor){
     $('#get_all').prop('disabled', false);
     document.getElementById('get_all').onclick = function(){
@@ -124,6 +122,7 @@ function set_get_all(query, jsonEditor){
         });
    }
 }
+
 function set_results(results, jsonEditor, times){
     queryResults = results;
    //update plots and graphs
@@ -132,9 +131,11 @@ function set_results(results, jsonEditor, times){
     redraw_graph( queryResults);
     ongoing = false;
     if (times){        
-        $('#exec_time').empty();
-        $('<li class="list-group-item" >Exec. time: '+ times.executionTime + ' (ms)</li>\
-           <li class="list-group-item" >Comp. time: '+ times.compilationTime + ' (ms)</li>').appendTo('#exec_time');
+        $('#exec_time').html(
+            '<li class="list-group-item" >Exec. time: ' + 
+                times.executionTime + ' (ms)</li>\
+            <li class="list-group-item" >Comp. time: ' + 
+                times.compilationTime + ' (ms)</li>');
    }
 }
 
@@ -160,7 +161,6 @@ function list_schemas(){
         }
      });
 }
-
 
 //Will handle internal errors (status 500 from scala server)
 // for the time being just handling RuntimeException
@@ -261,7 +261,6 @@ function handleQueryError(request, error, editor){
 
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
-
     var annotations = [];
     for (var n in errors){
         for(i in errors[n].positions){
@@ -270,7 +269,6 @@ function addErrorMarkers(editor, errors){
             addSquiglylines(editor, pos, errors[n].message, annotations)
         }
     }
-
     editor.session.setAnnotations( annotations );
 }
 
@@ -358,59 +356,26 @@ function setIndicatorLabel(label){
         default:
             throw ("wrong indicator label");
     }
-    
-}
-
-//helper function that transforms an object returned from the dropbox chooser
-// to something that we can register in our server
-function get_dropbox_options(selection){
-    var option_list = [];
-    for(n in selection){
-        var options = {protocol : 'url'};
-        // removes everything after the ?
-        // and adds the dl=1 option
-        options.url = selection[n].link.split('?')[0];
-        options.url +='?dl=1'
-        
-        console.log(selection);
-        options.filename = selection[n].name;
-        var extension =selection[n].name.split('.').pop();
-        options.name = selection[n].name.split('.')[0];
-        //cleans the not permited characters 
-        options.name = options.name.replace(/[ \.~-]/g,'_')
-        switch(extension){
-            case 'json':
-            case 'csv' :
-            case 'hjson':
-                options.type = extension;
-                break;
-            default:
-                options.type = 'text';
-                //throw " unsuported file type " + extension ;
-        }
-        option_list.push(options);
-    }
-    return option_list;
 }
 
 var upload_alerts = {
-        success: function(data) {
-            console.log(data);
-            if(data && data.name){
-                append_alert('File ' + data.name  + ' registered');
-            }
-            else{
-                append_alert('File registered');
-            }
-            // list the schemas again 
-            list_schemas();
-        },
-        error : function(request, status, error) {
-            console.log("error", request, status, error);
-            var response = JSON.parse(request.responseText);
-            append_error("Error registering file '" + response.exceptionType + "' : "+ response.message);
+    success: function(data) {
+        console.log(data);
+        if(data && data.name){
+            append_alert('File ' + data.name  + ' registered');
         }
-     }
+        else{
+            append_alert('File registered');
+        }
+        // list the schemas again 
+        list_schemas();
+    },
+    error : function(request, status, error) {
+        console.log("error", request, status, error);
+        var response = JSON.parse(request.responseText);
+        append_error("Error registering file '" + response.exceptionType + "' : "+ response.message);
+    }
+};
 
 // will start the dropbox chooser and register files from dropbox
 function add_from_dropbox(){
@@ -418,32 +383,33 @@ function add_from_dropbox(){
     var options = {
         // Required. Called when a user selects an item in the Chooser.
         success: function (files){
-            var options = get_dropbox_options(files);
-            var inputs = add_files_to_dialog(options);
-            document.getElementById("register_button").onclick = function(){
-                var ok = true;
-                var files = [];
-                for(n in options){
-                    var f = options[n];
-                    f.name = $("#"+inputs[n].name).val();
-                    //if ( ! /[_a-zA-Z]\w*/.test(name)) ok = false;
+            var option_list = [];
+            for(n in files){
+                var options = {protocol : 'url'};
+                // removes everything after the ?
+                // and adds the dl=1 option
+                options.url = files[n].link.split('?')[0];
+                options.url +='?dl=1'
 
-                    /* checks if the name is ok*/
-                    f.type = $("#"+inputs[n].type).val();
-                    //if (f.type == null) ok = false;
-                    files.push(f);
+                var extension =files[n].name.split('.').pop();
+                options.name = files[n].name.split('.')[0];
+                //cleans the not permited characters 
+                options.name = options.name.replace(/[ \.~-]/g,'_')
+                switch(extension){
+                    case 'json':
+                    case 'csv' :
+                    case 'hjson':
+                        options.type = extension;
+                        break;
+                    default:
+                        options.type = 'text';
+                        //throw " unsuported file type " + extension ;
                 }
-                if(ok){
-                    for (n in files){
-                        console.log("registering file ", files[n]);
-                        register_file(files[n], upload_alerts);
-                    }
-                    //closes the dialog
-                    $("#register_dialog").modal('hide');
-               }
-                
+                option_list.push(options);
             }
-            $("#register_dialog").modal('show');
+
+            register_files_dialog(option_list);
+
         },
         cancel: function() { },
         multiselect: true //selection of multiple files
@@ -451,48 +417,32 @@ function add_from_dropbox(){
     Dropbox.choose(options);
 }
 
-// adds a dataset from a URL
-function add_from_url(url, name, type) {
-    var f = { "name": name, "filename": name + "." + type, "url": url, "type": type, "protocol": "url" };
-    register_file(f, upload_alerts);
-}
-
-// function to download result from a query 
-function downloadObj(obj, filename, format){ 
-    //TODO: check if there are limits in the size of data for encodeURIComponent
-    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
-    var dlElem = document.getElementById('downloadAnchorElem');
-    dlElem.setAttribute("href", dataStr);
-    dlElem.setAttribute("download", filename);
-    dlElem.click();
-}
-
 //will add items to select name and file type for the files selected in the dialog
 // returns an array of objects with the ids of the inputs added {name, type}
-function add_files_to_dialog(files){
+function register_files_dialog(files){
     
     $("#modal_body").empty();
     $('<label>Write here the name you\'d like to use</label>').appendTo("#modal_body");
-    var inputs = [];
     for( n in files){
         var f = files[n];
-        var id = f.filename.replace(/[ \.~-]/g,'_');
-        var i = {name : 'n_'+id, type : 't_'+id };
-        inputs.push(i);
-        console.log('adding file', f);
+        var i = f.name.replace(/[ \.~-]/g,'_');
+        var id = {name : 'n_'+i, type : 't_'+i, url : 'u_'+i };
+
+        // this will add a hidden text input with the url
         $('<div class="form-group">\
             <div class="input-append">\
                 <div class="form-group has-feedback  has-success">\
-                    <input type="text" class="form-control" id="' + i.name + '" placeholder="file name" style="float:left;width:80%;">\
+                    <input type="text" class="form-control" id="' + id.name + '" placeholder="file name" style="float:left;width:80%;">\
                 </div>\
                 <div class="btn-group " style=style="float:right;">\
-                    <select class="form-control" id="'+ i.type +'">\
+                    <select class="form-control" id="'+ id.type +'">\
                     <option value="csv">CSV</option>\
                     <option value="json">JSON</option>\
                     <option value="hjson">HJSON</option>\
                     <option value="text">TEXT</option>\
                     </select>\
                 </div>\
+                <input type="text" class="form-control hidden" id="' + id.url + '" placeholder="'+f.url+'" style="float:left;width:80%;">\
             </div>\
         </div>').appendTo("#modal_body");
 
@@ -509,14 +459,50 @@ function add_files_to_dialog(files){
                 $('<span class="glyphicon glyphicon-ok form-control-feedback"></span>').appendTo(parent);
             }
         }
-        $("#"+i.name).val(f.name);
-        $("#"+i.type).val(f.type);
+        $("#"+id.name).val(f.name);
+        $("#"+id.type).val(f.type);
+        $("#"+id.url).val(f.url);
    }
-
     // adds the button at the end
-    $('<button type="submit" class="btn btn btn-success" id = "register_button">\
+    $('<button type="submit" class="btn btn btn-success" id="register_button">\
         <span class="glyphicon glyphicon-ok-sign"></span>  Go !</button>').appendTo("#modal_body");
-    return inputs;
+
+    //check promise, when and deferred in jquery,  
+    // http://api.jquery.com/promise/
+    // http://api.jquery.com/jQuery.when/
+    // http://api.jquery.com/deferred.promise/
+    $("#register_button").on('click', function(e){
+        var controls =  $('#register_dialog .form-control');
+        // this assumes that the order retrieved in the selector will be the same as the insertion order
+        // check the docs if this true or not
+        for(var n = 0; n < controls.length; n+=3){
+            f.name = controls[n].value;
+            f.type = controls[n+1].value;
+            f.url =  controls[n+2].value;
+            console.log("registering file ", f );
+            register_file(f, upload_alerts);
+        }
+        //closes the dialog
+        $("#register_dialog").modal('hide');
+    });
+
+    $("#register_dialog").modal('show');
+}
+
+// adds a dataset from a URL
+function add_from_url(url, name, type) {
+    var f = { "name": name, "url": url, "type": type, "protocol": "url" };
+    register_file(f, upload_alerts);
+}
+
+// function to download result from a query 
+function downloadObj(obj, filename, format){ 
+    //TODO: check if there are limits in the size of data for encodeURIComponent
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent( formatResults( obj, format));
+    var dlElem = document.getElementById('downloadAnchorElem');
+    dlElem.setAttribute("href", dataStr);
+    dlElem.setAttribute("download", filename);
+    dlElem.click();
 }
 
 //function to append success message to the alert pane
@@ -525,24 +511,22 @@ function append_alert(msg){
             '<button type="button" class="close" ' + 
                     'data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
-            '</button>' +  
+            '</button>' +
             msg + 
          '</div>').appendTo("#alerts");
-
     $('.alert').stop().fadeOut(5000);
 }
 
 //function to append error message to the alert pane
 function append_error(msg){
     $('<div class="col-lg-12 alert alert-danger">'+
-            '<button type="button" class="close" ' + 
-                    'data-dismiss="alert" aria-hidden="true">' + 
+            '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">' + 
                 '&times;' + 
             '</button>' +  
             msg + 
-         '</div>').appendTo("#alerts");
+     '</div>').appendTo("#alerts");
+    $('.alert').stop().fadeOut(5000);
 }
-
 
 function load_dataset(what) {
     var datasets = {
