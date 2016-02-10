@@ -122,6 +122,7 @@ function set_get_all(query, jsonEditor){
         });
    }
 }
+
 function set_results(results, jsonEditor, times){
     queryResults = results;
    //update plots and graphs
@@ -260,7 +261,6 @@ function handleQueryError(request, error, editor){
 
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
-
     var annotations = [];
     for (var n in errors){
         for(i in errors[n].positions){
@@ -269,7 +269,6 @@ function addErrorMarkers(editor, errors){
             addSquiglylines(editor, pos, errors[n].message, annotations)
         }
     }
-
     editor.session.setAnnotations( annotations );
 }
 
@@ -359,38 +358,6 @@ function setIndicatorLabel(label){
     }
 }
 
-//helper function that transforms an object returned from the dropbox chooser
-// to something that we can register in our server
-function get_dropbox_options(selection){
-    var option_list = [];
-    for(n in selection){
-        var options = {protocol : 'url'};
-        // removes everything after the ?
-        // and adds the dl=1 option
-        options.url = selection[n].link.split('?')[0];
-        options.url +='?dl=1'
-        
-        console.log(selection);
-        options.filename = selection[n].name;
-        var extension =selection[n].name.split('.').pop();
-        options.name = selection[n].name.split('.')[0];
-        //cleans the not permited characters 
-        options.name = options.name.replace(/[ \.~-]/g,'_')
-        switch(extension){
-            case 'json':
-            case 'csv' :
-            case 'hjson':
-                options.type = extension;
-                break;
-            default:
-                options.type = 'text';
-                //throw " unsuported file type " + extension ;
-        }
-        option_list.push(options);
-    }
-    return option_list;
-}
-
 var upload_alerts = {
     success: function(data) {
         console.log(data);
@@ -416,8 +383,32 @@ function add_from_dropbox(){
     var options = {
         // Required. Called when a user selects an item in the Chooser.
         success: function (files){
-            var options = get_dropbox_options(files);
-            var inputs = register_files_dialog(options);
+            var option_list = [];
+            for(n in files){
+                var options = {protocol : 'url'};
+                // removes everything after the ?
+                // and adds the dl=1 option
+                options.url = files[n].link.split('?')[0];
+                options.url +='?dl=1'
+
+                var extension =files[n].name.split('.').pop();
+                options.name = files[n].name.split('.')[0];
+                //cleans the not permited characters 
+                options.name = options.name.replace(/[ \.~-]/g,'_')
+                switch(extension){
+                    case 'json':
+                    case 'csv' :
+                    case 'hjson':
+                        options.type = extension;
+                        break;
+                    default:
+                        options.type = 'text';
+                        //throw " unsuported file type " + extension ;
+                }
+                option_list.push(options);
+            }
+
+            register_files_dialog(option_list);
 
         },
         cancel: function() { },
@@ -432,28 +423,26 @@ function register_files_dialog(files){
     
     $("#modal_body").empty();
     $('<label>Write here the name you\'d like to use</label>').appendTo("#modal_body");
-    var inputs = [];
     for( n in files){
         var f = files[n];
-        var id = f.filename.replace(/[ \.~-]/g,'_');
-        var i = {name : 'n_'+id, type : 't_'+id, url : 'u_'+id };
-        inputs.push(i);
-        console.log('adding file', f);
+        var i = f.name.replace(/[ \.~-]/g,'_');
+        var id = {name : 'n_'+i, type : 't_'+i, url : 'u_'+i };
+
         // this will add a hidden text input with the url
         $('<div class="form-group">\
             <div class="input-append">\
                 <div class="form-group has-feedback  has-success">\
-                    <input type="text" class="form-control" id="' + i.name + '" placeholder="file name" style="float:left;width:80%;">\
+                    <input type="text" class="form-control" id="' + id.name + '" placeholder="file name" style="float:left;width:80%;">\
                 </div>\
                 <div class="btn-group " style=style="float:right;">\
-                    <select class="form-control" id="'+ i.type +'">\
+                    <select class="form-control" id="'+ id.type +'">\
                     <option value="csv">CSV</option>\
                     <option value="json">JSON</option>\
                     <option value="hjson">HJSON</option>\
                     <option value="text">TEXT</option>\
                     </select>\
                 </div>\
-                <input type="text" class="form-control hidden" id="' + i.url + '" placeholder="'+f.url+'" style="float:left;width:80%;">\
+                <input type="text" class="form-control hidden" id="' + id.url + '" placeholder="'+f.url+'" style="float:left;width:80%;">\
             </div>\
         </div>').appendTo("#modal_body");
 
@@ -470,16 +459,19 @@ function register_files_dialog(files){
                 $('<span class="glyphicon glyphicon-ok form-control-feedback"></span>').appendTo(parent);
             }
         }
-        $("#"+i.name).val(f.name);
-        $("#"+i.type).val(f.type);
-        $("#"+i.url).val(f.url);
+        $("#"+id.name).val(f.name);
+        $("#"+id.type).val(f.type);
+        $("#"+id.url).val(f.url);
    }
     // adds the button at the end
-    $('<button type="submit" class="btn btn btn-success" id = "register_button">\
+    $('<button type="submit" class="btn btn btn-success" id="register_button">\
         <span class="glyphicon glyphicon-ok-sign"></span>  Go !</button>').appendTo("#modal_body");
 
+    //check promise, when and deferred in jquery,  
+    // http://api.jquery.com/promise/
+    // http://api.jquery.com/jQuery.when/
+    // http://api.jquery.com/deferred.promise/
     $("#register_button").on('click', function(e){
-        console.log($('#register_dialog .input-append'));
         var controls =  $('#register_dialog .form-control');
         // this assumes that the order retrieved in the selector will be the same as the insertion order
         // check the docs if this true or not
@@ -495,12 +487,11 @@ function register_files_dialog(files){
     });
 
     $("#register_dialog").modal('show');
-    return inputs;
 }
 
 // adds a dataset from a URL
 function add_from_url(url, name, type) {
-    var f = { "name": name, "filename": name + "." + type, "url": url, "type": type, "protocol": "url" };
+    var f = { "name": name, "url": url, "type": type, "protocol": "url" };
     register_file(f, upload_alerts);
 }
 
