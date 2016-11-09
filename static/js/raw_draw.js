@@ -291,7 +291,6 @@ function set_vis_size(){
     var w =  $("#vis_tab").width();
     var nav_w = 65;
     var vis_w = w-nav_w-60;
-    console.log("vis-nav w", nav_w, "vis_content",  vis_w);
     $("#vis_nav").width(nav_w);
     $("#vis_content").width(vis_w);
 }
