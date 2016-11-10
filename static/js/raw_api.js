@@ -177,7 +177,7 @@ function parse_url_params(){
         params = parts[1].split('&');
     }
     var params_data = {};
-    for (x in params)
+    for (var x = 0; x < params.length; x++)
      {
         params_data[ params[x].split('=')[0] ] = params[x].split('=')[1];
      }

@@ -84,11 +84,22 @@ def query_start():
     data = format_cursor(cur)
     return jsonify(dict(data=data))
 
+def pg_error_to_dict(error):
+    #Transforms a psycopg2.Error into a dict that can be handled by javascript
+    errorpos = dict(
+        errorType="pgError",
+        message=error.message,
+        position=dict(
+            begin=dict(line=1,column=1),
+            end=dict(line=1,column=2)
+        )
+    )
+    return dict(errorType="ParserError", error=errorpos)
 
 @app.errorhandler(psycopg2.Error)
 def handle_invalid_usage(error):
     conn.rollback()
-    response = jsonify(dict(type="pgError", message=error.message))
+    response = jsonify(pg_error_to_dict(error))
     response.status_code = 400
     return response
 

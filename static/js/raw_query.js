@@ -223,22 +223,22 @@ function handleQueryError(request, error, editor){
     console.log("Got status 400");
     // will store all error markers here 
     var e = [];
-    console.log("Error type", error.errorType);
+    console.log("Error", error);
     switch (error.errorType){
         case "SemanticErrors":
             var errorList = error.error.errors;
-            for (var n in errorList){
+            for (var n = 0; n < errorList.length; n++){
                 var marker = {
                     errorType : errorList[n].errorType,
                     positions :errorList[n].positions ,
                     message : errorList[n].message
                 }
+                console.log("adding marker", marker);
                 e.push(marker);
             }
             break;
         case "ParserError":
             var lines = editor.getValue().split('\n');
-            console.log("ParseError", pos);
             var pos = {
                 begin : error.error.position.begin,
                 end : {
@@ -262,21 +262,26 @@ function handleQueryError(request, error, editor){
 // will add a list of markers and annotations for errors in ACE editor
 function addErrorMarkers(editor, errors){
     var annotations = [];
-    for (var n in errors){
-        for(i in errors[n].positions){
+    for (var n = 0; n < errors.length; n++){
+        for(var i = 0; i < errors[n].positions.length; i++){
             var pos =errors[n].positions[i];
-            console.log("pos", pos);
             addSquiglylines(editor, pos, errors[n].message, annotations)
+            var  a =  {
+                row: pos.begin.line-1,
+                column: 0,
+                text: errors[n].message,
+                type: "error" // also warning and information
+            }
+            annotations.push(a);
         }
     }
-    editor.session.setAnnotations( annotations );
+    editor.session.setAnnotations(annotations);
 }
 
 // adds a squigly lines, from a position and a message,
 // this is hacky, I tried to check in Ace editor but could not find, 
 // TODO: check if there is a better way of doing this
 function addSquiglylines(editor, pos, msg, annotations){
-
     var addmarker= function(p, type){
         if(pos.begin.line == p.end.line && 
                 pos.begin.column == p.end.column){
@@ -288,21 +293,14 @@ function addSquiglylines(editor, pos, msg, annotations){
 
         var m1 = editor.session.addMarker(range, type, "text");
         markers.push(m1);
-        var  a =  {
-            row: pos.begin.line-1,
-            column: 0,
-            text: msg,
-            type: "error" // also warning and information
-        }
-        annotations.push(a);
     };
 
     var mark = function(line, start, end){
         if(end==start) end++;
         for (var n = start ; n < end ; n++){
             addmarker({
-                    begin:{line : line, column : n},
-                    end:{line : line, column : n+1}
+                    begin:{line: line, column: n},
+                    end:{line: line, column: n+1}
                 },
                 "queryError"
             );
@@ -384,7 +382,7 @@ function add_from_dropbox(){
         // Required. Called when a user selects an item in the Chooser.
         success: function (files){
             var option_list = [];
-            for(n in files){
+            for(var n = 0; n < files.length; n++){
                 var options = {protocol : 'url'};
                 // removes everything after the ?
                 // and adds the dl=1 option
@@ -423,7 +421,7 @@ function register_files_dialog(files){
     
     $("#modal_body").empty();
     $('<label>Write here the name you\'d like to use</label>').appendTo("#modal_body");
-    for( n in files){
+    for(var n = 0; n < files; n++){
         var f = files[n];
         var i = f.name.replace(/[ \.~-]/g,'_');
         var id = {name : 'n_'+i, type : 't_'+i, url : 'u_'+i };
