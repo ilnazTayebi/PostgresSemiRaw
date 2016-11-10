@@ -79,15 +79,18 @@ def last_status():
 def query_start():
     data = json.loads(request.data)
     cur = conn.cursor()
-    try:
-        cur.execute(data["query"])
-    except psycopg2.Error as e:
-        logging.error("error:", e)
-        conn.rollback()
-        raise
+    cur.execute(data["query"])
     conn.commit()
     data = format_cursor(cur)
     return jsonify(dict(data=data))
+
+
+@app.errorhandler(psycopg2.Error)
+def handle_invalid_usage(error):
+    conn.rollback()
+    response = jsonify(dict(type="pgError", message=error.message))
+    response.status_code = 400
+    return response
 
 @app.route('/file/<path:filename>', methods=['GET'])
 def static_file(filename):
