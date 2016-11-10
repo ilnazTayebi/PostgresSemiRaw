@@ -11,7 +11,6 @@ import json
 import datetime
 from sniff import sniff
 import psycopg2
-conn = psycopg2.connect("dbname=postgres user=postgres ")
 
 lock = threading.Lock()
 # deque is like a circular buffer (we will keep the last 100 messages)
@@ -52,6 +51,17 @@ def background_loader(do_reload=True, folder="data"):
         on_start=on_start, on_create=on_create, on_modified=on_modified,
         on_delete=on_delete, do_reload=do_reload)
 
+def format_cursor(cur):
+    # Transforms the results of a cursor into list of dicts
+    out = []
+    colnames = [desc[0] for desc in cur.description]
+    for row in cur.fetchall():
+        d = dict()
+        for i, name in enumerate(colnames):
+            d[name] = row[i]
+        out.append(d)
+    return out
+
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
 
@@ -68,8 +78,16 @@ def last_status():
 @app.route('/query-start', methods=['POST'])
 def query_start():
     data = json.loads(request.data)
-    logging.debug("got query %s" % data)
-    return jsonify(dict(data="hello!"))
+    cur = conn.cursor()
+    try:
+        cur.execute(data["query"])
+    except psycopg2.Error as e:
+        logging.error("error:", e)
+        conn.rollback()
+        raise
+    conn.commit()
+    data = format_cursor(cur)
+    return jsonify(dict(data=data))
 
 @app.route('/file/<path:filename>', methods=['GET'])
 def static_file(filename):
@@ -77,7 +95,13 @@ def static_file(filename):
 
 @app.route('/schemas', methods=['GET'])
 def schemas():
-    return jsonify(dict(schemas=["Hello", "World"]))
+    cur = conn.cursor()
+    query = """SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema != 'pg_catalog'
+                AND table_schema != 'information_schema' """
+    cur.execute(query)
+    return jsonify(dict(schemas=cur.fetchall()))
 
 if __name__ == '__main__':
     argp = ArgumentParser(description="Raw sniff server")
@@ -85,13 +109,24 @@ if __name__ == '__main__':
             help="reloads the file if a change was detected")
     argp.add_argument("--folder", "-f", default="data", metavar="FOLDER",
             help="Folder to be sniffed for changes")
-    argp.add_argument("--user", "-u", default="admin",
+    argp.add_argument("--host", "-H", default="localhost",
+                      help="hostname of NoDB server")
+    argp.add_argument("--user", "-u", default="postgres",
             help="user name to register files")
+    argp.add_argument("--dbname", "-d", default="postgres",
+                      help="database name")
+    argp.add_argument("--password", "-p", default="1234",
+                      help="password to connect")
 
     args = argp.parse_args()
     user = args.user
     thread = threading.Thread(target=background_loader,
-                                      args=(args.reload,args.folder, ))
+                  args=(args.reload,args.folder, ))
     thread.setDaemon(True)
-    thread.start()                                      
+    thread.start()
+    global conn
+    conn = psycopg2.connect(database=args.dbname,
+                            user=args.user,
+                            host=args.host,
+                            password=args.password)
     app.run(host='0.0.0.0', port=5555)
