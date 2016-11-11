@@ -11,13 +11,12 @@ import json
 import datetime
 from sniff import sniff
 import psycopg2
+import re
 
 lock = threading.Lock()
 # deque is like a circular buffer (we will keep the last 100 messages)
 info = collections.deque(maxlen=100)
 last_info = collections.deque(maxlen=100)
-
-user = ''
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -84,28 +83,53 @@ def query_start():
     data = format_cursor(cur)
     return jsonify(dict(data=data))
 
+error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
 def pg_error_to_dict(error):
     #Transforms a psycopg2.Error into a dict that can be handled by javascript
-    errorpos = dict(
+    logging.debug("error code '%s', message: %s" % (error.pgcode, error.message))
+    error_info = dict(
         errorType="pgError",
+        errorCode=error.pgcode,
         message=error.message,
-        position=dict(
+    )
+    #connection exception class
+    if error.pgcode[:2] == "08":
+        return dict(errorType="ConnectionError", error=error_info)
+
+    r = error_regex.match(error.message)
+    if r:
+        line = int(r.group(2))
+        c_start = len(r.group(4)) - (len(r.group(2)) + 7)
+        c_end = c_start + 10
+        position =dict(
+            begin=dict(line=line,column=c_start),
+            end=dict(line=line,column=c_end)
+        )
+        error_info["errors"] = [dict(
+            message=error.message,
+            errorType="SemanticError",
+            positions=[position]
+        )]
+        return dict(errorType="SemanticErrors", error=error_info)
+    else:
+        #this will mark the full first line
+        error_info["position"] = dict(
             begin=dict(line=1,column=1),
             end=dict(line=1,column=2)
         )
-    )
-    return dict(errorType="ParserError", error=errorpos)
+        return dict(errorType="ParserError", error=error_info)
 
 @app.errorhandler(psycopg2.Error)
-def handle_invalid_usage(error):
-    conn.rollback()
+def handle_database_error(error):
+    errorclass=error.pgcode[:2]
     response = jsonify(pg_error_to_dict(error))
-    response.status_code = 400
+    #connection exception class
+    if errorclass == "08":
+        response.status_code = 500
+    else:
+        conn.rollback()
+        response.status_code = 400
     return response
-
-@app.route('/file/<path:filename>', methods=['GET'])
-def static_file(filename):
-    return send_from_directory("../static", filename)
 
 @app.route('/schemas', methods=['GET'])
 def schemas():
@@ -116,6 +140,11 @@ def schemas():
                 AND table_schema != 'information_schema' """
     cur.execute(query)
     return jsonify(dict(schemas=cur.fetchall()))
+
+@app.route('/<path:filename>', methods=['GET'])
+def static_file(filename):
+    return send_from_directory("../static", filename)
+
 
 if __name__ == '__main__':
     argp = ArgumentParser(description="Raw sniff server")
