@@ -163,8 +163,7 @@ if __name__ == '__main__':
 
     args = argp.parse_args()
     user = args.user
-    thread = threading.Thread(target=background_loader,
-                  args=(args.reload,args.folder, ))
+    thread = threading.Thread(target=background_loader, args=(args.reload,args.folder, ))
     thread.setDaemon(True)
     thread.start()
     global conn
