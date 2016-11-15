@@ -20,6 +20,44 @@ last_info = collections.deque(maxlen=100)
 
 logging.basicConfig(level=logging.DEBUG)
 
+executer_url = ""
+user = ''
+
+def registerfile(path):
+    # extracts name and type from the filename
+    logging.info("Registering file %s" % path )
+    basename = os.path.basename(path)
+    parts = os.path.splitext(basename)
+    name = parts[0]
+    extension = parts[1].lower()
+    if extension == ".csv":
+        file_type = 'csv'
+    elif extension == ".json":
+        file_type = 'json'
+    elif extension == ".parquet":
+        file_type = 'parquet'
+    elif extension == '.log' or \
+                    extension == '.text' or \
+                    extension =='.txt':
+        file_type = 'text'
+    else:
+        logging.warn("not registering unknon file type "+ path)
+        append_msg( "warning", "not registering unknown file type %s" % path )
+        return
+
+    data = dict(
+        protocol='url',
+        filename =basename,
+        url='file://%s' % os.path.abspath(path),
+        name=name,
+        type=file_type)
+    url = '%s/register-file' % executer_url
+    response=requests.post(url, json=data, auth=(user, 'pass'))
+    if response.status_code == 200:
+        append_msg("success", "Registered file %s, shema name %s" % (path,name))
+    else:
+        append_msg("response-error", dict(msg="Error registering file %s" %path, response=json.loads(response.text)))
+
 def append_msg(msg_type, msg):
     info.append(dict(type=msg_type,msg=msg,date=datetime.datetime.now()))
     last_info.append(dict(type=msg_type,msg=msg,date=datetime.datetime.now()))
@@ -83,6 +121,7 @@ def query_start():
     data = format_cursor(cur)
     return jsonify(dict(data=data))
 
+# Regex to parse error messages from postgres and extract error position
 error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
 def pg_error_to_dict(error):
     #Transforms a psycopg2.Error into a dict that can be handled by javascript
@@ -145,15 +184,16 @@ def schemas():
 def static_file(filename):
     return send_from_directory("../static", filename)
 
-
 if __name__ == '__main__':
     argp = ArgumentParser(description="Raw sniff server")
+    argp.add_argument( "--executer","-e",default="http://localhost:54321",
+            help="url of the scala executer" , metavar="URL")
     argp.add_argument( "--reload","-r", action="store_true", default=False,
             help="reloads the file if a change was detected")
     argp.add_argument("--folder", "-f", default="data", metavar="FOLDER",
             help="Folder to be sniffed for changes")
     argp.add_argument("--host", "-H", default="localhost",
-                      help="hostname of NoDB server")
+            help="hostname of NoDB server")
     argp.add_argument("--user", "-u", default="postgres",
             help="user name to register files")
     argp.add_argument("--dbname", "-d", default="postgres",
@@ -162,6 +202,7 @@ if __name__ == '__main__':
                       help="password to connect")
 
     args = argp.parse_args()
+    executer_url = args.executer
     user = args.user
     thread = threading.Thread(target=background_loader, args=(args.reload,args.folder, ))
     thread.setDaemon(True)
