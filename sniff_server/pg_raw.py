@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Response, send_from_directory, Bluepr
 import logging
 import psycopg2
 import re
-
+import json
 
 pg_raw = Blueprint('pg_raw', __name__)
 
@@ -88,6 +88,10 @@ def schemas():
 @pg_raw.route('/<path:filename>', methods=['GET'])
 def static_file(filename):
     return send_from_directory("../static", filename)
+
+@pg_raw.route('/', methods=['GET'])
+def index():
+    return send_from_directory("../static/", "pg_raw.html")
 
 def init_db(args):
     global conn

@@ -32,10 +32,10 @@ if __name__ == '__main__':
                       help="use postgresRaw instead of Raw")
     args = argp.parse_args()
     if args.pg_raw:
-        app.register_blueprint(pg_raw)
-        init_sniffer(args)
-    else:
-        app.register_blueprint(raw_sniffer)
         init_db(args)
+        app.register_blueprint(pg_raw)
+    else:
+        init_sniffer(args)
+        app.register_blueprint(raw_sniffer)
 
     app.run(host='0.0.0.0', port=5555)
