@@ -65,8 +65,6 @@ def make_step(title, doc, query, q0):
     if title:
         v["section"] = title
     return v
-            
-        
 
 if __name__ == "__main__":
 
