@@ -2,7 +2,6 @@
 // here initializes the slide panel and the callbacks in it 
 $(document).ready(function(){
     $('#side_panel').BootSideMenu({side:"right"});
-    
     $('#get_next').prop('disabled', true);
     $('#get_all').prop('disabled', true);
 
@@ -62,10 +61,14 @@ $(document).ready(function(){
     });
 
     var editor = ace.edit("editor");
-    editor.$blockScrolling = Infinity;
-
     editor.setTheme("ace/theme/ambiance");
-    editor.getSession().setMode("ace/mode/qrawl");
+    editor.getSession().setMode("ace/mode/sql");
+    editor.$blockScrolling = Infinity;
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true
+    });
     //Syntax checker in ace uses same setAnnotations api, and clears old anotations.
     // check http://stackoverflow.com/questions/25903709/ace-editors-setannotations-wont-stay-permanent
     editor.session.setOption("useWorker", false);
@@ -93,12 +96,12 @@ $(document).ready(function(){
 
     editor_set_autoexecute(true);
 
-    document.getElementById('execute_btn').onclick = function(){ 
+    document.getElementById('execute_btn').onclick = function() {
         console.log("editor", editor);
         post_query(editor, jsonEditor);
     };
 
-    document.getElementById('auto_query').onchange = function(){
+    document.getElementById('auto_query').onchange = function() {
         if (document.getElementById("auto_query").checked){
             editor_set_autoexecute(true);
         }
@@ -110,18 +113,15 @@ $(document).ready(function(){
     // starts listing the schemas
     list_schemas();
     //for test purpose we use dropbox authentication 
-    if (params['sniff'] && params['sniff'] == 'true'){
+    if (params['sniff'] && params['sniff'] == 'true') {
         // Will periodically check the sniff server for new info
         setInterval(refresh_info, 3000);
     }
-
 });
 
-
-function refresh_info(){
+function refresh_info() {
     http_json_request("GET", "/sniff/last_status", undefined, {
         success: function(data){
-
             var status = data.status;
             if (status.length > 0) console.log("got new data", status);
             for (var n = 0 ; n <  status.length ; n++){
@@ -158,7 +158,4 @@ function refresh_info(){
             $('.alert').stop().fadeOut(5000);
         }
     })
-
 }
-
-

@@ -79,6 +79,8 @@ def background_loader(do_reload=True, folder="data"):
           on_delete=on_delete, do_reload=do_reload)
 
 def init_sniffer(args):
+    global  executer_url
+    global user
     executer_url = args.executer
     user = args.user
     thread = threading.Thread(target=background_loader, args=(args.reload,args.folder, ))
@@ -86,6 +88,10 @@ def init_sniffer(args):
     thread.start()
 
 raw_sniffer = Blueprint('raw_sniffer', __name__)
+
+@raw_sniffer.route('/', methods=['GET'])
+def index():
+    return send_from_directory("../static/", "raw.html")
 
 @raw_sniffer.route('/status', methods=['GET'])
 def status():

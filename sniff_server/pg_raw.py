@@ -85,10 +85,6 @@ def schemas():
     cur.execute(query)
     return jsonify(dict(schemas=cur.fetchall()))
 
-@pg_raw.route('/<path:filename>', methods=['GET'])
-def static_file(filename):
-    return send_from_directory("../static", filename)
-
 @pg_raw.route('/', methods=['GET'])
 def index():
     return send_from_directory("../static/", "pg_raw.html")

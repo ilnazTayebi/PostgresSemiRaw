@@ -12,6 +12,10 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
 
+@app.route('/<path:filename>', methods=['GET'])
+def static_file(filename):
+    return send_from_directory("../static", filename)
+
 if __name__ == '__main__':
     argp = ArgumentParser(description="Raw sniff server")
     argp.add_argument( "--executer","-e",default="http://localhost:54321",
