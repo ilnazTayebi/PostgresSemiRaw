@@ -26,15 +26,6 @@ def query_start():
     data = format_cursor(cur)
     return jsonify(dict(data=data))
 
-@pg_raw.route('/query-start', methods=['POST'])
-def query_start():
-    data = json.loads(request.data)
-    cur = conn.cursor()
-    cur.execute(data["query"])
-    conn.commit()
-    data = format_cursor(cur)
-    return jsonify(dict(data=data))
-
 # Regex to parse error messages from postgres and extract error position
 error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
 def pg_error_to_dict(error):
@@ -97,15 +88,6 @@ def schemas():
 @pg_raw.route('/<path:filename>', methods=['GET'])
 def static_file(filename):
     return send_from_directory("../static", filename)
-
-@pg_raw.route('/query-start', methods=['POST'])
-def query_start():
-    data = json.loads(request.data)
-    cur = conn.cursor()
-    cur.execute(data["query"])
-    conn.commit()
-    data = format_cursor(cur)
-    return jsonify(dict(data=data))
 
 def init_db(args):
     global conn
