@@ -29,7 +29,7 @@ def query_start():
 # Regex to parse error messages from postgres and extract error position
 error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
 def pg_error_to_dict(error):
-    #Transforms a psycopg2.Error into a dict that can be handled by javascript
+    """Transforms a psycopg2.Error into a dict that can be handled by javascript"""
     logging.debug("error code '%s', message: %s" % (error.pgcode, error.message))
     error_info = dict(
         errorType="pgError",
@@ -65,6 +65,8 @@ def pg_error_to_dict(error):
 
 @pg_raw.errorhandler(psycopg2.Error)
 def handle_database_error(error):
+    """Handler for database errors
+    It copies the REST query error API"""
     errorclass=error.pgcode[:2]
     response = jsonify(pg_error_to_dict(error))
     #connection exception class
