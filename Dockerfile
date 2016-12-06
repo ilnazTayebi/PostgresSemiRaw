@@ -35,7 +35,7 @@ RUN wget https://github.com/kennethreitz/requests/tarball/master && \
 ADD src/sniff_server /opt/postgresraw-ui
 ADD src/static /opt/static
 
-CMD exec /usr/bin/python /opt/postgresraw-ui/server.py \
+CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
     --reload \
     --folder /datasets \
     --pg_raw \
