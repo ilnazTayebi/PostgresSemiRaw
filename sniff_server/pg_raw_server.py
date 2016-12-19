@@ -4,7 +4,38 @@ import psycopg2
 import re
 import json
 
-pg_raw = Blueprint('pg_raw', __name__)
+pg_raw = Blueprint('pg_raw_server', __name__)
+
+# init_db(args)
+# Creates and stores a connection string based on arguments received
+def init_db(args):
+    global connection_string
+     # is it ok to store all these as global variables ???
+    connection_string = 'dbname=%s user=%s host=%s password=%s' \
+                        % (args.dbname,args.user,args.host,args.password)
+    #return connection_string
+
+# CustomConnection class
+# Allow to use a 'with' structure, which will automatically close the connection
+# eg. "with CustomConnection(conn_str) as conn: "
+class CustomConnection(object):
+    def __init__(self,conn_string):
+      self.conn = psycopg2.connect(conn_string)
+
+    def __enter__(self):
+        return self.conn
+
+    def __exit__(self, ctx_type, ctx_value, ctx_traceback):
+        self.conn.close()
+
+# Function execute_query
+# Execute query given as string (mainly for use outside of the module)
+def execute_query(query):
+    with CustomConnection(connection_string) as conn:
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        cur.close()
 
 def format_cursor(cur):
     # Transforms the results of a cursor into list of dicts
@@ -16,15 +47,6 @@ def format_cursor(cur):
             d[name] = row[i]
         out.append(d)
     return out
-
-@pg_raw.route('/query-start', methods=['POST'])
-def query_start():
-    data = json.loads(request.data)
-    cur = conn.cursor()
-    cur.execute(data["query"])
-    conn.commit()
-    data = format_cursor(cur)
-    return jsonify(dict(data=data))
 
 # Regex to parse error messages from postgres and extract error position
 error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
@@ -73,28 +95,34 @@ def handle_database_error(error):
     if errorclass == "08":
         response.status_code = 500
     else:
-        conn.rollback()
+        #error.cursor.connection.rollback() # -> error message: 'connection already closed'
         response.status_code = 400
     return response
 
+@pg_raw.route('/query-start', methods=['POST'])
+def query_start():
+    data = json.loads(request.data)
+    with CustomConnection(connection_string) as conn:
+        cur = conn.cursor()
+        cur.execute(data["query"])
+        conn.commit()
+        data = format_cursor(cur)
+        cur.close()
+        return jsonify(dict(data=data))
+
 @pg_raw.route('/schemas', methods=['GET'])
 def schemas():
-    cur = conn.cursor()
-    query = """SELECT table_name
+    with CustomConnection(connection_string) as conn:
+        cur = conn.cursor()
+        query = """SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema != 'pg_catalog'
                 AND table_schema != 'information_schema' """
-    cur.execute(query)
-    return jsonify(dict(schemas=cur.fetchall()))
+        cur.execute(query)
+        res = jsonify(dict(schemas=cur.fetchall()))
+        cur.close()
+        return res
 
 @pg_raw.route('/', methods=['GET'])
 def index():
     return send_from_directory("../static/", "pg_raw.html")
-
-def init_db(args):
-    global conn
-    conn = psycopg2.connect(database=args.dbname,
-                            user=args.user,
-                            host=args.host,
-                            port=args.port,
-                            password=args.password)

@@ -11,17 +11,17 @@ class CSVInferrer(object):
     def __init__(self, content, options=dict()):
         self._content = content
         self._options = options
-        if self._options.has_key('nulls'):
+        if self._options.has_key('nulls'): # re to look for lines starting and ending with self._options['nulls']
             self._null_reg = re.compile("^%s$" % self._options['nulls'])
         else:
-            self._null_reg = None
+            self._null_reg = re.compile("^$")
     def infer_type(self):
         sniffer = csv.Sniffer()
         # it will replace the options if available
-        delimiters = self._options.get('delimiter', ";,|\t ")
+        delimiters = self._options.get('delimiter', ";,|\t ") # get option 'delimiter' or use default ?
         dialect = sniffer.sniff(self._content, delimiters=delimiters)
         has_header = self._options.get('has_header', sniffer.has_header(self._content))
-        for o in self._options:
+        for o in self._options: # transfert options attributes to dialect ?? only existing attributes or adding possibly new ones ? 
             dialect.__dict__[o] = self._options[o]
 
         reader = csv.reader(self._content.splitlines(), dialect)
@@ -39,7 +39,7 @@ class CSVInferrer(object):
                             seen.append(name)
                         else:
                             raise TypeInferenceException("Field name '%s' exists more than once" % name)
-                    # skip the first row
+                    # skip the first row if it is a header row (otherwise, next step is to get data out of the row)
                     if has_header:
                         continue
                 else:

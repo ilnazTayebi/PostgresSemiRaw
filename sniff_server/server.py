@@ -4,7 +4,8 @@ from flask import Flask, request, jsonify, Response, send_from_directory, Bluepr
 
 from argparse import ArgumentParser, FileType
 import logging
-from pg_raw import pg_raw, init_db
+from pg_raw_sniffer import init_sniffer as init_pg_sniffer
+from pg_raw_server import pg_raw, init_db, execute_query
 from raw_sniffer import raw_sniffer, init_sniffer
 
 logging.basicConfig(level=logging.DEBUG)
@@ -31,17 +32,20 @@ if __name__ == '__main__':
     argp.add_argument("--user", "-u", default="postgres",
             help="user name to register files")
     argp.add_argument("--dbname", "-d", default="postgres",
-                      help="database name")
+                    help="database name")
     argp.add_argument("--password", "-p", default="1234",
-                      help="password to connect")
+                    help="password to connect")
     argp.add_argument('--pg_raw', '-g',  action='store_true', default=False,
-                      help="use postgresRaw instead of Raw")
+                    help="use postgresRaw instead of Raw")
+    argp.add_argument("--snoop_conf_folder", "-c", default="data", metavar="FOLDER",
+                    help="Path to the pg_raw configuration file")
     args = argp.parse_args()
     if args.pg_raw:
         init_db(args)
+        init_pg_sniffer(args,execute_query)
         app.register_blueprint(pg_raw)
     else:
-        init_sniffer(args)
+        raw_sniffer.init_sniffer(args)
         app.register_blueprint(raw_sniffer)
 
     app.run(host='0.0.0.0', port=5555)

@@ -1,3 +1,4 @@
+
 class InferrerException(Exception):
     def __init__(self, msg):
         super(InferrerException, self).__init__("[Inferrer] %s" % msg)
