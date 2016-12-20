@@ -37,9 +37,10 @@ ADD src/static /opt/static
 
 CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
     --reload \
-    --folder /datasets \
+    --folder ${docker_raw_data_folder} \
     --pg_raw \
     --host ${POSTGRES_HOST} \
     --user ${POSTGRES_USER} \
     --password ${POSTGRES_PASSWORD} \
-    --dbname ${POSTGRES_DB}
+    --dbname ${POSTGRES_DB} \
+    --snoop_conf_folder ${docker_pg_data_folder}
