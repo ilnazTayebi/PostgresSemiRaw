@@ -25,7 +25,9 @@ if __name__ == '__main__':
     argp.add_argument("--folder", "-f", default="data", metavar="FOLDER",
             help="Folder to be sniffed for changes")
     argp.add_argument("--host", "-H", default="localhost",
-            help="hostname of NoDB server")
+            help="hostname of (No)DB server")
+    argp.add_argument("--port", "-P", default="5432",
+            help="port of (No)DB server")
     argp.add_argument("--user", "-u", default="postgres",
             help="user name to register files")
     argp.add_argument("--dbname", "-d", default="postgres",

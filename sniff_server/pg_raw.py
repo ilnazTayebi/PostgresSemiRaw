@@ -96,4 +96,5 @@ def init_db(args):
     conn = psycopg2.connect(database=args.dbname,
                             user=args.user,
                             host=args.host,
+                            port=args.port,
                             password=args.password)
