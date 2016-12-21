@@ -45,5 +45,4 @@ CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
     --user ${POSTGRES_USER} \
     --password ${POSTGRES_PASSWORD} \
     --dbname ${POSTGRES_DB} \
-    --folder /datasets \
-    --snoop_conf_folder /data
+    --folder /datasets
