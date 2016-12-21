@@ -19,6 +19,12 @@
 FROM alpine:3.4
 MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
 
+# explicitly set user/group IDs
+RUN \
+	delgroup ping && \
+	deluser postgres && \
+	addgroup -g 999 -S postgres && adduser -S -G postgres -u 999 postgres
+
 RUN apk update && apk add readline zlib curl
 
 RUN mkdir /docker-entrypoint-initdb.d && \
@@ -28,10 +34,18 @@ RUN mkdir /docker-entrypoint-initdb.d && \
 ADD PostgresRaw.tar.bz2 /
 COPY docker-entrypoint.sh /
 
+VOLUME /data
+
+ENV PG_MAJOR 9.0
+ENV PG_VERSION g07b5ed1 
+
 ENV LANG en_US.utf8
-ENV PGDATA /host/pgdata
+
+ENV PATH /opt/PostgresRaw/lib/postgresql/bin:$PATH
+ENV PGDATA /data
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 5432
+
 CMD ["postgres"]
