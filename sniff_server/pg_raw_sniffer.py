@@ -47,7 +47,11 @@ def registerfile(path):
     logging.debug("\tSniffer: Try to get schema out of csv file '%s'" % path)
     schema, properties = infer_schema(path,'csv',name)
     if schema is None:
-        logging.info('schema is None')
+        logging.warning("\tSniffer: File '%s' will be ignored (schema is None)" % name)
+        return
+
+    if properties['has_header']:
+        logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % name)
         return
     
     rx = re.compile('[^a-zA-Z0-9_]+')
@@ -66,6 +70,7 @@ def registerfile(path):
         f.write("filename-%i = '%s'\n" % (n_snoop_conf_entries,path))
         f.write("relation-%i = '%s'\n" % (n_snoop_conf_entries,table_name))
         f.write("delimiter-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['delimiter']))
+        f.write("has_header-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['has_header']))
         n_snoop_conf_entries +=1
         
     logging.info("\tSniffer: File '%s' registered as table '%s'" % (path,table_name))

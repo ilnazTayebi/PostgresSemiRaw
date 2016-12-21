@@ -44,15 +44,4 @@ def get_structure_from_csv_file(url, n_objs=1000, options=dict(), n_bytes=250000
     
     f.close()
 
-    # if csv file has header
-    if properties['has_header']:
-        os.rename(path, path+'.old')
-        with open(path+'.old','r') as f:
-            with open(path,'w') as f1:
-                f.next() # skip header line
-                for line in f:
-                    f1.write(line)
-
-        os.remove(path+'.old')
-
     return schema, properties
