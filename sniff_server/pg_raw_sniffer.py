@@ -65,7 +65,7 @@ def registerfile(path):
     with open(snoop_conf_path, mode='a+') as f:
         f.write("filename-%i = '%s'\n" % (n_snoop_conf_entries,path))
         f.write("relation-%i = '%s'\n" % (n_snoop_conf_entries,table_name))
-        f.write("delimiter-%i = '%s'\n" % (n_snoop_conf_entries,properties['delimiter']))
+        f.write("delimiter-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['delimiter']))
         n_snoop_conf_entries +=1
         
     logging.info("\tSniffer: File '%s' registered as table '%s'" % (path,table_name))
@@ -152,7 +152,7 @@ def init_sniffer(args,execute_query_method):
     global execute_query
     global snoop_conf_path
     execute_query = execute_query_method
-    snoop_conf_path = args.snoop_conf_folder + "/snoop.conf"
+    snoop_conf_path = args.snoop_conf_folder + "/pgdata/snoop.conf"
     logging.info("snoop_conf_path: %s" % snoop_conf_path)
     if os.access(snoop_conf_path, os.F_OK):
         os.remove(snoop_conf_path)
@@ -164,4 +164,4 @@ def init_sniffer(args,execute_query_method):
 def clear_snoop_conf_file():
     if os.access(snoop_conf_path, os.F_OK):
         os.remove(snoop_conf_path)
-        
+
