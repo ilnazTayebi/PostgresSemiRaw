@@ -35,12 +35,15 @@ RUN wget https://github.com/kennethreitz/requests/tarball/master && \
 ADD src/sniff_server /opt/postgresraw-ui
 ADD src/static /opt/static
 
+EXPOSE 5555
+
 CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
     --reload \
-    --folder ${docker_raw_data_folder} \
     --pg_raw \
     --host ${POSTGRES_HOST} \
+    --port ${POSTGRES_PORT} \
     --user ${POSTGRES_USER} \
     --password ${POSTGRES_PASSWORD} \
     --dbname ${POSTGRES_DB} \
-    --snoop_conf_folder ${docker_pg_data_folder}
+    --folder /datasets \
+    --snoop_conf_folder /data

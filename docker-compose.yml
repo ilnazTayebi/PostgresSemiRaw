@@ -19,13 +19,10 @@
 version: '2'
 # the following environment variables are expected to be available when running 
 # docker-compose up
-# - raw_data_root:      The folder containing the data (CSV, json,...) on the
-#                       swarm node host
-# - docker_raw_data_folder: Where to map the data (CSV, json, ...) folder WITHIN the
-#                       containers
+# - raw_data_root:      The folder containing the data files (CSV, json,...) on the
+#                       swarm node host. Mapped to /datasets WITHIN the containers
 # - pg_data_root:       The folder containing the PostgreSQL binary tables on the
-#                       swarm node host
-# - docker_pg_data_folder: Where to map the previous data folder WITHIN the containers
+#                       swarm node host. Mapped to /data WITHIN the containers
 
 services:
 
@@ -34,13 +31,12 @@ services:
     container_name: "PostgresRAW-UI"
     environment:
      - POSTGRES_HOST
+     - POSTGRES_PORT
      - POSTGRES_USER
      - POSTGRES_PASSWORD
      - POSTGRES_DB=db
-     - PGDATA=${docker_pg_data_folder}
-     - docker_raw_data_folder
     volumes:
-     - "${raw_data_root}:${docker_raw_data_folder}:ro"
-     - "${pg_data_root}:${docker_pg_data_folder}:ro"
+     - "${raw_data_root}:/datasets:ro"
+     - "${pg_data_root}:/data:ro"
     links:
      - "PostgresRAW:db"
