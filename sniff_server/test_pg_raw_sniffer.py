@@ -13,9 +13,6 @@ def dummy_execute_query(query):
 class arguments():
     pass
 
-if __name__ == '__main__':
-    test_sniffer()
-
 # Function test_sniffer
 # Launches the sniffer, creates a file and makes sure it is detected and correctly interpreted
 def test_sniffer():	  
@@ -45,24 +42,24 @@ def test_sniffer():
     #logging.info("Executed query: %s" % executed_query)
     
     expected_query = '''DROP TABLE IF EXISTS test_file; CREATE TABLE test_file ( 
-	policyID int,
-	statecode text,
-	county text,
-	eq_site_limit real,
-	hu_site_limit real,
-	fl_site_limit real,
-	fr_site_limit real,
-	tiv_2011 real,
-	tiv_2012 real,
-	eq_site_deductible int,
-	hu_site_deductible real,
-	fl_site_deductible int,
-	fr_site_deductible int,
-	point_latitude real,
-	point_longitude text,
-	line text,
-	construction text,
-	point_granularity int
+	"policyID" int NOT NULL,
+	"statecode" text NOT NULL,
+	"county" text NOT NULL,
+	"eq_site_limit" real NOT NULL,
+	"hu_site_limit" real NOT NULL,
+	"fl_site_limit" real NOT NULL,
+	"fr_site_limit" real NOT NULL,
+	"tiv_2011" real NOT NULL,
+	"tiv_2012" real NOT NULL,
+	"eq_site_deductible" int NOT NULL,
+	"hu_site_deductible" real NOT NULL,
+	"fl_site_deductible" int NOT NULL,
+	"fr_site_deductible" int NOT NULL,
+	"point_latitude" real NOT NULL,
+	"point_longitude" text NOT NULL,
+	"line" text NOT NULL,
+	"construction" text NOT NULL,
+	"point_granularity" int NOT NULL
 )'''
     assert executed_query == expected_query
         
@@ -73,3 +70,6 @@ def test_sniffer():
     os.remove(file_path)
     if remove_data_folder:
         os.rmdir(args.folder)
+
+if __name__ == '__main__':
+    test_sniffer()
