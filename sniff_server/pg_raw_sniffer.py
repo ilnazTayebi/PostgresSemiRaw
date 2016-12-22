@@ -47,11 +47,11 @@ def registerfile(path):
     logging.debug("\tSniffer: Try to get schema out of csv file '%s'" % path)
     schema, properties = infer_schema(path,'csv',name)
     if schema is None:
-        logging.warning("\tSniffer: File '%s' will be ignored (schema is None)" % name)
+        logging.warning("\tSniffer: File '%s' will be ignored (schema is None)" % path)
         return
 
     if properties['has_header']:
-        logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % name)
+        logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % path)
         return
     
     rx = re.compile('[^a-zA-Z0-9_]+')
@@ -59,10 +59,12 @@ def registerfile(path):
     try:    
         query = SQLGenerator(table_name, schema).getCreateTableQuery()
     except SQLGeneratorException as e:
-        logging.warning("\tSniffer: Error reading file '%s' : %s" % (name,e))
-        logging.warning("\tSniffer: File '%s' will be ignored" % name)
+        logging.error("\tSniffer: Error reading file '%s' : %s" % (path,e))
+        logging.error("\t\tFaulty structure : %s" % schema)
+        logging.error("\tSniffer: File '%s' will be ignored" % path)
         return
     
+    #logging.debug('execute_query %s' % query)
     execute_query(query) #pg_raw_server.
 
     global n_snoop_conf_entries

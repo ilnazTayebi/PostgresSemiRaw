@@ -8,7 +8,7 @@ import re
 
 class SQLGeneratorException(Exception):
     def __init__(self, msg):
-        super(SQLGeneratorException, self).__init__("could not create SQL statement: %s" % msg)
+        super(SQLGeneratorException, self).__init__("could not create SQL statement.\n\t\t\t\t\t%s" % msg)
 
 # Class SQLGenerator
 # Holds a table name and a file structure  
@@ -28,6 +28,8 @@ class SQLGenerator():
             return "real"
         elif isinstance(rawType, rawBooleanType):
             return "boolean"
+        elif isinstance(rawType, rawSomeType): # column was entirely null -> set text type
+            return "text"
         elif isinstance(rawType, rawListType):
         # check the list contains a rawRecordType, which is the only allowed structure
             if isinstance(rawType.desc, rawRecordType):
@@ -42,7 +44,7 @@ class SQLGenerator():
                     not_null_tag = ''
                     v = v.desc
                     
-                if not(isinstance(v, rawIntType) or isinstance(v, rawStringType) or isinstance(v, rawFloatType) or isinstance(v, rawBooleanType)):
+                if not((not_null_tag=='' and isinstance(v, rawSomeType)) or isinstance(v, rawIntType) or isinstance(v, rawStringType) or isinstance(v, rawFloatType) or isinstance(v, rawBooleanType)):
                     raise SQLGeneratorException("Unsupported rawRecordType structure: %s" % v)
                     
                 tmp += '\t'
