@@ -43,8 +43,8 @@ function getObjValue(obj){
 		case "string":
 			return obj;
         case "null":
-             console.log("null value!");
-            return 0;
+            console.log("null value returning undefined");
+            return undefined;
 		default:
 			return objToString(obj);
 	}
@@ -181,8 +181,7 @@ function transverse(obj , name) {
 //finds object in the tree and inserts it if it is not found
 function getObjNode(name, root){
     var node = transverse(root, name);
-    if (node == undefined)
-    {
+    if (node == undefined || node == null) {
         node = {name: name, size:0};
         if (!root.children) root.children = [];
         root.children.push(node)
@@ -316,11 +315,8 @@ function getChildren(data,root, defaultName){
         case "string":
             root.children.push({ name : data, size : 1});
             break;
-        case "undefined":
-            console.log("could not create hierarchy from undefined data");
-            break;
         default:
-            console.log("could not draw array", data);
+            root.children.push({ name : String(data), size : 1});
             break;
     }
 }
