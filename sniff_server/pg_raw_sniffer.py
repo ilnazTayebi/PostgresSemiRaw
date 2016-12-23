@@ -145,7 +145,7 @@ def on_delete(f):
 
 # Function background_loader
 # Launches the actual sniffer using the functions defined above
-def background_loader(do_reload=True, folder="data"):
+def background_loader(do_reload=True, folder="./datasets"):
     print "folder=%s , reload = %s " %(folder, reload)
     sniff(folder=folder, lock=lock, interval=1,
           on_start=on_start, on_create=on_create, on_modified=on_modified,

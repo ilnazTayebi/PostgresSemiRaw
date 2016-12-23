@@ -23,7 +23,7 @@ if __name__ == '__main__':
             help="url of the scala executer" , metavar="URL")
     argp.add_argument( "--reload","-r", action="store_true", default=False,
             help="reloads the file if a change was detected")
-    argp.add_argument("--folder", "-f", default="data", metavar="FOLDER",
+    argp.add_argument("--folder", "-f", default="/datasets", metavar="FOLDER",
             help="Folder to be sniffed for changes")
     argp.add_argument("--host", "-H", default="localhost",
             help="hostname of (No)DB server")
@@ -37,7 +37,7 @@ if __name__ == '__main__':
                     help="password to connect")
     argp.add_argument('--pg_raw', '-g',  action='store_true', default=False,
                     help="use postgresRaw instead of Raw")
-    argp.add_argument("--snoop_conf_folder", "-c", default="data", metavar="FOLDER",
+    argp.add_argument("--snoop_conf_folder", "-c", default="/data", metavar="FOLDER",
                     help="Path to the pg_raw configuration file")
     args = argp.parse_args()
     if args.pg_raw:

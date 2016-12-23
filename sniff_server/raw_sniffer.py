@@ -72,7 +72,7 @@ def on_delete(f):
     # The alternative would have been to reload again all other data.
     append_msg("warning","File delete but feature not implemented yet %s" % f)
 
-def background_loader(do_reload=True, folder="data"):
+def background_loader(do_reload=True, folder="./datasets"):
     print "folder=%s , reload = %s " %(folder, reload)
     sniff(folder=folder, lock=lock, interval=1,
           on_start=on_start, on_create=on_create, on_modified=on_modified,
