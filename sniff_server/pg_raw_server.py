@@ -12,8 +12,8 @@ pg_raw = Blueprint('pg_raw_server', __name__)
 def init_db(args):
     global connection_string
      # is it ok to store all these as global variables ???
-    connection_string = 'dbname=%s user=%s host=%s password=%s' \
-                        % (args.dbname,args.user,args.host,args.password)
+    connection_string = 'dbname=%s user=%s host=%s port=%s password=%s' \
+                        % (args.dbname,args.user,args.host,args.port,args.password)
     #return connection_string
 
 # CustomConnection class
