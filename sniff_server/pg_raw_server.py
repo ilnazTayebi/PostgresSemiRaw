@@ -3,6 +3,7 @@ import logging
 import psycopg2
 import re
 import json
+from collections import OrderedDict
 
 pg_raw = Blueprint('pg_raw_server', __name__)
 
@@ -42,7 +43,7 @@ def format_cursor(cur):
     out = []
     colnames = [desc[0] for desc in cur.description]
     for row in cur.fetchall():
-        d = dict()
+        d = OrderedDict()
         for i, name in enumerate(colnames):
             d[name] = row[i]
         out.append(d)
@@ -108,7 +109,7 @@ def query_start():
         conn.commit()
         data = format_cursor(cur)
         cur.close()
-        return jsonify(dict(data=data))
+        return jsonify(OrderedDict(data=data))
 
 @pg_raw.route('/schemas', methods=['GET'])
 def schemas():
@@ -119,7 +120,7 @@ def schemas():
                 WHERE table_schema != 'pg_catalog'
                 AND table_schema != 'information_schema' """
         cur.execute(query)
-        res = jsonify(dict(schemas=cur.fetchall()))
+        res = jsonify(OrderedDict(schemas=cur.fetchall()))
         cur.close()
         return res
 
