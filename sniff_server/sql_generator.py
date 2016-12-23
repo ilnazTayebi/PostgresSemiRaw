@@ -50,7 +50,7 @@ class SQLGenerator():
                 tmp += '\t'
                 tmp += '"%s" ' % k #self.db_forbidden_char.sub('',k)
                 tmp += self.recurse(v) 
-                tmp += not_null_tag
+                #tmp += not_null_tag # Do not write the not null tag for now: only the first 250000 bytes of the file have been parsed
                 tmp += ',\n'
                 
             tmp = tmp[:-2]
