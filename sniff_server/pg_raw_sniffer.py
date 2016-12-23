@@ -11,6 +11,7 @@ from sniff import sniff
 #import pg_raw_server
 from inferrer import inferrer
 from sql_generator import SQLGenerator, SQLGeneratorException
+import time
 
 #executer_url = ""
 #user = ''
@@ -151,6 +152,22 @@ def background_loader(do_reload=True, folder="./datasets"):
           on_start=on_start, on_create=on_create, on_modified=on_modified,
           on_delete=on_delete, do_reload=do_reload)
 
+# Wrapper for a thread function based on http://stackoverflow.com/questions/29692250/restarting-a-thread-in-python
+# Makes sure the thread function stays alive
+def threadwrap(threadfunc, *args):
+    def wrapper(*args):
+        while True:
+            try:
+                threadfunc(*args)
+            except BaseException as e:
+                logging.info("\tSniffer: {!r}".format(e))
+                logging.info("\tSniffer: restarting...".format(e))
+                time.sleep(1)
+            else:
+                logging.info('\tSniffer: exited normally; restarting...')
+                time.sleep(1)
+    return wrapper
+
 # Function init_sniffer
 # Sets global variables snoop_conf_path and execute_query_method, and launches a sniffer in a thread
 # Passing the execute_query_method as argument makes pg_raw_sniffer independent of database
@@ -164,7 +181,7 @@ def init_sniffer(args,execute_query_method):
     if os.access(snoop_conf_path, os.F_OK):
         os.remove(snoop_conf_path)
     
-    thread = threading.Thread(target=background_loader, args=(args.reload,args.folder, ))
+    thread = threading.Thread(target=threadwrap(background_loader), args=(args.reload,args.folder, ))
     thread.setDaemon(True)
     thread.start()
 
