@@ -51,9 +51,9 @@ def registerfile(path):
         logging.warning("\tSniffer: File '%s' will be ignored (schema is None)" % path)
         return
 
-    if properties['has_header']:
-        logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % path)
-        return
+#     if properties['has_header']:
+#         logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % path)
+#         return
     
     rx = re.compile('[^a-zA-Z0-9_]+')
     table_name = rx.sub('',name)
@@ -72,8 +72,8 @@ def registerfile(path):
     with open(snoop_conf_path, mode='a+') as f:
         f.write("filename-%i = '%s'\n" % (n_snoop_conf_entries,path))
         f.write("relation-%i = '%s'\n" % (n_snoop_conf_entries,table_name))
-        f.write("delimiter-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['delimiter']))
-        f.write("has_header-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['has_header']))
+        f.write("delimiter-%i = '%s'\n" % (n_snoop_conf_entries,properties['delimiter']))
+        f.write("header-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['has_header']))
         n_snoop_conf_entries +=1
         
     logging.info("\tSniffer: File '%s' registered as table '%s'" % (path,table_name))
