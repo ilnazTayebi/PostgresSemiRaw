@@ -1,15 +1,18 @@
 # Docker container for PostgresRAW-UI
 
+This project creates a Docker image for running PostgresRAW-UI. It has been developed on Ubuntu and not tested on other platforms.
+
 ## Build procedure
 
- 1. Clone the UI sources
+ 1. Clone the PostgresRAW-UI-docker and PostgresRAW-UI sources
     ```sh
     $ git clone git@github.com:HBPSP8Repo/PostgresRAW-UI-docker.git
     $ cd PostgresRAW-UI-docker
     $ git clone git@github.com:HBPSP8Repo/PostgresRAW-UI.git src
     ```
 
- 2. Build the container as usual
+ 2. The container is built and given the name 'hbpmip/postgresraw-ui' with the following command:
+    $ docker build -t hbpmip/postgresraw-ui .
 
 ## Deployment
 
