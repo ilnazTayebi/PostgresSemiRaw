@@ -7,6 +7,7 @@ import logging
 from pg_raw_sniffer import init_sniffer as init_pg_sniffer
 from pg_raw_server import pg_raw, init_db, execute_query
 from raw_sniffer import raw_sniffer, init_sniffer
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -37,9 +38,10 @@ if __name__ == '__main__':
                     help="password to connect")
     argp.add_argument('--pg_raw', '-g',  action='store_true', default=False,
                     help="use postgresRaw instead of Raw")
-    argp.add_argument("--snoop_conf_folder", "-c", default="/data", metavar="FOLDER",
+    argp.add_argument("--snoop_conf_folder", "-c", default="/data/pgdata", metavar="FOLDER",
                     help="Path to the pg_raw configuration file")
     args = argp.parse_args()
+    #time.sleep(3) # allow time for db launch and log
     if args.pg_raw:
         init_db(args)
         init_pg_sniffer(args,execute_query)

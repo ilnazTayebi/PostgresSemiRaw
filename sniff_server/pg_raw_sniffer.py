@@ -65,7 +65,7 @@ def registerfile(path):
         logging.error("\tSniffer: File '%s' will be ignored" % path)
         return
     
-    #logging.debug('execute_query %s' % query)
+    #logging.warning('execute_query %s' % query)
     execute_query(query) #pg_raw_server.
 
     global n_snoop_conf_entries
@@ -176,7 +176,7 @@ def init_sniffer(args,execute_query_method):
     global execute_query
     global snoop_conf_path
     execute_query = execute_query_method
-    snoop_conf_path = args.snoop_conf_folder + "/pgdata/snoop.conf"
+    snoop_conf_path = args.snoop_conf_folder + "/snoop.conf"
     logging.info("snoop_conf_path: %s" % snoop_conf_path)
     if os.access(snoop_conf_path, os.F_OK):
         os.remove(snoop_conf_path)
