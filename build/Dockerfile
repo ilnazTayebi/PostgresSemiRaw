@@ -27,8 +27,8 @@ ENV JOBS=$JOBS
 RUN apk update && \
     apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
 
-RUN git clone https://github.com/HBPSP8Repo/NoDB.git && \
-    cd /NoDB/PostgresRaw && \
+COPY PostgresRAW PostgresRAW
+RUN cd /PostgresRAW/PostgresRaw && \
     CFLAGS=-O0 ./configure --prefix=/opt/PostgresRaw && \
     make -j $JOBS && \
     make install && \
@@ -36,6 +36,6 @@ RUN git clone https://github.com/HBPSP8Repo/NoDB.git && \
 
 VOLUME ["/host"]
 
-WORKDIR "/NoDB/PostgresRaw"
+WORKDIR "/PostgresRAW/PostgresRaw"
 
 CMD ["/bin/sh" ]

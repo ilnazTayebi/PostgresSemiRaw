@@ -19,6 +19,19 @@
 FROM alpine:3.4
 MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
 
+ARG BUILD_DATE
+ARG VCS_REF
+LABEL org.label-schema.build-date=$BUILD_DATE \
+    org.label-schema.name="hbpmip/postgresraw-ui" \
+    org.label-schema.description="Docker image for running PostgresRAW" \
+    org.label-schema.url="https://github.com/HBPSP8Repo/PostgresRAW-docker" \
+    org.label-schema.vcs-type="git" \
+    org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.vcs-url="https://github.com/HBPSP8Repo/PostgresRAW" \
+    org.label-schema.vendor="DIAS EPFL" \
+    org.label-schema.docker.dockerfile="Dockerfile" \
+    org.label-schema.schema-version="1.0"
+
 # explicitly set user/group IDs
 RUN \
 	delgroup ping && \
@@ -35,14 +48,14 @@ ADD PostgresRaw.tar.bz2 /
 COPY docker-entrypoint.sh /
 
 VOLUME /data
-
+    
 ENV PG_MAJOR 9.0
-ENV PG_VERSION g07b5ed1 
+ENV PG_VERSION 562314d 
 
 ENV LANG en_US.utf8
 
 ENV PATH /opt/PostgresRaw/lib/postgresql/bin:$PATH
-ENV PGDATA /data/pgdata
+ENV PGDATA /data
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
