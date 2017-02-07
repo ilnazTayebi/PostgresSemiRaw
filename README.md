@@ -1,3 +1,5 @@
+#PostgresRAW-UI: Web UI and sniffer for PostgresRAW
+
 1. Running PostgresRAW-UI
 2. Using PostgresRAW-UI with PostgresRAW
 3. Automated deployment
@@ -6,7 +8,7 @@
 PostgresRAW-UI offers a web UI for PostgresRAW and automates detection and registration of raw files (sniffer). The folder containing the files to be automatically added to the database must be provided as an argument when starting the server.
 
 
-1. Running PostgresRAW-UI
+##1. Running PostgresRAW-UI
 
 Requirements: python 2.7, flask, requests, psycopg2
 
@@ -31,7 +33,7 @@ To see the web UI go to:
 http://localhost:5000/static/raw_demo.html 
 
 
-2. Using PostgresRAW-UI with PostgresRAW
+##2. Using PostgresRAW-UI with PostgresRAW
 
 In PostresRAW mode, the sniffer of PostgresRAW-UI detects csv files in the folder given by the 'folder' argument. The inferrer module then infers their schema and creates corresponding dummy tables in the given database 'dbname' (more details below). 
 
@@ -52,7 +54,7 @@ The csv file delimiter is expected to be a comma (','). Other standard delimiter
 Note: files without a '.csv' extension are not recognised as csv.
 
 
-3. Automated deployment
+##3. Automated deployment
 
 The git project RAW-deploy automates the deployment of two connected docker containers running PostgresRAW and PostgresRAW-UI. 
 
