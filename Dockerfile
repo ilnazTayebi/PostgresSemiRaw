@@ -55,7 +55,7 @@ ENV PG_VERSION 562314d
 ENV LANG en_US.utf8
 
 ENV PATH /opt/PostgresRaw/lib/postgresql/bin:$PATH
-ENV PGDATA /data
+ENV PGDATA /data/pgdata
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
