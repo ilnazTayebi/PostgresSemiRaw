@@ -49,7 +49,7 @@ The column names are retrieved from the header line of the csv file, without mod
 
 The type of each data feature (column) is inferred based on the first lines of the file, as one of the following types: int, real, boolean or text. Data not fitting any of the specialised types defaults to text type. Empty values are recognised as NULLs.
 
-The csv file delimiter is expected to be a comma (','). Other standard delimiters used in a consistent way should be recognised. The double quote character ('"') must be used for text quoting (and escaping).
+The csv file delimiter is expected to be a comma (','). Other standard delimiters used in a consistent way should be recognised automatically. The double quote character ('"') must be used for text quoting (and escaping). NULL values are represented with an empty unquoted string (for instance with comma delimiters : ,,).
 
 Note: files without a '.csv' extension are not recognised as csv.
 

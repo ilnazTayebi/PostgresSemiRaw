@@ -4,6 +4,7 @@ import psycopg2
 import re
 import json
 from collections import OrderedDict
+import timeit
 
 pg_raw = Blueprint('pg_raw_server', __name__)
 
@@ -14,7 +15,6 @@ def init_db(args):
      # is it ok to store all these as global variables ???
     connection_string = 'dbname=%s user=%s host=%s port=%s password=%s' \
                         % (args.dbname,args.user,args.host,args.port,args.password)
-    #return connection_string
 
 # CustomConnection class
 # Allow to use a 'with' structure, which will automatically close the connection
@@ -38,16 +38,17 @@ def execute_query(query):
         conn.commit()
         cur.close()
 
-def format_cursor(cur):
+def format_cursor(cur,maxRows=1000):
     # Transforms the results of a cursor into list of dicts
     out = []
     colnames = [desc[0] for desc in cur.description]
     for row in cur.fetchall():
+        if (len(out)==maxRows): return out,True
         d = OrderedDict()
         for i, name in enumerate(colnames):
             d[name] = row[i]
         out.append(d)
-    return out
+    else: return out,False
 
 # Regex to parse error messages from postgres and extract error position
 error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
@@ -100,16 +101,43 @@ def handle_database_error(error):
         response.status_code = 400
     return response
 
-@pg_raw.route('/query-start', methods=['POST'])
-def query_start():
+# URI /query
+# Request: case class QueryRequest(query: String)
+# Response Success case class QueryResponse(output: Any, compilationTime: Long, executionTime: Long)
+@pg_raw.route('/query', methods=['POST'])
+def query_full():
+    start_time = timeit.default_timer()
     data = json.loads(request.data)
+    logging.debug("query: %s" % data["query"])
     with CustomConnection(connection_string) as conn:
         cur = conn.cursor()
         cur.execute(data["query"])
         conn.commit()
-        data = format_cursor(cur)
+        (data,has_more) = format_cursor(cur,-1)
         cur.close()
-        return jsonify(OrderedDict(data=data))
+        elapsed = timeit.default_timer() - start_time
+        return jsonify(output=data,compilationTime=0, executionTime=elapsed)
+
+
+# URI /query-start
+# Request: case class QueryStartRequest(query: String, resultsPerPage:Int)
+# Response: case class QueryBlockResponse(data: Any, start: Int, size: Int, hasMore: Boolean, token: String, var compilationTime: Long, var executionTime: Long)
+@pg_raw.route('/query-start', methods=['POST'])
+def query_start():
+    start_time = timeit.default_timer()
+    data = json.loads(request.data)
+    resPerPage = None
+    if ("resultsPerPage" in data): resPerPage = data["resultsPerPage"]
+    if (resPerPage==None): resPerPage=1000
+    logging.debug("query-start: %s" % data["query"])
+    with CustomConnection(connection_string) as conn:
+        cur = conn.cursor()
+        cur.execute(data["query"])
+        conn.commit()
+        (data,has_more) = format_cursor(cur,resPerPage)
+        cur.close()
+        elapsed = timeit.default_timer() - start_time
+        return jsonify(data=data,start=0,size=len(data),hasMore=has_more,token='',compilationTime=0, executionTime=elapsed)
 
 @pg_raw.route('/schemas', methods=['GET'])
 def schemas():

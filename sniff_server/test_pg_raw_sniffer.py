@@ -1,6 +1,6 @@
 import os
 import pg_raw_sniffer
-import pg_raw_server
+#import pg_raw_server
 import logging
 import time
 
@@ -15,7 +15,7 @@ class arguments():
 
 # Function test_sniffer
 # Launches the sniffer, creates a file and makes sure it is detected and correctly interpreted
-def test_sniffer():	  
+def test_sniffer():
     args = arguments()
     args.reload = 'true'
     args.folder = 'data'
@@ -27,10 +27,10 @@ def test_sniffer():
     if not os.access(args.folder, os.F_OK):
         os.mkdir(args.folder)
         remove_data_folder = True
-        
+
     pg_raw_sniffer.init_sniffer(args,dummy_execute_query)
-    
-    
+
+
     file_path = args.folder+'/test_file.csv'
     with open(file_path, mode='w+') as f:
         f.write('''policyID,statecode,county,eq_site_limit,hu_site_limit,fl_site_limit,fr_site_limit,tiv_2011,tiv_2012,eq_site_deductible,hu_site_deductible,fl_site_deductible,fr_site_deductible,point_latitude,point_longitude,line,construction,point_granularity
@@ -39,30 +39,30 @@ def test_sniffer():
 ''')
 
     time.sleep(1.5)
-    #logging.info("Executed query: %s" % executed_query)
-    
+    logging.info("Executed query: %s" % executed_query)
+
     expected_query = '''DROP TABLE IF EXISTS test_file; CREATE TABLE test_file ( 
-	"policyID" int NOT NULL,
-	"statecode" text NOT NULL,
-	"county" text NOT NULL,
-	"eq_site_limit" real NOT NULL,
-	"hu_site_limit" real NOT NULL,
-	"fl_site_limit" real NOT NULL,
-	"fr_site_limit" real NOT NULL,
-	"tiv_2011" real NOT NULL,
-	"tiv_2012" real NOT NULL,
-	"eq_site_deductible" int NOT NULL,
-	"hu_site_deductible" real NOT NULL,
-	"fl_site_deductible" int NOT NULL,
-	"fr_site_deductible" int NOT NULL,
-	"point_latitude" real NOT NULL,
-	"point_longitude" text NOT NULL,
-	"line" text NOT NULL,
-	"construction" text NOT NULL,
-	"point_granularity" int NOT NULL
+	"policyID" int,
+	"statecode" text,
+	"county" text,
+	"eq_site_limit" real,
+	"hu_site_limit" real,
+	"fl_site_limit" real,
+	"fr_site_limit" real,
+	"tiv_2011" real,
+	"tiv_2012" real,
+	"eq_site_deductible" int,
+	"hu_site_deductible" real,
+	"fl_site_deductible" int,
+	"fr_site_deductible" int,
+	"point_latitude" real,
+	"point_longitude" text,
+	"line" text,
+	"construction" text,
+	"point_granularity" int
 )'''
     assert executed_query == expected_query
-        
+
 
     # deletes test files and folders
     pg_raw_sniffer.clear_snoop_conf_file()
