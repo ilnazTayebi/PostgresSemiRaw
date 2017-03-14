@@ -57,6 +57,8 @@ def registerfile(path):
     
     rx = re.compile('[^a-zA-Z0-9_]+')
     table_name = rx.sub('',name)
+    rx2 = re.compile('[^a-zA-Z]+')
+    table_name = rx2.sub('',name)
     try:    
         query = SQLGenerator(table_name, schema).getCreateTableQuery()
     except SQLGeneratorException as e:
