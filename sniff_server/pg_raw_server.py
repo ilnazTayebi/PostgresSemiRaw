@@ -48,7 +48,7 @@ def format_cursor(cur,maxRows=1000):
         for i, name in enumerate(colnames):
             d[name] = row[i]
         out.append(d)
-    else: return out,False
+    return out,False
 
 # Regex to parse error messages from postgres and extract error position
 error_regex = re.compile("(.*)\nLINE (\\d+):(.*)\n(\\s*\^)")
@@ -91,6 +91,7 @@ def pg_error_to_dict(error):
 def handle_database_error(error):
     """Handler for database errors
     It copies the REST query error API"""
+    if error.pgcode == None: logging.error(type(error).__name__ ); return error.message
     errorclass=error.pgcode[:2]
     response = jsonify(pg_error_to_dict(error))
     #connection exception class

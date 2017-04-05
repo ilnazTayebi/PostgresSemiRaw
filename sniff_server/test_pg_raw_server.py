@@ -20,10 +20,12 @@ def test_server():
         logging.info("Test /schema result: %s" % rv.data)
         assert("schemas" in rv.data)
 
-        query = "select * from pg_operator;"
+        query = "select * from pg_operator JOIN pg_tables ON true LIMIT 2000;"
         res = client_app.post('/query', data=json.dumps(dict(query=query)), follow_redirects=True)
-        logging.info("Test /query (n rows in pg_operator): %s" % len(json.loads(res.data)["output"]))
+        l_res = json.loads(res.data)
+        logging.info("Test /query (n rows in pg_operator): %s" % len(l_res["output"]))
         assert("output" in res.data)
+        assert(len(l_res["output"])==2000)
 
         query = "select * from pg_operator JOIN pg_tables ON true;"
         res = client_app.post('/query-start', data=json.dumps(dict(query=query)), follow_redirects=True)
