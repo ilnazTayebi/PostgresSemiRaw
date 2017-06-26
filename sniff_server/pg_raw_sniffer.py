@@ -33,7 +33,7 @@ last_info = collections.deque(maxlen=100)
 def registerfile(path):
     # extracts name and type from the filename
     logging.info("\tSniffer: Found file '%s'" % path )
-    
+
     basename = os.path.basename(path)
     parts = os.path.splitext(basename)
     name = parts[0].lower()             # two files with the same .lower() name will not be distinguished...
@@ -42,9 +42,9 @@ def registerfile(path):
         logging.warn("\tSniffer: Unsupported file '%s' will not be registered" % path)
         append_msg( "warning", "Unsupported file '%s' will not be registered" % path )
         return
-        
+
     file_type = 'csv'
-    
+
     logging.debug("\tSniffer: Try to get schema out of csv file '%s'" % path)
     schema, properties = infer_schema(path,'csv',name)
     if schema is None:
@@ -54,19 +54,19 @@ def registerfile(path):
 #     if properties['has_header']:
 #         logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % path)
 #         return
-    
+
     rx = re.compile('[^a-zA-Z0-9_]+')
     table_name = rx.sub('',name)
-    rx2 = re.compile('[^a-zA-Z]+')
+    rx2 = re.compile('^[^a-zA-Z]+')
     table_name = rx2.sub('',name)
-    try:    
+    try:
         query = SQLGenerator(table_name, schema).getCreateTableQuery()
     except SQLGeneratorException as e:
         logging.error("\tSniffer: Error reading file '%s' : %s" % (path,e))
         logging.error("\t\tFaulty structure : %s" % schema)
         logging.error("\tSniffer: File '%s' will be ignored" % path)
         return
-    
+
     #logging.warning('execute_query %s' % query)
     execute_query(query) #pg_raw_server.
 
@@ -77,9 +77,9 @@ def registerfile(path):
         f.write("delimiter-%i = '%s'\n" % (n_snoop_conf_entries,properties['delimiter']))
         f.write("header-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['has_header']))
         n_snoop_conf_entries +=1
-        
+
     logging.info("\tSniffer: File '%s' registered as table '%s'" % (path,table_name))
-    
+
     '''
     data = dict(
         protocol='url',
@@ -116,7 +116,7 @@ def infer_schema(file_path, file_type, name, options = dict()):
 
     # basedir = os.path.dirname(file)
     return schema, properties
-    
+
 
 # Function infer_create_table_query
 # Builds and returns a CREATE TABLE query corresponding to a given csv file
@@ -182,7 +182,7 @@ def init_sniffer(args,execute_query_method):
     logging.info("snoop_conf_path: %s" % snoop_conf_path)
     if os.access(snoop_conf_path, os.F_OK):
         os.remove(snoop_conf_path)
-    
+
     thread = threading.Thread(target=threadwrap(background_loader), args=(args.reload,args.folder, ))
     thread.setDaemon(True)
     thread.start()
@@ -190,4 +190,3 @@ def init_sniffer(args,execute_query_method):
 def clear_snoop_conf_file():
     if os.access(snoop_conf_path, os.F_OK):
         os.remove(snoop_conf_path)
-
