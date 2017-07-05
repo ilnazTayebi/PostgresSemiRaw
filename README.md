@@ -30,7 +30,7 @@ This example assumes that:
 
 To see the web UI go to:
 
-http://localhost:5000/static/raw_demo.html 
+http://localhost:5555/static/raw_demo.html 
 
 
 ##2. Using PostgresRAW-UI with PostgresRAW
