@@ -5,7 +5,7 @@ This project creates a lightweight Docker image for running PostgresRAW. It has 
 1. Clone the PostgresRAW-docker sources
 
     ```sh
-    $ git clone https://github.com/HBPSP8Repo/PostgresRAW-docker.git
+    $ git clone https://github.com/HBPMedical/PostgresRAW-docker.git
     $ cd PostgresRAW-docker
     ```
 

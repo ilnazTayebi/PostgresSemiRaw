@@ -8,7 +8,7 @@ In order to use PostgresRAW, it is recommended to copy the compiled PostgresRAW 
 
 ```sh
  $ cd PostgresRAW-docker/built
- $ git clone https://github.com/HBPSP8Repo/PostgresRAW.git PostgresRAW
+ $ git clone https://github.com/HBPMedical/PostgresRAW.git PostgresRAW
 ```
     
 ### Build the new version, make sure to remove caches as appropriate
