@@ -55,10 +55,12 @@ def registerfile(path):
 #         logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % path)
 #         return
 
+    rx = re.compile('[-]+')
+    table_name = rx.sub('_',name)
     rx = re.compile('[^a-zA-Z0-9_]+')
-    table_name = rx.sub('',name)
+    table_name = rx.sub('',table_name)
     rx2 = re.compile('^[^a-zA-Z]+')
-    table_name = rx2.sub('',name)
+    table_name = rx2.sub('',table_name)
     try:
         query = SQLGenerator(table_name, schema).getCreateTableQuery()
     except SQLGeneratorException as e:
