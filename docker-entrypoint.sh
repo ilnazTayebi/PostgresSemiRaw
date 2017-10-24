@@ -1,5 +1,4 @@
 #!/bin/sh
-export PATH=$PATH:/opt/PostgresRaw/bin
 chown -R postgres "$PGDATA"
 
 if [ -z "$(ls -A "$PGDATA")" ]; then

@@ -1,4 +1,4 @@
-#                    Copyright (c) 2016-2016
+#                    Copyright (c) 2016-2017
 #   Data Intensive Applications and Systems Labaratory (DIAS)
 #            Ecole Polytechnique Federale de Lausanne
 #
@@ -16,13 +16,33 @@
 # DISCLAIM ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 # USE OF THIS SOFTWARE.
 
-FROM alpine:3.6
+FROM alpine:3.6 as builder
 MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
+
+ENV LANG=C.UTF-8
+ENV PREFIX=/opt/PostgresRAW
+
+ARG JOBS=1
+ENV JOBS=$JOBS
+
+RUN apk update && \
+    apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
+
+COPY src /PostgresRAW
+RUN cd /PostgresRAW/PostgresRaw && \
+    CFLAGS=-O0 ./configure --prefix=$PREFIX && \
+    make -j $JOBS && \
+    make install
+
+#######################################################################
+FROM alpine:3.6
+# LSC: All environment variables are resetted by the FROM:
+ENV PREFIX=/opt/PostgresRAW
 
 ARG BUILD_DATE
 ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.name="hbpmip/postgresraw-ui" \
+    org.label-schema.name="hbpmip/postgresraw" \
     org.label-schema.description="Docker image for running PostgresRAW" \
     org.label-schema.url="https://github.com/HBPMedical/PostgresRAW-docker" \
     org.label-schema.vcs-type="git" \
@@ -44,17 +64,17 @@ RUN mkdir /docker-entrypoint-initdb.d && \
     curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
     chmod +x /usr/local/bin/gosu
 
-ADD PostgresRaw.tar.bz2 /
+COPY --from=builder $PREFIX $PREFIX
 COPY docker-entrypoint.sh /
 
 VOLUME /data
-    
+
 ENV PG_MAJOR 9.0
 ENV PG_VERSION 562314d 
 
 ENV LANG en_US.utf8
 
-ENV PATH /opt/PostgresRaw/lib/postgresql/bin:$PATH
+ENV PATH $PATH:$PREFIX/bin
 ENV PGDATA /data/pgdata
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
