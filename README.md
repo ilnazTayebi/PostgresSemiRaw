@@ -17,7 +17,7 @@ $ cd PostgresRAW-docker
 $ git clone https://github.com/HBPMedical/PostgresRAW.git src
 ```
 
-## Build PostgresRAW docker 
+## Build the PostgresRAW docker image
 
 The image is build and given the name 'hbpmip/postgresraw' with the following command:
 
@@ -33,7 +33,7 @@ $ docker build -t hbpmip/postgresraw \
 
 **Note:** Replace the `8` in `JOBS=8` with the number of CPU threads to reduce the build time on your machine.
 
-## Using the PostgresRAW docker image
+## Use the PostgresRAW docker image
 
 You can start the container with the following command:
 
