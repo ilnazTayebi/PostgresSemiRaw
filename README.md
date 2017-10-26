@@ -42,7 +42,7 @@ $ POSTGRES_PORT=5432 POSTGRES_USER=postgres POSTGRES_PASSWORD=secret POSTGRES_DB
     docker run \
     -p 5432:5432 \
     -v $PWD/../data:/data:rw \
-    -v $PWD/../datasets:/datasets:r \
+    -v $PWD/../datasets:/datasets:ro \
     hbpmip/postgresraw
 ```
 
