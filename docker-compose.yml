@@ -1,4 +1,4 @@
-#                    Copyright (c) 2016-2016
+#                    Copyright (c) 2016-2017
 #   Data Intensive Applications and Systems Labaratory (DIAS)
 #            Ecole Polytechnique Federale de Lausanne
 #
@@ -20,25 +20,25 @@ version: '2'
 # the following environment variables are expected to be available when running
 # docker-compose up
 # - raw_data_root:      The folder containing the data files (CSV, json,...) on the
-#                       swarm node host. Mapped to /datasets WITHIN the containers
+#                       host. Mapped to /datasets WITHIN the containers
 # - pg_data_root:       The folder containing the PostgreSQL binary tables on the
-#                       swarm node host. Mapped to /data WITHIN the containers
+#                       host. Mapped to /data WITHIN the containers
 
 services:
 
-  RawUI:
+  PostgresRAW-UI:
     image: "hbpmip/postgresraw-ui"
-    container_name: "PostgresRAW-UI"
     environment:
-     - POSTGRES_HOST
-     - POSTGRES_PORT
-     - POSTGRES_USER
-     - POSTGRES_PASSWORD
-     - POSTGRES_DB=db
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
      #- FED_DATA_SOURCE="harmonized_clinical_data"
      #- LOCAL_DATA_SOURCE="mip_cde_features harmonized_clinical_data"
     volumes:
-     - "${raw_data_root}:/datasets:ro"
-     - "${pg_data_root}:/data:ro"
+      - "${raw_data_root}:/datasets:ro"
+      - "${pg_data_root}:/data:rw"
+    ports:
+      - "5554:5555"
     links:
-     - "PostgresRAW:db"
+      - "${POSTGRES_HOST}:db"
