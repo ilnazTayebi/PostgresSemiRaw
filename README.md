@@ -33,15 +33,22 @@ $ docker build -t hbpmip/postgresraw-ui \
 Assuming you started the docker container of PostgresRAW as presented in the [example](https://github.com/HBPMedical/PostgresRAW-docker#use-the-postgresraw-docker-image), you can use the following command:
 
 ```sh
-$ POSTGRES_PORT=5432 POSTGRES_USER=postgres POSTGRES_PASSWORD=secret POSTGRES_DB=db \
-    docker run \
-    -p 5555:5555 \
+$ docker run --rm \
+    -e POSTGRES_HOST=db \
+    -e POSTGRES_PORT=5432 \
+    -e POSTGRES_USER=dbuser \
+    -e POSTGRES_PASSWORD=secret \
+    -e POSTGRES_DB=db \
+    -p 4445:5555 \
     -v $PWD/../data:/data:rw \
     -v $PWD/../datasets:/datasets:ro \
+    --name PostgresRAW-UI \
+    --link PostgresRAW:db \
     hbpmip/postgresraw-ui
 ```
 
 * **Note 1:** The folder mounted on `/data` is expected to **contain** the `pg_data` folder.
 * **Note 2:** The folder mounted on `/datasets` is where you store the CSV files.
+* **Note 3:** In the example above, we use the port `5432` as this is the port used internaly by the PostgresRAW docker container, and not the externally mapped `5554`.
 
-The PostgresRAW-UI will be available on `http://localhost:5555` and allows you to execute SQL queries, and choose several display options of the results.
+The PostgresRAW-UI will be available on `http://localhost:4445` and allows you to execute SQL queries, and choose several display options of the results.
