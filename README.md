@@ -38,12 +38,15 @@ $ docker build -t hbpmip/postgresraw \
 You can start the container with the following command:
 
 ```sh
-$ POSTGRES_PORT=5432 POSTGRES_USER=postgres POSTGRES_PASSWORD=secret POSTGRES_DB=db \
-    docker run \
-    -p 5432:5432 \
+$ docker run --rm \
+    -e POSTGRES_USER=dbuser \
+    -e POSTGRES_PASSWORD=secret \
+    -e POSTGRES_DB=db \
+    -p 5554:5432 \
     -v $PWD/../data:/data:rw \
     -v $PWD/../datasets:/datasets:ro \
-    hbpmip/postgresraw
+    hbpmip/postgresraw
+
 ```
 
 The only specificity compared to a regular PostgreSQL image, is the extra volume which is mounted read-only on `datasets`. This volume is the folder which contains the CSV files to register as tables.
@@ -55,7 +58,7 @@ You might want to checkout the web interface, which will also watch the folder a
 Alternatively, you can use `psql` as usual, for example, assuming the container was started as above:
 
 ```sh
-psql -U postgres -h localhost -p 5432
+psql -U postgres -h localhost -p 5554
 ```
 
 Other than that, this container behaves as the official Postgres container, for more
