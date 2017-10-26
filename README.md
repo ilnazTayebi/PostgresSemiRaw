@@ -30,22 +30,18 @@ $ docker build -t hbpmip/postgresraw-ui \
 
 ## Use the PostgresRAW-UI docker image
 
-To start this image you need to specify the following variables:
+Assuming you started the docker container of PostgresRAW as presented in the [example](https://github.com/HBPMedical/PostgresRAW-docker#use-the-postgresraw-docker-image), you can use the following command:
 
-```yaml
-   environment:
-    - POSTGRES_HOST
-    - POSTGRES_USER
-    - POSTGRES_PASSWORD
-    - POSTGRES_DB=db
-
-   # - raw_data_root: The folder containing the data on the swarm node host
-   # - docker_data_folder: Where to map the data folder WITHIN the containers
-   volumes:
-    - "${raw_data_root}:/${docker_data_folder}:ro"
-
-   links:
-    - "PostgresRAW:db"
+```sh
+$ POSTGRES_PORT=5432 POSTGRES_USER=postgres POSTGRES_PASSWORD=secret POSTGRES_DB=db \
+    docker run \
+    -p 5555:5555 \
+    -v $PWD/../data:/data:rw \
+    -v $PWD/../datasets:/datasets:ro \
+    hbpmip/postgresraw-ui
 ```
 
-Adapt the ```POSTGRES_DB``` variable value and the name of the docker container which runs PostgresRAW (under "links") according to your settings.
+* **Note 1:** The folder mounted on `/data` is expected to **contain** the `pg_data` folder.
+* **Note 2:** The folder mounted on `/datasets` is where you store the CSV files.
+
+The PostgresRAW-UI will be available on `http://localhost:5555` and allows you to execute SQL queries, and choose several display options of the results.
