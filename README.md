@@ -58,7 +58,7 @@ You might want to checkout the web interface, which will also watch the folder a
 Alternatively, you can use `psql` as usual, for example, assuming the container was started as above:
 
 ```sh
-psql -U postgres -h localhost -p 5554
+psql -U dbuser -d db -h localhost -p 5554
 ```
 
 Other than that, this container behaves as the official Postgres container, for more
