@@ -45,8 +45,8 @@ $ docker run --rm \
     -p 5554:5432 \
     -v $PWD/../data:/data:rw \
     -v $PWD/../datasets:/datasets:ro \
+    --name PostgresRAW \
     hbpmip/postgresraw
-
 ```
 
 The only specificity compared to a regular PostgreSQL image, is the extra volume which is mounted read-only on `datasets`. This volume is the folder which contains the CSV files to register as tables.
