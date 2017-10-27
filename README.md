@@ -51,7 +51,7 @@ To see the web UI go to: http://localhost:5555/static/raw_demo.html
 
 In PostgresRAW mode, the sniffer of PostgresRAW-UI detects CSV files in the folder given by the **folder** argument. The inferrer module then infers their schema and creates corresponding dummy tables in the given database **dbname** (more details below). 
 
-The sniffer also registers the associations `{file; dummy table}` through a configuration file named `snoop.conf`. This file is created in the **snoop\_conf\_folder**. PostgresRAW expects to find the configuration file in its data folder (as defined by `PGDATA`), so the **snoop\_conf\_folder** argument must give the path of that folder. please refer to the [PostgresRAW](https://github.com/HBPMedical/PostgresRAW) project for more information.
+The sniffer also registers the associations `{file; dummy table}` through a configuration file named `snoop.conf`. This file is created in the **snoop\_conf\_folder**. PostgresRAW expects to find the configuration file in its data folder (as defined by `PGDATA`), so the **snoop\_conf\_folder** argument must give the path of that folder. Please refer to the [PostgresRAW](https://github.com/HBPMedical/PostgresRAW) project for more information.
 
 Using the sniffer of PostgresRAW-UI, no schema has to be defined manually in the database for the raw CSV files. Rather, the structure of data made available for querying in the watched folder is translated in real time to a database schema based on the following rules:
 
@@ -73,5 +73,5 @@ Note: files without a `.csv` extension are not recognised as CSV.
 
 ## 3. Automated deployment
 
-The git project RAW-deploy automates the deployment of two connected docker containers running PostgresRAW and PostgresRAW-UI. 
+The [RAW-deploy](https://github.com/HBPMedical/RAW-deploy) project automates the deployment of two connected docker containers running PostgresRAW and PostgresRAW-UI. 
 
