@@ -16,7 +16,7 @@
 # DISCLAIM ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 # USE OF THIS SOFTWARE.
 
-FROM alpine:3.4
+FROM alpine:3.6
 MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
 
 ARG BUILD_DATE
@@ -24,10 +24,10 @@ ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.name="hbpmip/postgresraw-ui" \
     org.label-schema.description="Docker image for running PostgresRAW-UI" \
-    org.label-schema.url="https://github.com/HBPSP8Repo/PostgresRAW-UI-docker" \
+    org.label-schema.url="https://github.com/HBPMedical/PostgresRAW-UI-docker" \
     org.label-schema.vcs-type="git" \
     org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-url="https://github.com/HBPSP8Repo/PostgresRAW-UI" \
+    org.label-schema.vcs-url="https://github.com/HBPMedical/PostgresRAW-UI" \
     org.label-schema.vendor="DIAS EPFL" \
     org.label-schema.docker.dockerfile="Dockerfile" \
     org.label-schema.schema-version="1.0"
