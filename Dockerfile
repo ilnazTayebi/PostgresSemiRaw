@@ -39,9 +39,9 @@ RUN apk update && apk add \
     py-psycopg2 \
     py-flask
 
-# the default version of requests 
-RUN wget https://github.com/kennethreitz/requests/tarball/master && \
-    tar -zxf master && mv kennethreitz-requests-* requests && \
+# the default version of requests
+RUN wget https://github.com/requests/requests/archive/v2.13.0.zip && \
+    unzip ../v2.13.0.zip && mv requests* requests && \
     cd requests && python setup.py install && \
     rm -rf master requests
 
