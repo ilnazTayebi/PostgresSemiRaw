@@ -69,8 +69,8 @@ COPY docker-entrypoint.sh /
 
 VOLUME /data
 
-ENV PG_MAJOR 9.0
-ENV PG_VERSION 562314d 
+ENV PG_MAJOR 9.6			# Not sure if and how this is used
+ENV PG_VERSION PostgresRAW-$VCS_REF 	# Not sure if and how this is used 
 
 ENV LANG en_US.utf8
 
