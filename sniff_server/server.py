@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
+from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint, json
 
 from argparse import ArgumentParser, FileType
 import logging
@@ -8,11 +8,23 @@ from pg_raw_sniffer import init_sniffer as init_pg_sniffer
 from pg_raw_server import pg_raw, init_db, execute_query
 from raw_sniffer import raw_sniffer, init_sniffer
 import time
+import decimal
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 app.config["JSON_SORT_KEYS"] = False
+
+# Adding support to jsonify numeric types
+class MyJSONEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            # Convert decimal instances to strings.
+            return float(obj)
+        return super(MyJSONEncoder, self).default(obj)
+
+app.json_encoder = MyJSONEncoder
 
 @app.route('/<path:filename>', methods=['GET'])
 def static_file(filename):
