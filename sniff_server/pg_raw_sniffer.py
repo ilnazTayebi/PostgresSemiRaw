@@ -12,13 +12,14 @@ from sniff import sniff
 from inferrer import inferrer
 from sql_generator import SQLGenerator, SQLGeneratorException
 import time
+import fileinput
 
 #executer_url = ""
 #user = ''
 
 config_file = ""
 execute_query = None
-n_snoop_conf_entries = 0
+n_snoop_conf_entries = 1
 snoop_conf_path = ""
 
 lock = threading.Lock()
@@ -26,24 +27,24 @@ lock = threading.Lock()
 info = collections.deque(maxlen=100)
 last_info = collections.deque(maxlen=100)
 
+mipTablesForLocalView = ['mip_cde_features', 'harmonized_clinical_data']
+mipTablesForFederationView = ['harmonized_clinical_data']
 
 # Function registerfile
 # Given the path of a csv file, creates the corresponding table in pgRAW database and updates
 # pgRAW configuration in order to access the file's content
 def registerfile(path):
     # extracts name and type from the filename
-    logging.info("\tSniffer: Found file '%s'" % path )
-
-    basename = os.path.basename(path)
-    parts = os.path.splitext(basename)
-    name = parts[0].lower()             # two files with the same .lower() name will not be distinguished...
-    extension = parts[1].lower()
-    if extension != ".csv":
+    name,extension = get_filename_and_extension_from_path(path)
+    table_name = get_tablename_from_filename(name)
+    if (extension != ".csv" or name[0]=='.'):
         logging.warn("\tSniffer: Unsupported file '%s' will not be registered" % path)
-        append_msg( "warning", "Unsupported file '%s' will not be registered" % path )
+        append_msg( "Warning", "Unsupported file '%s' will not be registered" % path )
         return
 
-    file_type = 'csv'
+    logging.info("\tSniffer: Found csv file '%s'" % path )
+
+    # TODO check name conflict (same table_name for another path)
 
     logging.debug("\tSniffer: Try to get schema out of csv file '%s'" % path)
     schema, properties = infer_schema(path,'csv',name)
@@ -51,51 +52,137 @@ def registerfile(path):
         logging.warning("\tSniffer: File '%s' will be ignored (schema is None)" % path)
         return
 
-#     if properties['has_header']:
-#         logging.warning("\tSniffer: File '%s' will be ignored (first line is header)" % path)
-#         return
-
-    rx = re.compile('[-]+')
-    table_name = rx.sub('_',name)
-    rx = re.compile('[^a-zA-Z0-9_]+')
-    table_name = rx.sub('',table_name)
-    rx2 = re.compile('^[^a-zA-Z]+')
-    table_name = rx2.sub('',table_name)
     try:
-        query = SQLGenerator(table_name, schema).getCreateTableQuery()
+        sqlGen = SQLGenerator(table_name, schema, path)
+        existingTableColumnsQuery = sqlGen.getExistingTableColumnsQuery()
+        #logging.info("\tSniffer: existingTableColumnsQuery: '%s' " % existingTableColumnsQuery)
+        existingTableColumns = execute_query(existingTableColumnsQuery)
+        #logging.info("\tSniffer: existingTableColumns '%s'" % existingTableColumns)
+        existingTableSchema = sqlGen.getExistingTableCreateCode(existingTableColumns)
+        #logging.info("\tSniffer: existingTableSchema: '%s'" % sqlGen.existingTableQuery)
+        query = sqlGen.getCreateTableQuery() # return empty string in table already exists with correct schema.
+        #logging.info("\tSniffer: query to create new table: '%s'" % query)
+
     except SQLGeneratorException as e:
         logging.error("\tSniffer: Error reading file '%s' : %s" % (path,e))
         logging.error("\t\tFaulty structure : %s" % schema)
         logging.error("\tSniffer: File '%s' will be ignored" % path)
         return
 
-    #logging.warning('execute_query %s' % query)
-    execute_query(query) #pg_raw_server.
 
-    global n_snoop_conf_entries
-    with open(snoop_conf_path, mode='a+') as f:
-        f.write("filename-%i = '%s'\n" % (n_snoop_conf_entries,path))
-        f.write("relation-%i = '%s'\n" % (n_snoop_conf_entries,table_name))
-        f.write("delimiter-%i = '%s'\n" % (n_snoop_conf_entries,properties['delimiter']))
-        f.write("header-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['has_header']))
-        n_snoop_conf_entries +=1
+    if (table_name in mipTablesForLocalView):
+        drop_create_mip_views(sqlGen,path,query)
+
+    else:
+        #logging.info('execute_query %s' % query)
+        execute_query(query) #pg_raw_server.
+
+    load=False
+    if (load):
+        logging.info("\tSniffer: loading data")
+        query = " COPY %s FROM \'%s\' CSV HEADER;"%(table_name, path)
+    else:
+        logging.info("\tSniffer: declaring file in PostgresRAW config")
+        global n_snoop_conf_entries
+        try:
+            with open(snoop_conf_path, mode='a+') as f:
+                f.write("filename-%i = '%s'\n" % (n_snoop_conf_entries,path))
+                f.write("relation-%i = '%s'\n" % (n_snoop_conf_entries,table_name))
+                f.write("delimiter-%i = '%s'\n" % (n_snoop_conf_entries,properties['delimiter']))
+                f.write("header-%i = '%s'\n\n" % (n_snoop_conf_entries,properties['has_header']))
+                n_snoop_conf_entries +=1
+        except EnvironmentError as e: # parent of IOError, OSError *and* WindowsError where available
+            logging.error("\tError while trying to write in %s: " % snoop_conf_path)
+            logging.error("\t%s" % e)
 
     logging.info("\tSniffer: File '%s' registered as table '%s'" % (path,table_name))
 
-    '''
-    data = dict(
-        protocol='url',
-        filename =basename,
-        url='file://%s' % os.path.abspath(path),
-        name=name,
-        type=file_type)
-    url = '%s/register-file' % executer_url
-    response=requests.post(url, json=data, auth=(user, 'pass'))
-    if response.status_code == 200:
-        append_msg("success", "Registered file %s, schema name %s" % (path,name))
-    else:
-        append_msg("response-error", dict(msg="Error registering file %s" %path, response=json.loads(response.text)))
-    '''
+def unregisterfile(path):
+    # extracts name and type from the filename
+    name,extension = get_filename_and_extension_from_path(path)
+    table_name = get_tablename_from_filename(name)
+
+    if (extension != ".csv" or name[0]=='.'):
+        return
+
+    logging.info("\tSniffer: File '%s' was deleted; it will be unregistered" % path )
+
+    global n_snoop_conf_entries
+    try:
+        #with open(snoop_conf_path, mode='a+') as snoop:
+            linesToDrop = 0
+            reg = "filename-[0-9]+ = \'%s\'"%path
+            for line in fileinput.FileInput(snoop_conf_path, inplace=1):
+                matchObj = re.match( reg, line, re.I)
+                if matchObj:
+                    logging.info("\tSniffer: deleting corresponding lines in configuration file")
+                    #line = line.replace("Config","AnotherConfig")
+                    linesToDrop = 4
+                else:
+                    if linesToDrop > 0:
+                        linesToDrop -= 1
+                    else:
+                        print line,
+                        #sys.stdout.write(line)
+    except EnvironmentError as e: # parent of IOError, OSError *and* WindowsError where available
+        logging.error("\tError while trying to write in %s: " % snoop_conf_path)
+        logging.error("\t%s" % e)
+
+    try:
+        sqlGen = SQLGenerator(table_name, None, path)
+        query = sqlGen.getDropTableQuery()
+        if (table_name in mipTablesForLocalView):
+            drop_create_mip_views(sqlGen,path,query)
+    except SQLGeneratorException as e:
+        logging.error("\t"+e)
+        logging.error("\tSniffer: File '%s' could not be unregistered" % path)
+        return
+
+    #logging.info('execute_query %s' % query)
+    execute_query(query) #pg_raw_server.
+
+    logging.info("\tSniffer: File '%s' unregistered, table '%s' dropped" % (path,table_name))
+
+
+def drop_create_mip_views(sqlGen,path,middle_query):
+    # Create mip_local_features view (use all tables in mipTablesForLocalView)
+    query = sqlGen.getDropViewsQuery() + middle_query
+    execute_query(query)
+    query = sqlGen.getExistingTablesQuery(mipTablesForLocalView)
+    tables = execute_query(query)  # Return value: ['table0', 'table1', 'table2']
+    if (len(tables)==0): return
+    query = sqlGen.getTablesColumnsQuery(tables)
+    columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1','type2'), ('col_name2', 'type0', 'type1','type2'), ...]
+    query = sqlGen.getCreateMipLocalFeaturesViewQuery(tables,columns)
+    execute_query(query)
+
+    # Create mip_federation_features view (use all tables in mipTablesForFederationView)
+    query = sqlGen.getExistingTablesQuery(mipTablesForFederationView)
+    tables = execute_query(query)  # Return value: ['table0', 'table1', 'table2']
+    if (len(tables)==0): return
+    query = sqlGen.getTablesColumnsQuery(tables)
+    columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1','type2'), ('col_name2', 'type0', 'type1','type2'), ...]
+    query = sqlGen.getCreateMipFederationFeaturesViewQuery(tables,columns)
+    execute_query(query)
+    return
+
+def get_filename_and_extension_from_path(path):
+    basename = os.path.basename(path)
+    parts = os.path.splitext(basename)
+    name = parts[0].lower()             # two files with the same .lower() name will not be distinguished...
+    extension = parts[1].lower()
+
+    return name,extension
+
+def get_tablename_from_filename(name):
+    rx = re.compile('[-]+')
+    table_name = rx.sub('_',name)
+    rx = re.compile('[^a-zA-Z0-9_]+')
+    table_name = rx.sub('',table_name)
+    rx2 = re.compile('^[^a-zA-Z]+')
+    table_name = rx2.sub('',table_name)
+
+    return table_name
 
 # Function infer_schema
 # Builds and returns the schema corresponding to a given csv file (a rawListType from raw_types module)
@@ -123,9 +210,9 @@ def infer_schema(file_path, file_type, name, options = dict()):
 # Function infer_create_table_query
 # Builds and returns a CREATE TABLE query corresponding to a given csv file
 # calls from_url to infer the schema and uses an SQLGenerator to create the query
-def infer_create_table_query(file_path, file_type, name, options = dict()):
-    query = SQLGenerator(name, schema).getCreateTableQuery()
-    return query
+# def infer_create_table_query(file_path, file_type, name, options = dict()):
+#     query = SQLGenerator(name, schema).getCreateTableQuery()
+#     return query
 
 def append_msg(msg_type, msg):
     info.append(dict(type=msg_type,msg=msg,date=datetime.datetime.now()))
@@ -140,18 +227,19 @@ def on_create(f, do_reload=True):
     registerfile(f)
 
 def on_modified(f):
-    append_msg("warning", "File changed detected (%s)" % f) #, modification of file scheme not supported
+    #append_msg("info", "File changed detected (%s). Table will be deleted and re-created." % f) # TODO: check if same schema, keep old table if so.
     registerfile(f)
 
 def on_delete(f):
     # Do nothing on delete.
     # The alternative would have been to reload again all other data.
-    append_msg("warning","File deleted (%s), but feature not implemented yet" % f)
+    unregisterfile(f)
 
 # Function background_loader
 # Launches the actual sniffer using the functions defined above
 def background_loader(do_reload=True, folder="./datasets"):
     print "folder=%s , reload = %s " %(folder, reload)
+    clear_snoop_conf_file()
     sniff(folder=folder, lock=lock, interval=1,
           on_start=on_start, on_create=on_create, on_modified=on_modified,
           on_delete=on_delete, do_reload=do_reload)
@@ -176,14 +264,13 @@ def threadwrap(threadfunc, *args):
 # Sets global variables snoop_conf_path and execute_query_method, and launches a sniffer in a thread
 # Passing the execute_query_method as argument makes pg_raw_sniffer independent of database
 def init_sniffer(args,execute_query_method):
-    logging.info("pg_raw_server_sniffer.py init_sniffer")
+    #logging.info("pg_raw_server_sniffer.py init_sniffer")
     global execute_query
     global snoop_conf_path
     execute_query = execute_query_method
     snoop_conf_path = args.snoop_conf_folder + "/snoop.conf"
-    logging.info("snoop_conf_path: %s" % snoop_conf_path)
-    if os.access(snoop_conf_path, os.F_OK):
-        os.remove(snoop_conf_path)
+    logging.info("Configuration file path: %s" % snoop_conf_path)
+    clear_snoop_conf_file()
 
     thread = threading.Thread(target=threadwrap(background_loader), args=(args.reload,args.folder, ))
     thread.setDaemon(True)
@@ -191,4 +278,7 @@ def init_sniffer(args,execute_query_method):
 
 def clear_snoop_conf_file():
     if os.access(snoop_conf_path, os.F_OK):
+        logging.info("Clearing configuration file")
         os.remove(snoop_conf_path)
+        global n_snoop_conf_entries
+        n_snoop_conf_entries=1

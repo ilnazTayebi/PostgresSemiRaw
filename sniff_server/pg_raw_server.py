@@ -32,22 +32,36 @@ class CustomConnection(object):
 # Function execute_query
 # Execute query given as string (mainly for use outside of the module)
 def execute_query(query):
+    #logging.info("execute_query '%s'" % (query))
     with CustomConnection(connection_string) as conn:
         cur = conn.cursor()
         cur.execute(query)
         conn.commit()
+        res =[]
+        #logging.info("fetching res, status: %s, rowcount: %s" % (cur.statusmessage,cur.rowcount))
+        try:
+            res = cur.fetchall() # example return value: [(1, 100, "abc'def"), (2, None, 'dada'), (3, 42, 'bar')]
+        except psycopg2.ProgrammingError as e:
+            pass
+
+        #logging.info("res: %s" % res)
+        logging.info(" Query status message: %s" % cur.statusmessage)
         cur.close()
+    return res
 
 def format_cursor(cur,maxRows=1000):
     # Transforms the results of a cursor into list of dicts
     out = []
     colnames = [desc[0] for desc in cur.description]
-    for row in cur.fetchall():
-        if (len(out)==maxRows): return out,True
-        d = OrderedDict()
-        for i, name in enumerate(colnames):
-            d[name] = row[i]
-        out.append(d)
+    try:
+        for row in cur.fetchall():
+            if (len(out)==maxRows): return out,True
+            d = OrderedDict()
+            for i, name in enumerate(colnames):
+                d[name] = row[i]
+            out.append(d)
+    except psycopg2.ProgrammingError as e:
+        pass
     return out,False
 
 # Regex to parse error messages from postgres and extract error position
@@ -149,7 +163,11 @@ def schemas():
                 WHERE table_schema != 'pg_catalog'
                 AND table_schema != 'information_schema' """
         cur.execute(query)
-        res = jsonify(OrderedDict(schemas=cur.fetchall()))
+        res =[]
+        try:
+            res = jsonify(OrderedDict(schemas=cur.fetchall()))
+        except psycopg2.ProgrammingError as e:
+            pass
         cur.close()
         return res
 
