@@ -35,7 +35,19 @@ $ docker build -t hbpmip/postgresraw \
 
 ## Use the PostgresRAW docker image
 
-You can start the container with the following command:
+To start PostgresRAW, you will need two folders to store the data, one for the PostgreSQL data, and one for the raw CSV files.
+
+Those two folders need to be owned by the user `999`, which is the `Postgres` user id inside the PostgresRAW container.
+
+You can create those two folders with the following commands:
+
+```sh
+$ mkdir -p $PWD/../data
+$ mkdir -p $PWD/../datasets
+$ sudo chown 999 $PWD/../data $PWD/../datasets
+```
+
+You can then start the container with the following command:
 
 ```sh
 $ docker run --rm \
