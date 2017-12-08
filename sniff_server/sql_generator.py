@@ -2,7 +2,7 @@ from inferrer.raw_types import *
 from collections import OrderedDict
 import xml.dom.minidom
 import re
-
+from mip_cde import mipCde, mipCdeString
 
 
 class SQLGeneratorException(Exception):
@@ -98,13 +98,43 @@ class SQLGenerator():
         i = 0
         for table in existingTables:
             tblName = "\'%s\'"%table
-            sqlStatement += "(SELECT column_name,CASE WHEN data_type=\'character\' THEN \'char(\'||character_maximum_length||\')\' WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i "%(i,tblName,i)
+            sqlStatement += "(SELECT column_name,"
+            # sqlStatement += "CASE WHEN data_type=\'character\' THEN \'char(\'||character_maximum_length||\')\' "
+            # sqlStatement += "WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' "
+            # sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
+            sqlStatement += "CASE WHEN data_type=\'character\' THEN \'text\' "
+            sqlStatement += "WHEN data_type=\'character varying\' THEN \'text\' "
+            sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
+            sqlStatement += "ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i "%(i,tblName,i)
             sqlStatement += "NATURAL FULL JOIN \n"
             i += 1
 
         sqlStatement = sqlStatement[:-19]
         sqlStatement += ";"
         return sqlStatement
+
+    def getTablesCdeColumnsQuery(self, existingTables):
+    if (len(existingTables)<1): return ""
+    sqlStatement = "SELECT * FROM \n"
+    sqlStatement += "(SELECT unnest(array["+mipCdeString+"]) AS column_name) as columns "
+    sqlStatement += "NATURAL LEFT JOIN \n "
+    i = 0
+    for table in existingTables:
+        tblName = "\'%s\'"%table
+        sqlStatement += "(SELECT column_name,"
+        # sqlStatement += "CASE WHEN data_type=\'character\' THEN \'char(\'||character_maximum_length||\')\' "
+        # sqlStatement += "WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' "
+        # sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
+        sqlStatement += "CASE WHEN data_type=\'character\' THEN \'text\' "
+        sqlStatement += "WHEN data_type=\'character varying\' THEN \'text\' "
+        sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
+        sqlStatement += "ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i \n "%(i,tblName,i)
+        sqlStatement += "NATURAL FULL JOIN \n"
+        i += 1
+
+    sqlStatement = sqlStatement[:-22]
+    sqlStatement += ";"
+    return sqlStatement
 
     def getCreateMipLocalFeaturesViewQuery(self,tables,columns_info):
         columns_type = [] # Final type for each column, will be used for cast
@@ -135,6 +165,41 @@ class SQLGenerator():
         return sqlStatement
 
 
+# TODO(?) mip_federation_features definition as a flat view with fixed columns
+#     def getCreateMipFederationFeaturesViewQuery(self,tables,columns_info):
+#         columns_type = [] # Final type for each column, will be used for cast
+#         n_tables = len(tables)
+#         for c in columns_info:
+#             coltyp = None
+#             for t in range(1,len(c)):
+#                 if (c[t]!=None):
+#                     coltyp = c[t];
+#                     break;
+#             columns_type.append(coltyp)
+#
+#         sqlStatement = 'CREATE VIEW mip_federation_features AS SELECT * FROM (\n'
+#
+#         for t in range(1,n_tables+1):
+#             tmp = "  SELECT \n    subjectcode AS rid,\n    unnest(array["
+#             for c in range(0,len(columns_type)):
+#                 if (columns_info[c][t]!=None): tmp += "\'%s\',"%(columns_info[c][0])
+#             tmp = tmp[:-1]
+#             tmp += "]) as colname,\n    unnest(array["
+#             for c in range(0,len(columns_type)):
+#                 if (columns_info[c][t]!=None): tmp += "\"%s\"::text,"%(columns_info[c][0])
+#             tmp = tmp[:-1]
+#             tmp += "]) as val FROM %s"%tables[t-1]
+#             sqlStatement += tmp
+#             sqlStatement += "\nUNION\n"
+#
+#         sqlStatement = sqlStatement[:-7]
+#         sqlStatement += ") AS foo;\n"
+#         #sqlStatement += ") AS foo WHERE val IS NOT NULL;\n"
+#
+#         return sqlStatement
+
+
+# mip_federation_features definition as a 3-column view (without NULL commented)
     def getCreateMipFederationFeaturesViewQuery(self,tables,columns_info):
         columns_type = [] # Final type for each column, will be used for cast
         n_tables = len(tables)
@@ -162,7 +227,8 @@ class SQLGenerator():
             sqlStatement += "\nUNION\n"
 
         sqlStatement = sqlStatement[:-7]
-        sqlStatement += ") AS foo WHERE val IS NOT NULL;\n"
+        sqlStatement += ") AS foo;\n"
+        #sqlStatement += ") AS foo WHERE val IS NOT NULL;\n"
 
         return sqlStatement
 

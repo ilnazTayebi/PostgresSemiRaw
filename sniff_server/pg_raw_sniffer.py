@@ -160,7 +160,7 @@ def drop_create_mip_views(sqlGen,path,middle_query):
     query = sqlGen.getExistingTablesQuery(mipTablesForFederationView)
     tables = execute_query(query)  # Return value: ['table0', 'table1', 'table2']
     if (len(tables)==0): return
-    query = sqlGen.getTablesColumnsQuery(tables)
+    query = sqlGen.getTablesCdeColumnsQuery(tables)
     columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1','type2'), ('col_name2', 'type0', 'type1','type2'), ...]
     query = sqlGen.getCreateMipFederationFeaturesViewQuery(tables,columns)
     execute_query(query)
