@@ -114,27 +114,27 @@ class SQLGenerator():
         return sqlStatement
 
     def getTablesCdeColumnsQuery(self, existingTables):
-    if (len(existingTables)<1): return ""
-    sqlStatement = "SELECT * FROM \n"
-    sqlStatement += "(SELECT unnest(array["+mipCdeString+"]) AS column_name) as columns "
-    sqlStatement += "NATURAL LEFT JOIN \n "
-    i = 0
-    for table in existingTables:
-        tblName = "\'%s\'"%table
-        sqlStatement += "(SELECT column_name,"
-        # sqlStatement += "CASE WHEN data_type=\'character\' THEN \'char(\'||character_maximum_length||\')\' "
-        # sqlStatement += "WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' "
-        # sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
-        sqlStatement += "CASE WHEN data_type=\'character\' THEN \'text\' "
-        sqlStatement += "WHEN data_type=\'character varying\' THEN \'text\' "
-        sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
-        sqlStatement += "ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i \n "%(i,tblName,i)
-        sqlStatement += "NATURAL FULL JOIN \n"
-        i += 1
+        if (len(existingTables)<1): return ""
+        sqlStatement = "SELECT * FROM \n"
+        sqlStatement += "(SELECT unnest(array["+mipCdeString+"]) AS column_name) as columns "
+        sqlStatement += "NATURAL LEFT JOIN \n "
+        i = 0
+        for table in existingTables:
+            tblName = "\'%s\'"%table
+            sqlStatement += "(SELECT column_name,"
+            # sqlStatement += "CASE WHEN data_type=\'character\' THEN \'char(\'||character_maximum_length||\')\' "
+            # sqlStatement += "WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' "
+            # sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
+            sqlStatement += "CASE WHEN data_type=\'character\' THEN \'text\' "
+            sqlStatement += "WHEN data_type=\'character varying\' THEN \'text\' "
+            sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
+            sqlStatement += "ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i \n "%(i,tblName,i)
+            sqlStatement += "NATURAL FULL JOIN \n"
+            i += 1
 
-    sqlStatement = sqlStatement[:-22]
-    sqlStatement += ";"
-    return sqlStatement
+        sqlStatement = sqlStatement[:-22]
+        sqlStatement += ";"
+        return sqlStatement
 
     def getCreateMipLocalFeaturesViewQuery(self,tables,columns_info):
         columns_type = [] # Final type for each column, will be used for cast
@@ -216,11 +216,13 @@ class SQLGenerator():
         for t in range(1,n_tables+1):
             tmp = "  SELECT \n    subjectcode AS rid,\n    unnest(array["
             for c in range(0,len(columns_type)):
-                if (columns_info[c][t]!=None): tmp += "\'%s\',"%(columns_info[c][0])
+                tmp += "\'%s\',"%(columns_info[c][0])
+                #if (columns_info[c][t]!=None): tmp += "\'%s\',"%(columns_info[c][0])
             tmp = tmp[:-1]
             tmp += "]) as colname,\n    unnest(array["
             for c in range(0,len(columns_type)):
                 if (columns_info[c][t]!=None): tmp += "\"%s\"::text,"%(columns_info[c][0])
+                else: tmp += "NULL::text,"
             tmp = tmp[:-1]
             tmp += "]) as val FROM %s"%tables[t-1]
             sqlStatement += tmp
