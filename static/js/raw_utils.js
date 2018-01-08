@@ -8,13 +8,13 @@ String.prototype.capitalize = function() {
 // this function was adapted from :
 //http://stackoverflow.com/questions/332422/how-do-i-get-the-name-of-an-objects-type-in-javascript
 // like this I can get arrays types and all of that
-function getType(obj)  { 
+function getType(obj)  {
 	if (typeof obj == "undefined") return "undefined";
     if (obj == null) {
-        console.log("null type!");
+        //console.log("null type!");
         return "null";
    }
-    
+
 	var funcNameRegex = /function (.{1,})\(/;
 	var results = (funcNameRegex).exec((obj).constructor.toString());
 	var type =  (results && results.length > 1) ? results[1] : "";
@@ -25,13 +25,14 @@ function getType(obj)  {
 // gets the value to insert in a visualization table
 function getRowType(obj){
 	var type = getType(obj);
-	switch(getType(obj)){
+	switch(type){
 		case "number":
 		case "date":
+		case "null":
 			return type;
 		default:
 			return "string";
-	}    
+	}
 }
 
 // function to convert a object so that it can drawn
@@ -43,7 +44,7 @@ function getObjValue(obj){
 		case "string":
 			return obj;
         case "null":
-            console.log("null value returning undefined");
+            //console.log("null value returning undefined");
             return undefined;
 		default:
 			return objToString(obj);
@@ -62,13 +63,33 @@ function arrayToTable(data){
 
 	switch(getType(data[0])){
 		case "object":
+			var typesArray = {};
+      // Default types: null
 			for (var name in data[0]){
-				table.addColumn( getRowType(data[0][name]) , name);
+				typesArray[name]="null";
 			}
-			for(var i= 0;i < data.length;i++){        
+      // Get type even if first raw contains null
+			for(var i= 0;i < data.length;i++){
+				for(var name in data[i]){
+					if (typesArray[name]=="null" && data[i][name]!=null){
+						typesArray[name]=getRowType(data[i][name]);
+					}
+				}
+			}
+      // Fully null columns get type "string"
+			for (var name in data[0]){
+				if (typesArray[name]=="null") typesArray[name]="string";
+        //console.log("typesArray["+name+"]="+typesArray[name]);
+			}
+      // Define columns
+			for (var name in data[0]){
+				table.addColumn(typesArray[name],name);
+			}
+      // Define data
+			for(var i= 0;i < data.length;i++){
 				var row = [];
 				for(var name in data[i]){
-					row.push(getObjValue(data[i][name]))
+					row.push(getObjValue(data[i][name]));
 				}
 				table.addRow(row);
 			}
@@ -101,7 +122,7 @@ function dataToPointTable(data){
             table.addColumn( "number", "x");
             table.addColumn( "number", "y");
             table.addColumn( "number", "z");
-            
+
             for (var x = 0; x < data.length; x++ ){
                 for (var y = 0 ;  y < data[x].length ; y++){
                     var z = parseFloat(data[x][y]);
@@ -141,7 +162,7 @@ function dataToMatrix(data){
 }
 
 //creates a visualization table from the data
-function dataToTable(data){    
+function dataToTable(data){
     var table = new google.visualization.DataTable();
 
     switch( getType(data) ){
@@ -159,7 +180,7 @@ function dataToTable(data){
             console.log("ERROR: data is undefined, visualization table is empty")
             return table;
         default:
-            table.addColumn(getRowType(data), getType(data));	                    
+            table.addColumn(getRowType(data), getType(data));
             table.addRow([data]);
             return table;
     }
@@ -167,7 +188,7 @@ function dataToTable(data){
 
 // recursive function that finds a object in the tree with a certain name
 function transverse(obj , name) {
-    if ( obj.name == name ){ 
+    if ( obj.name == name ){
         return obj;
     }
     for(var i in obj.children){
@@ -195,7 +216,7 @@ function getChildrenFromObjArray(data, root, defaultName ){
 
     var types = [];
     var names = [];
-    
+
     for (var name in data){
         types.push( getType(data[name]));
         names.push(name);
@@ -211,7 +232,7 @@ function getChildrenFromObjArray(data, root, defaultName ){
     }
     for (var n = names.length -1; n >= 0 ; n-- ){
         if(types[n] == 'string'){
-            // finds if this node exists 
+            // finds if this node exists
             var name = data[names[n]];
             var node = getObjNode(name, curr_root);
             // next item will be inserted at the level of the current node
@@ -240,7 +261,7 @@ function getChildrenFromObjArray(data, root, defaultName ){
     //gets the last node and sets the new children and the accumulated counter
     var last_node = getObjNode(acc.name, curr_root);
     if(acc.children.length){
-        last_node['children'] = acc.children; 
+        last_node['children'] = acc.children;
     }
     last_node.size = acc.size;
 }
@@ -250,7 +271,7 @@ function getChildrenFromObjArray(data, root, defaultName ){
 // see getChildrenFromObjArray function
 function getChildrenArray(data, root, defaultName ){
     switch(getType(data)){
-        // cases number and string are the same as 
+        // cases number and string are the same as
         case "number":
             root.children.push({ name : defaultName, size : data});
             break;
@@ -270,7 +291,7 @@ function getChildrenArray(data, root, defaultName ){
             break;
     }
 }
-// generates hierarchies from objects 
+// generates hierarchies from objects
 function getChildrenFromOb(data, root ){
     for (var name in data){
         switch(getType(data[name])){
@@ -289,7 +310,7 @@ function getChildrenFromOb(data, root ){
 }
 
 // Creates an hierarchy from data and inserts it in "root"
-// default name is 
+// default name is
 function getChildren(data,root, defaultName){
 
     // if it does not find a string to assign to a name defaults to 'number'
@@ -307,8 +328,8 @@ function getChildren(data,root, defaultName){
                 for(var i in data){
                     getChildrenArray(data[i], root, defaultName +":"+String(i));
                 }
-            }   
-            break;        
+            }
+            break;
         case "number":
             root.children.push({ name : defaultName, size : data});
             break;
@@ -345,7 +366,7 @@ function getCsvValue(obj){
 
 function arrayToMatrix(data){
 	var out = [];
-    
+
 	switch(getType(data[0])){
 		case "object":
 		    var header = [];
@@ -353,13 +374,13 @@ function arrayToMatrix(data){
 				header.push(name);
 			}
             out.push(header);
-			for(var i= 0;i < data.length;i++){        
+			for(var i= 0;i < data.length;i++){
 				var row = [];
 				for(var name in data[i]){
 					row.push(getCsvValue(data[i][name]))
-				}            
+				}
 				out.push(row);
-			}   
+			}
 
 			break;
 			//TODO: find way of drawing 2d Arrays (check the min of the lenghts and stringify the rest)
@@ -370,9 +391,9 @@ function arrayToMatrix(data){
 			// if it is not an array or object supposes it is a builtin type and just adds rows like that
 		default:
 			out.push( [ getType(data[0]) ] );
-			for(var i= 0;i < data.length;i++){        
-				out.push( [ getCsvValue(data[i]) ] );	                    
-			} 
+			for(var i= 0;i < data.length;i++){
+				out.push( [ getCsvValue(data[i]) ] );
+			}
 	}
 	return out;
 }
@@ -397,7 +418,7 @@ function objToMatrix(obj){
             console.log("ERROR: data is undefined, visualization table is empty")
             return out;
         default:
-            out[0] = [getType(obj)]; 
+            out[0] = [getType(obj)];
             out[1]= [getCsvValue(obj)];
             return out;
     }
@@ -416,7 +437,7 @@ function objToCSV(obj){
 function objToHtmlTable(obj, doc){
     if ( doc == undefined ) doc = true;
     var out = '<table>\n';
-    
+
     var matrix = objToMatrix(obj);
     if (matrix.length < 1) {
         out +='</table>';
@@ -438,7 +459,7 @@ function objToHtmlTable(obj, doc){
     }
 
     out += "</table>";
-    
+
     if (doc){
         var header = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">\n'+
                     '<head>\n'+
@@ -458,5 +479,5 @@ function objToHtmlTable(obj, doc){
     else{
         return out;
     }
-    
+
 }
