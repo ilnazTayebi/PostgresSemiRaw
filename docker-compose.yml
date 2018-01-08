@@ -17,7 +17,7 @@
 # USE OF THIS SOFTWARE.
 
 version: '2'
-# the following environment variables are expected to be available when running 
+# the following environment variables are expected to be available when running
 # docker-compose up
 # - raw_data_root:      The folder containing the data files (CSV, json,...) on the
 #                       swarm node host. Mapped to /datasets WITHIN the containers
@@ -35,6 +35,8 @@ services:
      - POSTGRES_USER
      - POSTGRES_PASSWORD
      - POSTGRES_DB=db
+     #- FED_DATA_SOURCE="harmonized_clinical_data"
+     #- LOCAL_DATA_SOURCE="mip_cde_features harmonized_clinical_data"
     volumes:
      - "${raw_data_root}:/datasets:ro"
      - "${pg_data_root}:/data:ro"

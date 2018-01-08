@@ -51,6 +51,11 @@ ADD src/static /opt/static
 
 EXPOSE 5555
 
+# These default environment variables can be overwritten when running the
+# container (docker run -e FED_DATA_SOURCE="..." or environment: in docker compose)
+ENV FED_DATA_SOURCE="harmonized_clinical_data"
+ENV LOCAL_DATA_SOURCE="mip_cde_features harmonized_clinical_data"
+
 CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
     --reload \
     --pg_raw \
@@ -59,5 +64,7 @@ CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
     --user ${POSTGRES_USER} \
     --password ${POSTGRES_PASSWORD} \
     --dbname ${POSTGRES_DB} \
+    --fed_data_source ${FED_DATA_SOURCE} \
+    --local_data_source ${LOCAL_DATA_SOURCE} \
     --folder /datasets \
     --snoop_conf_folder /data/pgdata
