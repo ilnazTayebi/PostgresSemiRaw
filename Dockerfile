@@ -28,8 +28,8 @@ ENV JOBS=$JOBS
 RUN apk update && \
     apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
 
-COPY src /PostgresRAW
-RUN cd /PostgresRAW/PostgresRaw && \
+COPY src/PostgresRAW /PostgresRAW
+RUN cd /PostgresRAW && \
     CFLAGS=-O0 ./configure --prefix=$PREFIX && \
     make -j $JOBS && \
     make install
