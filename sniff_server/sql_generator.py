@@ -211,7 +211,7 @@ class SQLGenerator():
                     break;
             columns_type.append(coltyp)
 
-        sqlStatement = 'CREATE VIEW mip_federation_features AS SELECT * FROM (\n'
+        sqlStatement = 'CREATE VIEW mip_federation_features AS SELECT foo.rid,foo.colname,foo.val FROM (\n'
 
         for t in range(1,n_tables+1):
             tmp = "  SELECT \n    subjectcode AS rid,\n    unnest(array["
