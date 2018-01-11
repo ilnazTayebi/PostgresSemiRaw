@@ -34,14 +34,9 @@ class CustomConnection(object):
 def execute_query(query):
     #logging.info("execute_query '%s'" % (query))
     with CustomConnection(connection_string) as conn:
-        try:
-            cur = conn.cursor()
-            cur.execute(query)
-            conn.commit()
-        except psycopg2.ProgrammingError as e:
-            logging.error(" Query failed: %s" % query)
-            logging.error(" %s" % e)
-
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
         res =[]
         #logging.info("fetching res, status: %s, rowcount: %s" % (cur.statusmessage,cur.rowcount))
         try:

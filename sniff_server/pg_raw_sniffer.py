@@ -22,14 +22,13 @@ execute_query = None
 n_snoop_conf_entries = 1
 snoop_conf_path = ""
 
-mipTablesForLocalView = []
-mipTablesForFederationView = []
-
 lock = threading.Lock()
 # deque is like a circular buffer (we will keep the last 100 messages)
 info = collections.deque(maxlen=100)
 last_info = collections.deque(maxlen=100)
 
+mipTablesForLocalView = ['mip_cde_features', 'harmonized_clinical_data']
+mipTablesForFederationView = ['harmonized_clinical_data']
 
 # Function registerfile
 # Given the path of a csv file, creates the corresponding table in pgRAW database and updates
@@ -71,8 +70,8 @@ def registerfile(path):
         return
 
 
-    if (table_name in mipTablesForLocalView+mipTablesForFederationView):
-        drop_create_mip_views(sqlGen,query)
+    if (table_name in mipTablesForLocalView):
+        drop_create_mip_views(sqlGen,path,query)
 
     else:
         #logging.info('execute_query %s' % query)
@@ -133,7 +132,7 @@ def unregisterfile(path):
         sqlGen = SQLGenerator(table_name, None, path)
         query = sqlGen.getDropTableQuery()
         if (table_name in mipTablesForLocalView):
-            drop_create_mip_views(sqlGen,query)
+            drop_create_mip_views(sqlGen,path,query)
     except SQLGeneratorException as e:
         logging.error("\t"+e)
         logging.error("\tSniffer: File '%s' could not be unregistered" % path)
@@ -145,7 +144,7 @@ def unregisterfile(path):
     logging.info("\tSniffer: File '%s' unregistered, table '%s' dropped" % (path,table_name))
 
 
-def drop_create_mip_views(sqlGen,middle_query):
+def drop_create_mip_views(sqlGen,path,middle_query):
     # Create mip_local_features view (use all tables in mipTablesForLocalView)
     query = sqlGen.getDropViewsQuery() + middle_query
     execute_query(query)
@@ -161,8 +160,8 @@ def drop_create_mip_views(sqlGen,middle_query):
     query = sqlGen.getExistingTablesQuery(mipTablesForFederationView)
     tables = execute_query(query)  # Return value: ['table0', 'table1', 'table2']
     if (len(tables)==0): return
-    query = sqlGen.getTablesCdeColumnsQuery(tables)
-    columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1', 'type2'), ('col_name2', 'type0', 'type1', 'type2'), ...]
+    query = sqlGen.getTablesColumnsQuery(tables)
+    columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1','type2'), ('col_name2', 'type0', 'type1','type2'), ...]
     query = sqlGen.getCreateMipFederationFeaturesViewQuery(tables,columns)
     execute_query(query)
     return
@@ -268,22 +267,10 @@ def init_sniffer(args,execute_query_method):
     #logging.info("pg_raw_server_sniffer.py init_sniffer")
     global execute_query
     global snoop_conf_path
-    global mipTablesForLocalView
-    global mipTablesForFederationView
-
     execute_query = execute_query_method
-
     snoop_conf_path = args.snoop_conf_folder + "/snoop.conf"
     logging.info("Configuration file path: %s" % snoop_conf_path)
     clear_snoop_conf_file()
-
-    mipTablesForLocalView = args.local_data_source
-    logging.info("Tables for MIP Local view: %s" % mipTablesForLocalView)
-    mipTablesForFederationView = args.fed_data_source
-    logging.info("Tables for MIP Federated view: %s" % mipTablesForFederationView)
-
-    # Create views with existing tables
-    drop_create_mip_views(SQLGenerator("", "", ""),"")
 
     thread = threading.Thread(target=threadwrap(background_loader), args=(args.reload,args.folder, ))
     thread.setDaemon(True)

@@ -10,10 +10,6 @@ from raw_sniffer import raw_sniffer, init_sniffer
 import time
 import decimal
 
-#defaults tables used for MIP views defined in Dockerfile
-#defaultTablesForLocalView = ['mip_cde_features', 'harmonized_clinical_data']
-#defaultTablesForFederationView = ['harmonized_clinical_data']
-
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
@@ -69,9 +65,6 @@ if __name__ == '__main__':
                     help="use postgresRaw instead of Raw")
     argp.add_argument("--snoop_conf_folder", "-c", default="/data/pgdata", metavar="FOLDER",
                     help="Path to the pg_raw configuration file")
-    argp.add_argument('--local_data_source', nargs='*', default=[])
-    argp.add_argument('--fed_data_source', nargs='*', default=[])
-
     args = argp.parse_args()
     #time.sleep(3) # allow time for db launch and log
 

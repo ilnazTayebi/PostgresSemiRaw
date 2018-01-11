@@ -21,7 +21,7 @@ class CSVInferrer(object):
         delimiters = self._options.get('delimiter', ";,|\t ") # get option 'delimiter' or use default ?
         dialect = sniffer.sniff(self._content, delimiters=delimiters)
         has_header = self._options.get('has_header', sniffer.has_header(self._content))
-        for o in self._options: # transfert options attributes to dialect ?? only existing attributes or adding possibly new ones ?
+        for o in self._options: # transfert options attributes to dialect ?? only existing attributes or adding possibly new ones ? 
             dialect.__dict__[o] = self._options[o]
 
         reader = csv.reader(self._content.splitlines(), dialect)
@@ -74,7 +74,7 @@ class CSVInferrer(object):
 
     __regexps = [
         (re.compile("[0-9]*\\.[0-9]+$"), rawFloatType()),
-        (re.compile("[0-9]{1,9}$"), rawIntType()),
+        (re.compile("[0-9]+$"), rawIntType()),
         (re.compile("(true|false)$"), rawBooleanType()),
     ]
     def __what_is(self, txt):
@@ -85,3 +85,5 @@ class CSVInferrer(object):
             if reg.match(txt):
                 return v
         return rawStringType()
+        
+
