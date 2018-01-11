@@ -58,7 +58,13 @@ var draw_functions  = {
         });
     },    
     pieChart : function(){ 
-
+        var data = arrayToDataset(draw_data.data);
+        console.log("dataset", data)
+        graph_div.innerHTML = '<canvas id="chartjs" style="height: 98%; width: 100%;"></canvas>';
+        var ctx = document.getElementById('chartjs').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar', data: data, options: {}
+        });
     },
     line_chart: function(){
 
