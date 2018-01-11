@@ -54,7 +54,7 @@ def execute_query(query):
         cur.close()
     return res
 
-def format_cursor(cur,maxRows=1000):
+def format_cursor(cur,maxRows=100):
     # Transforms the results of a cursor into list of dicts
     out = []
     colnames = [desc[0] for desc in cur.description]
@@ -148,8 +148,8 @@ def query_start():
     data = json.loads(request.data)
     resPerPage = None
     if ("resultsPerPage" in data): resPerPage = data["resultsPerPage"]
-    if (resPerPage==None): resPerPage=1000
-    logging.debug("query-start: %s" % data["query"])
+    if (resPerPage==None): resPerPage=100
+    #logging.debug("query-start: %s" % data["query"])
     with CustomConnection(connection_string) as conn:
         cur = conn.cursor()
         cur.execute(data["query"])
