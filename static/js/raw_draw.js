@@ -1,5 +1,5 @@
 // the div used in all the drawing functions
-var graph_div =undefined;
+var graph_div =document.getElementById('graph');
 
 // global variable that holds the data to be plotted
 var draw_data = {
@@ -7,10 +7,8 @@ var draw_data = {
     last_draw : "json_editor"
 }
 
-$('#vis-container').load('vis_tab.html #visualization', function(){
-    // assigning the div after loading
-    graph_div = $('#graph')[0];
-    
+$(document).ready(function(){
+    //graph_div =$('#graph')[0];
     // assigns the callbacks to all the elements
     $('#draw_table').on('click', function (e){ draw_graph('table',e)});
     // 2d graphs
@@ -53,7 +51,7 @@ var draw_functions  = {
     barChart : function(){ 
         var data = arrayToDataset(draw_data.data);
         console.log("dataset", data)
-        graph_div.innerHTML = '<canvas id="chartjs"></canvas>';
+        graph_div.innerHTML = '<canvas id="chartjs" style="height: 98%; width: 100%;"></canvas>';
         var ctx = document.getElementById('chartjs').getContext('2d');
         new Chart(ctx, {
             type: 'bar', data: data, options: {}

@@ -79,27 +79,29 @@ function dataToMatrix(data){
 
 //function that converts arrays to visualization tables
 function arrayToDataset(data){
-    var labels = [];
+    var labels = undefined;
 	var datasets = [];
-    var colors = ['rgb(255, 99, 132)', 'rgb(255, 132, 99)', 'rgb(99, 255, 132)', 'rgb(132, 99, 255)', 'rgb(99, 99, 99)']
+    var colors = ['rgb(127, 127, 255)', 'rgb(255, 127, 127)', 'rgb(127, 255, 127)', 'rgb(198, 99, 198)', 'rgb(99, 99, 99)']
 	switch(getType(data[0])){
 		case "object":
 		    var counter = 0;
 			for (var name in data[0]){
-			    labels.push(name)
-			    datasets.push({
-                    label: name,
-                    backgroundColor: colors[counter],
-                    borderColor: 'rgb(0, 0, 0)',
-                    data: []
-                })
-			}
 
-			for(var i= 0; i < data.length; i++){
-				var row = [];
-				for(var name in data[i]){
-					datasets[i].data.push(getObjValue(data[i][name]))
-				}
+			    if (counter == 0) {
+			        labels = data.map(function(x) {
+                         return getObjValue(x[name])
+                     });
+			    } else {
+			        datasets.push({
+                        label: name,
+                        backgroundColor: colors[counter -1],
+                        borderColor: 'rgb(0, 0, 0)',
+                        data: data.map(function(x) {
+                            return getObjValue(x[name])
+                        })
+                    });
+			    }
+                counter++
 			}
 
 			break;
