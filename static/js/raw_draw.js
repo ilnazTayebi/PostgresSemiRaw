@@ -7,9 +7,6 @@ var draw_data = {
     last_draw : "json_editor"
 }
 
-
-google.load("visualization", "1", {packages:["corechart", "table", "geochart", "map"]});
-
 $('#vis-container').load('vis_tab.html #visualization', function(){
     // assigning the div after loading
     graph_div = $('#graph')[0];
@@ -23,7 +20,7 @@ $('#vis-container').load('vis_tab.html #visualization', function(){
     $('#draw_scatter').on('click', function (e){ draw_graph('scatterChart',e)});
     $('#draw_line').on('click', function (e){ draw_graph('line_chart',e)});
     //geo graphs
-    $('#draw_geo').on('click', function (e){ draw_graph('geo_world',e)});
+    //$('#draw_geo').on('click', function (e){ draw_graph('geo_world',e)});
     // hierarchy graphs
     $('#draw_sunburst').on('click', function (e){ draw_graph('sunburts',e)});
     $('#draw_tree').on('click', function (e){ draw_graph('tree',e)});
@@ -53,53 +50,19 @@ var draw_functions  = {
             {showRowNumber: true, width: '100%', height: '100%'}
         );
     },
-    columnChart : function(){ 
-        var t = dataToTable(draw_data.data);
-        var visualization = new google.visualization.ColumnChart(graph_div);
-        visualization.draw(t);
-    },
     barChart : function(){ 
-        var t = dataToTable(draw_data.data);
-        var visualization = new google.visualization.BarChart(graph_div);
-        visualization.draw(t);
+        var data = arrayToDataset(draw_data.data);
+        console.log("dataset", data)
+        graph_div.innerHTML = '<canvas id="chartjs"></canvas>';
+        var ctx = document.getElementById('chartjs').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar', data: data, options: {}
+        });
     },    
     pieChart : function(){ 
-        var t = dataToTable(draw_data.data);
-        var visualization = new google.visualization.PieChart(graph_div);
-        visualization.draw(t);
-    },
-    scatterChart : function(){
-        var t = dataToTable(draw_data.data);
-        var visualization = new google.visualization.ScatterChart(graph_div);
-        visualization.draw(t);
-    },
-    areaChart : function(){ 
-        var t = dataToTable(draw_data.data);
-        var visualization = new google.visualization.AreaChart(graph_div);
-        visualization.draw(t);
-    },
-    histogram: function(){
-        var t = dataToTable(draw_data.data);
-        var chart = new google.visualization.Histogram(graph_div);
-        chart.draw(t);
+
     },
     line_chart: function(){
-        var chart = new google.visualization.LineChart(graph_div);
-        var t = dataToTable(draw_data.data);
-        chart.draw(t);
-    },
-    geo_world: function(){
-        // this is because google maps screws the css
-        // by inserting a div just for drawing at least does not screw up other graphs
-        graph_div.innerHTML = '<div id="map_canvas" style="height: 100%; width: 100%;"></div>';
-        draw_data.last_draw = "geo_world";
-        var chart = new google.visualization.Map(document.getElementById('map_canvas'));
-        options = {
-            mapType : 'normal',
-            showTip : true
-        }
-        var t = dataToTable(draw_data.data);
-        chart.draw(t, options);
 
     },
     sunburts: function(){
@@ -343,7 +306,7 @@ function correct_enabled_tab(graph){
 
 function draw_graph( graph, e){
     console.log("graph div", graph_div);
-
+    graph_div.innerHTML = '';
     correct_enabled_tab(graph);
     draw_data.last_draw = graph;
     draw_functions[graph]();

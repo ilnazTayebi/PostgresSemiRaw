@@ -140,6 +140,73 @@ function dataToMatrix(data){
     return matrix;
 }
 
+//function that converts arrays to visualization tables
+function arrayToDataset(data){
+    var labels = [];
+	var datasets = [];
+    var colors = ['rgb(255, 99, 132)', 'rgb(255, 132, 99)', 'rgb(99, 255, 132)', 'rgb(132, 99, 255)', 'rgb(99, 99, 99)']
+	switch(getType(data[0])){
+		case "object":
+		    var counter = 0;
+			for (var name in data[0]){
+			    labels.push(name)
+			    datasets.push({
+                    label: name,
+                    backgroundColor: colors[counter],
+                    borderColor: 'rgb(0, 0, 0)',
+                    data: []
+                })
+			}
+
+			for(var i= 0; i < data.length; i++){
+				var row = [];
+				for(var name in data[i]){
+					datasets[i].data.push(getObjValue(data[i][name]))
+				}
+			}
+
+			break;
+			//TODO: find way of drawing 2d Arrays (check the min of the lenghts and stringify the rest)
+			//case "array":
+		case "undefined":
+			console.log("could not draw empty array " , data)
+			break;
+			// if it is not an array or object supposes it is a builtin type and just adds rows like that
+		default:
+		    datasets.push({
+                label: getType(data[0]),
+                backgroundColor: colors[0],
+                borderColor: 'rgb(0, 0, 0)',
+                data: data
+            })
+	}
+	return {
+	    labels: labels,
+	    datasets: datasets
+	}
+}
+
+function dataToDataset(data) {
+    switch( getType(data) ){
+        case "array":
+            return arrayToDataset(data);
+        case 'object':
+            var row = [];
+            for(var name in data){
+                table.addColumn( getRowType(data[name]) , name);
+                row.push(getObjValue(data[name]))
+            }
+            table.addRow(row);
+            return table;
+        case "undefined":
+            console.log("ERROR: data is undefined, visualization table is empty")
+            return table;
+        default:
+            table.addColumn(getRowType(data), getType(data));
+            table.addRow([data]);
+            return table;
+    }
+}
 //creates a visualization table from the data
 function dataToTable(data){    
     var table = new google.visualization.DataTable();
