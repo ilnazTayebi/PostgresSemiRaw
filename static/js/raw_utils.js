@@ -77,8 +77,9 @@ function dataToMatrix(data){
     return matrix;
 }
 
+
 //function that converts arrays to visualization tables
-function arrayToDataset(data){
+function arrayToDataset(data, differentColors){
     var labels = undefined;
 	var datasets = [];
     var colors = ['rgb(127, 127, 255)', 'rgb(255, 127, 127)', 'rgb(127, 255, 127)', 'rgb(198, 99, 198)', 'rgb(99, 99, 99)']
@@ -86,7 +87,14 @@ function arrayToDataset(data){
 		case "object":
 		    var counter = 0;
 			for (var name in data[0]){
-
+                var dataColors = undefined;
+                if (differentColors) {
+                    dataColors = data.map(function(x, n) {
+                         return colors[n % colors.length]
+                     });
+                } else {
+                    dataColors = colors[counter -1];
+                }
 			    if (counter == 0) {
 			        labels = data.map(function(x) {
                          return getObjValue(x[name])
@@ -94,7 +102,7 @@ function arrayToDataset(data){
 			    } else {
 			        datasets.push({
                         label: name,
-                        backgroundColor: colors[counter -1],
+                        backgroundColor: dataColors,
                         borderColor: 'rgb(0, 0, 0)',
                         data: data.map(function(x) {
                             return getObjValue(x[name])
@@ -123,28 +131,6 @@ function arrayToDataset(data){
 	    labels: labels,
 	    datasets: datasets
 	}
-}
-
-function dataToDataset(data) {
-    switch( getType(data) ){
-        case "array":
-            return arrayToDataset(data);
-        case 'object':
-            var row = [];
-            for(var name in data){
-                table.addColumn( getRowType(data[name]) , name);
-                row.push(getObjValue(data[name]))
-            }
-            table.addRow(row);
-            return table;
-        case "undefined":
-            console.log("ERROR: data is undefined, visualization table is empty")
-            return table;
-        default:
-            table.addColumn(getRowType(data), getType(data));
-            table.addRow([data]);
-            return table;
-    }
 }
 
 // recursive function that finds a object in the tree with a certain name

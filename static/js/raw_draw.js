@@ -38,6 +38,8 @@ $(document).ready(function(){
 // loads the forms
 $('#forms-container').load('forms.html #forms');
 
+var graph_colors = ['rgb(127, 127, 255)', 'rgb(255, 127, 127)', 'rgb(127, 255, 127)', 'rgb(198, 99, 198)', 'rgb(99, 99, 99)']
+
 //data structure with functions to visualize the data
 var draw_functions  = {
     table : function(){
@@ -49,25 +51,31 @@ var draw_functions  = {
         );
     },
     barChart : function(){ 
-        var data = arrayToDataset(draw_data.data);
+        var data = arrayToDataset(draw_data.data, false);
         console.log("dataset", data)
-        graph_div.innerHTML = '<canvas id="chartjs" style="height: 98%; width: 100%;"></canvas>';
+        graph_div.innerHTML = '<canvas id="chartjs" style="height: 100%; width: 100%;"></canvas>';
         var ctx = document.getElementById('chartjs').getContext('2d');
         new Chart(ctx, {
             type: 'bar', data: data, options: {}
         });
     },    
     pieChart : function(){ 
-        var data = arrayToDataset(draw_data.data);
+        var data = arrayToDataset(draw_data.data, true);
         console.log("dataset", data)
-        graph_div.innerHTML = '<canvas id="chartjs" style="height: 98%; width: 100%;"></canvas>';
+        graph_div.innerHTML = '<canvas id="chartjs" style="height: 100%; width: 100%;"></canvas>';
         var ctx = document.getElementById('chartjs').getContext('2d');
         new Chart(ctx, {
-            type: 'bar', data: data, options: {}
+            type: 'pie', data: data, options: {}
         });
     },
     line_chart: function(){
-
+        var data = arrayToDataset(draw_data.data);
+        console.log("dataset", data)
+        graph_div.innerHTML = '<canvas id="chartjs" style="height: 100%; width: 100%;"></canvas>';
+        var ctx = document.getElementById('chartjs').getContext('2d');
+        new Chart(ctx, {
+            type: 'line', data: data, options: {}
+        });
     },
     sunburts: function(){
         d = dataToHierarchy(draw_data.data);
