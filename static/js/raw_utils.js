@@ -56,69 +56,6 @@ function objToString(obj){
     return JSON.stringify(obj);
 }
 
-//function that converts arrays to visualization tables
-function arrayToTable(data){
-	var table = new google.visualization.DataTable();
-
-	switch(getType(data[0])){
-		case "object":
-			for (var name in data[0]){
-				table.addColumn( getRowType(data[0][name]) , name);
-			}
-			for(var i= 0;i < data.length;i++){        
-				var row = [];
-				for(var name in data[i]){
-					row.push(getObjValue(data[i][name]))
-				}
-				table.addRow(row);
-			}
-
-			break;
-			//TODO: find way of drawing 2d Arrays (check the min of the lenghts and stringify the rest)
-			//case "array":
-		case "undefined":
-			console.log("could not draw empty array " , data)
-			break;
-			// if it is not an array or object supposes it is a builtin type and just adds rows like that
-		default:
-			table.addColumn( getRowType(data[0]) , getType(data[0]));
-			for(var i= 0;i < data.length;i++){
-				var row = [getObjValue(data[i])];
-				table.addRow(row);
-			}
-	}
-	return table;
-}
-
-function dataToPointTable(data){
-    var type = getType(data[0]);
-    switch(type){
-        case "object":
-            return arrayToTable(data);
-        case "array":
-            console.log("matrix to points");
-            var table = new google.visualization.DataTable();
-            table.addColumn( "number", "x");
-            table.addColumn( "number", "y");
-            table.addColumn( "number", "z");
-            
-            for (var x = 0; x < data.length; x++ ){
-                for (var y = 0 ;  y < data[x].length ; y++){
-                    var z = parseFloat(data[x][y]);
-                    table.addRow([x,y,z]);
-                }
-            }
-            return table;
-        case "undefined":
-            console.log("could not draw undefined " , data);
-            throw ("could not draw undefined ");
-            break;
-            // if it is not an array or object supposes it is a builtin type and just adds rows like that
-        default:
-            throw ("Array of type: " + type + ", cannot be converted to matrix");
-    }
-    return matrix;
-}
 
 //function that transforms data to a matrix (for heatmap)
 function dataToMatrix(data){
@@ -203,30 +140,6 @@ function dataToDataset(data) {
             return table;
         default:
             table.addColumn(getRowType(data), getType(data));
-            table.addRow([data]);
-            return table;
-    }
-}
-//creates a visualization table from the data
-function dataToTable(data){    
-    var table = new google.visualization.DataTable();
-
-    switch( getType(data) ){
-        case "array":
-            return arrayToTable(data);
-        case 'object':
-            var row = [];
-            for(var name in data){
-                table.addColumn( getRowType(data[name]) , name);
-                row.push(getObjValue(data[name]))
-            }
-            table.addRow(row);
-            return table;
-        case "undefined":
-            console.log("ERROR: data is undefined, visualization table is empty")
-            return table;
-        default:
-            table.addColumn(getRowType(data), getType(data));	                    
             table.addRow([data]);
             return table;
     }

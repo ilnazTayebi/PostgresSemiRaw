@@ -15,12 +15,12 @@ $('#vis-container').load('vis_tab.html #visualization', function(){
     $('#draw_table').on('click', function (e){ draw_graph('table',e)});
     // 2d graphs
     $('#draw_pie').on('click', function (e){ draw_graph('pieChart',e)});
-    $('#draw_bar').on('click', function (e){ draw_graph('columnChart',e)});
-    $('#draw_histogram').on('click', function (e){ draw_graph('histogram',e)});
-    $('#draw_scatter').on('click', function (e){ draw_graph('scatterChart',e)});
+    $('#draw_bar').on('click', function (e){
+        console.log("drawing barchart");
+        draw_graph('barChart', e);
+     });
     $('#draw_line').on('click', function (e){ draw_graph('line_chart',e)});
     //geo graphs
-    //$('#draw_geo').on('click', function (e){ draw_graph('geo_world',e)});
     // hierarchy graphs
     $('#draw_sunburst').on('click', function (e){ draw_graph('sunburts',e)});
     $('#draw_tree').on('click', function (e){ draw_graph('tree',e)});
@@ -171,10 +171,7 @@ function check_compatible_graphs(data){
         elements = ['draw_table',
                     'draw_pie',
                     'draw_bar',
-                    'draw_histogram',
-                    'draw_scatter',
                     'draw_line',
-                    'draw_geo',
                     'draw_sunburst',
                     'draw_tree',
                     'draw_circle_pack',
@@ -305,7 +302,7 @@ function correct_enabled_tab(graph){
 }
 
 function draw_graph( graph, e){
-    console.log("graph div", graph_div);
+    console.log("graph div", graph_div, graph);
     graph_div.innerHTML = '';
     correct_enabled_tab(graph);
     draw_data.last_draw = graph;
