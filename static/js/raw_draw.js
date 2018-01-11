@@ -219,16 +219,13 @@ function check_compatible_graphs(data){
         if (type == "object" ){
             keys = Object.keys(data[0]);
             // at least one non numeric value
-            if (all_numeric(data[0], 0) == false){
-                to_enable.push('draw_geo');
-            }
+
             if (keys.length >= 2 && all_numeric(data[0], 1) ){
                 to_enable.push('draw_bar',
                             'draw_histogram',
                             'draw_scatter',
                             'draw_line',
                             '2d_dropdown');
-                to_enable.push('draw_geo');
                 if (all_numeric(data[0], 0) == false) {
                     to_enable.push('draw_pie');
                 }
@@ -241,9 +238,6 @@ function check_compatible_graphs(data){
         else if (type == "number" ){
             to_enable.push('draw_histogram',
                           '2d_dropdown');
-        }
-        else if (type == "string"){
-            to_enable.push('draw_geo');
         }
         else if (type == "array"){
             to_enable.push('3d_dropdown', 
@@ -294,8 +288,6 @@ function correct_enabled_tab(graph){
             case "treemap":
             case "bubble_chart":
                 return "tree_li";
-            case "geo_world":
-                return "geo_li";
             case 'json_editor':
                 return 'values_li';
             default:
