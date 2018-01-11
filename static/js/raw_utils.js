@@ -77,6 +77,42 @@ function dataToMatrix(data){
     return matrix;
 }
 
+function arrayToTable(data) {
+
+    var table = '<div class="table-container"><table class="nested-table">\n'
+
+    switch(getType(data[0])){
+        case "object":
+            table += "<tr>";
+            for (var name in data[0]){
+                table += "<th>" + name + "</th>"
+            }
+            table += "</tr>\n"
+            for(var n = 0; n < data.length; n ++) {
+                table += "<tr>";
+                for (var name in data[n]){
+                    table += "<td>" + getObjValue(data[n][name]) + "</td>";
+                }
+                 table += "</tr>\n";
+            }
+            break;
+            //TODO: find way of drawing 2d Arrays (check the min of the lenghts and stringify the rest)
+            //case "array":
+        case "undefined":
+            console.log("could not draw empty array " , data)
+            break;
+            // if it is not an array or object supposes it is a builtin type and just adds rows like that
+        default:
+            table += "<tr><th>" + getType(data[0]) + "</th></tr>\n";
+            for(var n = 0; n < data.length; n ++) {
+                table += "<tr><td>" + getObjValue(data[n][name]) + "</td></tr>\n";
+            }
+
+    }
+    table += "</table></div>"
+    return table;
+
+}
 
 //function that converts arrays to visualization tables
 function arrayToDataset(data, differentColors){

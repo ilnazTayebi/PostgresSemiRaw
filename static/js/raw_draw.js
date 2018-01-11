@@ -43,12 +43,9 @@ var graph_colors = ['rgb(127, 127, 255)', 'rgb(255, 127, 127)', 'rgb(127, 255, 1
 //data structure with functions to visualize the data
 var draw_functions  = {
     table : function(){
-	    //graph_div.empty();
-	    var t = dataToTable(draw_data.data);
-	    var visualization = new google.visualization.Table(graph_div);
-	    visualization.draw(t,
-            {showRowNumber: true, width: '100%', height: '100%'}
-        );
+        var table = arrayToTable(draw_data.data)
+        console.log(table)
+        graph_div.innerHTML = table;
     },
     barChart : function(){ 
         var data = arrayToDataset(draw_data.data, false);
