@@ -50,5 +50,6 @@ $ docker run --rm \
 * **Note 1:** The folder mounted on `/data` is expected to **contain** the `pg_data` folder.
 * **Note 2:** The folder mounted on `/datasets` is where you store the CSV files.
 * **Note 3:** In the example above, we use `--link` to link to the PostgresRAW container. In this case, we have to connect to the port used internaly by the PostgresRAW docker container, which is `5432`, and not the externally mapped `5554`.
+* **Note 4:** Use the `LOCAL_DATA_SOURCE` and `FED_DATA_SOURCE` environment variables to override the default configuration for the MIP views. See [PostgresRAW-UI documentation](https://github.com/HBPMedical/PostgresRAW-UI) for more information. Example use (to show the research data at the Federation level): `-e FED_DATA_SOURCE="mip_cde_features"`
 
 The PostgresRAW-UI will be available on `http://localhost:4445` and allows you to execute SQL queries, and choose several display options of the results.
