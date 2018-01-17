@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import Flask, request, jsonify, Response, send_from_directory, Blueprint
 import logging
 import psycopg2
@@ -8,20 +9,69 @@ import timeit
 
 pg_raw = Blueprint('pg_raw_server', __name__)
 
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    # Retrieve values from the environment
+    dbname = server_args.dbname
+    host = server_args.host
+    port = server_args.port
+
+    try:
+        conn = psycopg2.connect('dbname=%s user=%s host=%s port=%s password=%s' \
+                        % (dbname, username, host, port, password))
+    except psycopg2.OperationalError:
+        return False
+    else:
+        conn.close()
+        return True
+
+# Function execute_query
+# Execute query given as string (mainly for use outside of the module)
+def execute_query(query):
+    #logging.info("execute_query '%s'" % (query))
+    with CustomConnection(server_args.user, server_args.password) as conn:
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        res =[]
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
 # init_db(args)
 # Creates and stores a connection string based on arguments received
 def init_db(args):
-    global connection_string
-     # is it ok to store all these as global variables ???
-    connection_string = 'dbname=%s user=%s host=%s port=%s password=%s' \
-                        % (args.dbname,args.user,args.host,args.port,args.password)
+    global server_args
+    server_args = args
 
 # CustomConnection class
 # Allow to use a 'with' structure, which will automatically close the connection
-# eg. "with CustomConnection(conn_str) as conn: "
+# eg. "with CustomConnection(user, password) as conn: "
 class CustomConnection(object):
-    def __init__(self,conn_string):
-      self.conn = psycopg2.connect(conn_string)
+    def __init__(self, user, password):
+
+        # Retrieve values from the environment
+        dbname = server_args.dbname
+        host = server_args.host
+        port = server_args.port
+
+        self.conn = psycopg2.connect('dbname=%s user=%s host=%s port=%s password=%s' \
+                        % (dbname,user,host,port,password))
 
     def __enter__(self):
         return self.conn
@@ -33,7 +83,7 @@ class CustomConnection(object):
 # Execute query given as string (mainly for use outside of the module)
 def execute_query(query):
     #logging.info("execute_query '%s'" % (query))
-    with CustomConnection(connection_string) as conn:
+    with CustomConnection(server_args.user, server_args.password) as conn:
         try:
             cur = conn.cursor()
             cur.execute(query)
@@ -125,11 +175,12 @@ def handle_database_error(error):
 # Request: case class QueryRequest(query: String)
 # Response Success case class QueryResponse(output: Any, compilationTime: Long, executionTime: Long)
 @pg_raw.route('/query', methods=['POST'])
+@requires_auth
 def query_full():
     start_time = timeit.default_timer()
     data = json.loads(request.data)
     logging.debug("query: %s" % data["query"])
-    with CustomConnection(connection_string) as conn:
+    with CustomConnection(request.authorization.username, request.authorization.password) as conn:
         cur = conn.cursor()
         cur.execute(data["query"])
         conn.commit()
@@ -143,6 +194,7 @@ def query_full():
 # Request: case class QueryStartRequest(query: String, resultsPerPage:Int)
 # Response: case class QueryBlockResponse(data: Any, start: Int, size: Int, hasMore: Boolean, token: String, var compilationTime: Long, var executionTime: Long)
 @pg_raw.route('/query-start', methods=['POST'])
+@requires_auth
 def query_start():
     start_time = timeit.default_timer()
     data = json.loads(request.data)
@@ -150,7 +202,7 @@ def query_start():
     if ("resultsPerPage" in data): resPerPage = data["resultsPerPage"]
     if (resPerPage==None): resPerPage=100
     #logging.debug("query-start: %s" % data["query"])
-    with CustomConnection(connection_string) as conn:
+    with CustomConnection(request.authorization.username, request.authorization.password) as conn:
         cur = conn.cursor()
         cur.execute(data["query"])
         conn.commit()
@@ -160,8 +212,9 @@ def query_start():
         return jsonify(data=data,start=0,size=len(data),hasMore=has_more,token='',compilationTime=0, executionTime=elapsed)
 
 @pg_raw.route('/schemas', methods=['GET'])
+@requires_auth
 def schemas():
-    with CustomConnection(connection_string) as conn:
+    with CustomConnection(request.authorization.username, request.authorization.password) as conn:
         cur = conn.cursor()
         query = """SELECT table_name
                 FROM information_schema.tables
@@ -177,5 +230,6 @@ def schemas():
         return res
 
 @pg_raw.route('/', methods=['GET'])
+@requires_auth
 def index():
     return send_from_directory("../static/", "pg_raw.html")
