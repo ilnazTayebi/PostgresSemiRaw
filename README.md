@@ -1,6 +1,19 @@
 # PostgresRAW-UI: Web UI and file sniffer for PostgresRAW
 
-PostgresRAW-UI offers a web UI for PostgresRAW and automates detection and registration of raw files (sniffer). The folder containing the files to be automatically added to the database must be provided as an argument when starting the server.
+PostgresRAW-UI offers the following functionalities:
+
+- Web UI for PostgresRAW
+- REST API for PostgresRAW
+- Automatic detection and registration of raw files (sniffer)
+- Automatic MIP view creation
+
+The automatic file registration watches a folder provided as an argument when starting the server. When files appear or are modified in this folder, the corresponding tables are automatically made available in the database. If needed, the MIP views are adapted to the changes of their underlying files.
+
+
+1. [Running PostgresRAW-UI](#running-postgresraw-ui)
+2. [Using the sniffer with PostgresRAW](#using-the-sniffer-with-postgresraw)
+3. [MIP views creation](#mip-views-creation)
+4. [Automated deployment](#automated-deployment)
 
 ## 1. Running PostgresRAW-UI
 
@@ -47,7 +60,7 @@ This example assumes that:
 
 To see the web UI go to: http://localhost:5555/static/raw_demo.html 
 
-## 2. Using PostgresRAW-UI with PostgresRAW
+## 2. Using the sniffer with PostgresRAW
 
 In PostgresRAW mode, the sniffer of PostgresRAW-UI detects CSV files in the folder given by the **folder** argument. The inferrer module then infers their schema and creates corresponding dummy tables in the given database **dbname** (more details below). 
 
@@ -70,8 +83,33 @@ The CSV file delimiter is expected to be a comma (`,`). Other standard delimiter
 
 Note: files without a `.csv` extension are not recognised as CSV.
 
+## 3. MIP views creation
 
-## 3. Automated deployment
+In the context of the MIP, data will be stored in two tables:
+
+- `mip_cde_features` contains the research data loaded in the database,
+- `harmonized_clinical_data` gives access to the clinical data pre-processed by the MIP and stored in a csv file named "harmonized\_clinical\_data.csv".
+
+The "harmonized\_clinical\_data.csv" file is dropped in PostgresRAW data folder and automatically detected and registered by the sniffer.
+
+Further, views are automatically created to display the data in the format required for MIP Local and MIP Federated. The views are named:
+
+- `mip_local_features`
+- `mip_federation_features`
+
+The view `mip_local_features` displays all the underlying data in a unified flat-table schema. All the columns existing in the underlying tables are included (once). By default, the underlying tables are `mip_cde_features` and `harmonized_clinical_data`, but this can be adapted using the `--local_data_source` option (default value: "mip\_cde\_features harmonized\_clinical\_data"; list tables without comma or other separators).
+
+The view `mip_federation_features` displays the underlying data in a 3-columns star schema. The columns are named "rid", "colname" and "val". By default, the data displayed for the Federation is only the clinical data, i.e. the `harmonized_clinical_data` table. This can be adapted using the `--fed_data_source` option (default value: "harmonized\_clinical\_data").
+
+This option must be used at one node to display the research data once at the Federation level.
+
+Following the requirement of the Federation, the `mip_federation_features` view includes the CDE features for each subject, and only the CDE features. Missing CDE features are included as records with a "NULL" value in the "val" column.
+
+The following schema represents the default configuration for the MIP views.
+
+![](mip_views_schema.pdf)
+
+## 4. Automated deployment
 
 The [RAW-deploy](https://github.com/HBPMedical/RAW-deploy) project automates the deployment of two connected docker containers running PostgresRAW and PostgresRAW-UI. 
 
