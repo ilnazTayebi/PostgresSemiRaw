@@ -49,6 +49,9 @@ RUN wget https://github.com/requests/requests/archive/v2.13.0.zip && \
 ADD src/sniff_server /opt/postgresraw-ui
 ADD src/static /opt/static
 
+# Display version in the UI
+RUN sed -i "s,VCS_REF,${VCS_REF},;s,BUILD_DATE,${BUILD_DATE}," /opt/static/pg_raw.html
+
 EXPOSE 5555
 
 # These default environment variables can be overwritten when running the
