@@ -13,9 +13,8 @@ The automatic file registration watches a folder provided as an argument when st
 1. [Running PostgresRAW-UI](#running-postgresraw-ui)
 2. [Using the sniffer with PostgresRAW](#using-the-sniffer-with-postgresraw)
 3. [MIP views creation](#mip-views-creation)
-4. [Automated deployment](#automated-deployment)
 
-## 1. Running PostgresRAW-UI
+## Running PostgresRAW-UI
 
 Requirements:
 
@@ -53,14 +52,14 @@ $ python server.py --reload \
 This example assumes that:
 
  * PostresRAW is used
- * POSTGRES_* environment variables are defined and link to PostgresRAW
- * PostgresRAW configuration file is expected to be found in /data
+ * `POSTGRES_*` environment variables are defined and link to PostgresRAW
+ * PostgresRAW configuration file is expected to be found in `/data`
  * the watched folder (containing raw data files to be automatically registered) is `/datasets`
  * the folder containing the NoDB configuration file is `/data`, and the file itself is found in `/data/pgdata/snoop.conf`
 
-To see the web UI go to: http://localhost:5555/static/raw_demo.html 
+To see the web UI, browse http://localhost:5555. 
 
-## 2. Using the sniffer with PostgresRAW
+## Using the sniffer with PostgresRAW
 
 In PostgresRAW mode, the sniffer of PostgresRAW-UI detects CSV files in the folder given by the **folder** argument. The inferrer module then infers their schema and creates corresponding dummy tables in the given database **dbname** (more details below). 
 
@@ -68,22 +67,22 @@ The sniffer also registers the associations `{file; dummy table}` through a conf
 
 Using the sniffer of PostgresRAW-UI, no schema has to be defined manually in the database for the raw CSV files. Rather, the structure of data made available for querying in the watched folder is translated in real time to a database schema based on the following rules:
 
-For each `[name].csv` file discovered in **datasets**, an equivalent table is made available in the Query Engine for querying. The table name is based on the file name, with the following rules uppercase characters are transformed to lowercase and any special character removed (except underscore '\_').
+- For each `[name].csv` file discovered in **datasets**, an equivalent table is made available in the Query Engine for querying. The table name is based on the file name, with the following rules uppercase characters are transformed to lowercase and any special character removed (except underscore '\_').
 
-Here are two examples:
+	Here are two examples:
 
- 1. A file named `Brain_Feature_Set.csv` is accessed through a table named **`brain_feature_set`**.
- 2. A file named `B%dExämp|e.csv` will be exposed through a table named **`bdexmpe`**.
+	 1. A file named `Brain_Feature_Set.csv` is accessed through a table named **`brain_feature_set`**.
+	 2. A file named `B%dExämp|e.csv` will be exposed through a table named **`bdexmpe`**.
 
-The column names are retrieved from the header line of the CSV file, without modifications. It is highly recommended to stick to simple lowercase names in order to access data seamlessly. Columns of CSV files without header are named by default `_1`, `_2`, `_3`, etc…
+- The column names are retrieved from the header line of the CSV file, without modifications. It is highly recommended to stick to simple lowercase names in order to access data seamlessly. Columns of CSV files without header are named by default `_1`, `_2`, `_3`, etc…
 
-The type of each data feature (column) is inferred based on the first lines of the file, as one of the following types: *int*, *real*, *boolean* or *text*. Data not fitting any of the specialised types defaults to *text* type. Empty values are recognised as *NULL*s.
+- The type of each data feature (column) is inferred based on the first lines of the file, as one of the following types: *int*, *real*, *boolean* or *text*. Data not fitting any of the specialised types defaults to *text* type. Empty values are recognised as *NULL*s.
 
-The CSV file delimiter is expected to be a comma (`,`). Other standard delimiters used in a consistent way should be recognised automatically. The double quote character (`"`) must be used for text quoting (and escaping). NULL values are represented with an empty unquoted string (for instance with comma delimiters : `,,`).
+- The CSV file delimiter is expected to be a comma (`,`). Other standard delimiters used in a consistent way should be recognised automatically. The double quote character (`"`) must be used for text quoting (and escaping). NULL values are represented with an empty unquoted string (for instance with comma delimiters : `,,`).
 
 Note: files without a `.csv` extension are not recognised as CSV.
 
-## 3. MIP views creation
+## MIP views creation
 
 In the context of the MIP, data will be stored in two tables:
 
@@ -109,7 +108,4 @@ The following schema represents the default configuration for the MIP views.
 
 ![](mip_views_schema.pdf)
 
-## 4. Automated deployment
-
-The [RAW-deploy](https://github.com/HBPMedical/RAW-deploy) project automates the deployment of two connected docker containers running PostgresRAW and PostgresRAW-UI. 
 
