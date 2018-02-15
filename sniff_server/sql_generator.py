@@ -2,7 +2,7 @@ from inferrer.raw_types import *
 from collections import OrderedDict
 import xml.dom.minidom
 import re
-from mip_cde import mipCde, mipCdeString
+from mip_cde import mipCde
 
 
 class SQLGeneratorException(Exception):
@@ -116,7 +116,7 @@ class SQLGenerator():
     def getTablesCdeColumnsQuery(self, existingTables):
         if (len(existingTables)<1): return ""
         sqlStatement = "SELECT * FROM \n"
-        sqlStatement += "(SELECT unnest(array["+mipCdeString+"]) AS column_name) as columns "
+        sqlStatement += "(SELECT unnest(array["+mipCde+"]) AS column_name) as columns "
         sqlStatement += "NATURAL LEFT JOIN \n "
         i = 0
         for table in existingTables:

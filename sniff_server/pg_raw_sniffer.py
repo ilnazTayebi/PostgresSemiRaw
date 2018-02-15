@@ -155,6 +155,7 @@ def drop_create_mip_views(sqlGen,middle_query):
     query = sqlGen.getTablesColumnsQuery(tables)
     columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1','type2'), ('col_name2', 'type0', 'type1','type2'), ...]
     query = sqlGen.getCreateMipLocalFeaturesViewQuery(tables,columns)
+    #logging.info("\tSniffer: CreateMipLocalFeaturesViewQuery: \n '%s'" % (query))
     execute_query(query)
 
     # Create mip_federation_features view (use all tables in mipTablesForFederationView)
@@ -164,6 +165,7 @@ def drop_create_mip_views(sqlGen,middle_query):
     query = sqlGen.getTablesCdeColumnsQuery(tables)
     columns = execute_query(query)  # Return value: [('col_name', 'type0', 'type1', 'type2'), ('col_name2', 'type0', 'type1', 'type2'), ...]
     query = sqlGen.getCreateMipFederationFeaturesViewQuery(tables,columns)
+    #logging.info("\tSniffer: CreateMipFederationFeaturesViewQuery: \n '%s'" % (query))
     execute_query(query)
     return
 
