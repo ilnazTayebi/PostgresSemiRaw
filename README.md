@@ -106,6 +106,6 @@ Following the requirement of the Federation, the `mip_federation_features` view 
 
 The following schema represents the default configuration for the MIP views.
 
-![](mip_views_schema.pdf)
+![Image](mip_views_schema.jpg)
 
 
