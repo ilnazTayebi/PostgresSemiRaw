@@ -55,7 +55,10 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
 
     gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
 
-    { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
+    { echo;
+      echo "#host all all 0.0.0.0/0 $authMethod";
+      echo "host all all 172.0.0.0/8 md5 # Allow connection from Docker containers and localhost";
+    } >> "$PGDATA"/pg_hba.conf
 fi
 
 exec gosu postgres "$@"
