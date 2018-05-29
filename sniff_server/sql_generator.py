@@ -103,6 +103,7 @@ class SQLGenerator():
             # sqlStatement += "WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' "
             # sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
             sqlStatement += "CASE WHEN data_type=\'character\' THEN \'text\' "
+            sqlStatement += "WHEN column_name=\'subjectcode\' THEN \'text\' "
             sqlStatement += "WHEN data_type=\'character varying\' THEN \'text\' "
             sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
             sqlStatement += "ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i "%(i,tblName,i)
@@ -126,6 +127,7 @@ class SQLGenerator():
             # sqlStatement += "WHEN data_type=\'character varying\' AND character_maximum_length IS NOT NULL THEN \'varchar(\'||character_maximum_length||\')\' "
             # sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
             sqlStatement += "CASE WHEN data_type=\'character\' THEN \'text\' "
+            sqlStatement += "WHEN column_name=\'subjectcode\' THEN \'text\' "
             sqlStatement += "WHEN data_type=\'character varying\' THEN \'text\' "
             sqlStatement += "WHEN data_type=\'numeric\' AND numeric_precision IS NOT NULL AND numeric_scale IS NOT NULL THEN \'numeric(\'||numeric_precision||\',\'||numeric_scale||\')\' "
             sqlStatement += "ELSE data_type END AS data_type_%i FROM information_schema.columns WHERE table_name = %s) AS table_%i \n "%(i,tblName,i)
@@ -136,6 +138,36 @@ class SQLGenerator():
         sqlStatement += ";"
         return sqlStatement
 
+
+    def getMostGeneralType(self,type1,type2):
+        # the column types come from getTablesCdeColumnsQuery, so based on tests,
+        # they should be limited to boolean, integer, real, double precision, numeric and text
+
+        # if one of the fields is text, return text
+        if (type1=="text" or type2=="text"):
+            return "text"
+        # if one of the fields is numeric and the other is a numeric type, return numeric
+        if ((type1=="numeric" and type2 in ["numeric","double precision","real","integer","boolean"]) or (type2=="numeric" and type1 in ["double precision","real","integer","boolean"] )):
+            return "numeric"
+        # if one of the fields is double precision and the other is the same or a more limited numeric type, return double precision
+        if ((type1=="double precision" and type2 in ["double precision","real","integer","boolean"]) or (type2=="double precision" and type1 in ["real","integer","boolean"] )):
+            return "double precision"
+        # if both fields are real, return real
+        if (type1=="real" and type2=="real"):
+            return "real"
+        # if both fields are integer, return integer
+        if (type1=="integer" and type2=="integer"):
+            return "integer"
+        # in other cases where both fields have numeric types, return numeric
+        if (type1 in ["numeric","double precision","real","integer","boolean"] and type2 in ["numeric","double precision","real","integer","boolean"]):
+            return "numeric"
+        # if both fields are boolean, return boolean
+        if (type1=="boolean" and type2=="boolean"):
+            return "boolean"
+        # in all other cases, return text
+        return "text"
+
+
     def getCreateMipLocalFeaturesViewQuery(self,tables,columns_info):
         columns_type = [] # Final type for each column, will be used for cast
         n_tables = len(tables)
@@ -143,8 +175,12 @@ class SQLGenerator():
             coltyp = None
             for t in range(1,len(c)):
                 if (c[t]!=None):
-                    coltyp = c[t];
-                    break;
+                    if (coltyp==None):
+                        coltyp = c[t];
+                    else:
+                        coltyp = self.getMostGeneralType(coltyp,c[t]);
+                    #coltyp = c[t];
+                    #break;
             columns_type.append(coltyp)
 
         sqlStatement = 'CREATE VIEW mip_local_features AS\n'
@@ -214,7 +250,7 @@ class SQLGenerator():
         sqlStatement = 'CREATE VIEW mip_federation_features AS SELECT foo.rid,foo.colname,foo.val FROM (\n'
 
         for t in range(1,n_tables+1):
-            tmp = "  SELECT \n    subjectcode AS rid,\n    unnest(array["
+            tmp = "  SELECT \n    subjectcode::text AS rid,\n    unnest(array["
             for c in range(0,len(columns_type)):
                 tmp += "\'%s\',"%(columns_info[c][0])
                 #if (columns_info[c][t]!=None): tmp += "\'%s\',"%(columns_info[c][0])
