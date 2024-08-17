@@ -1,4 +1,4 @@
-#                    Copyright (c) 2016-2017
+#                    Copyright (c) 2016-2016
 #   Data Intensive Applications and Systems Labaratory (DIAS)
 #            Ecole Polytechnique Federale de Lausanne
 #
@@ -16,70 +16,58 @@
 # DISCLAIM ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 # USE OF THIS SOFTWARE.
 
-FROM alpine:3.6 as builder
-MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
-
-ENV LANG=C.UTF-8
-ENV PREFIX=/opt/PostgresRAW
-
-ARG JOBS=1
-ENV JOBS=$JOBS
-
-RUN apk update && \
-    apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
-
-COPY src/PostgresRAW /PostgresRAW
-RUN cd /PostgresRAW && \
-    CFLAGS=-O0 ./configure --prefix=$PREFIX && \
-    make -j $JOBS && \
-    make install
-
-#######################################################################
 FROM alpine:3.6
-# LSC: All environment variables are resetted by the FROM:
-ENV PREFIX=/opt/PostgresRAW
+MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
 
 ARG BUILD_DATE
 ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.name="hbpmip/postgresraw" \
-    org.label-schema.description="Docker image for running PostgresRAW" \
-    org.label-schema.url="https://github.com/HBPMedical/PostgresRAW-docker" \
+    org.label-schema.name="hbpmip/postgresraw-ui" \
+    org.label-schema.description="Docker image for running PostgresRAW-UI" \
+    org.label-schema.url="https://github.com/HBPMedical/PostgresRAW-UI-docker" \
     org.label-schema.vcs-type="git" \
     org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-url="https://github.com/HBPMedical/PostgresRAW" \
+    org.label-schema.vcs-url="https://github.com/HBPMedical/PostgresRAW-UI" \
     org.label-schema.vendor="DIAS EPFL" \
     org.label-schema.docker.dockerfile="Dockerfile" \
     org.label-schema.schema-version="1.0"
 
-# explicitly set user/group IDs
-RUN \
-	delgroup ping && \
-	deluser postgres && \
-	addgroup -g 999 -S postgres && adduser -S -G postgres -u 999 postgres
 
-RUN apk update && apk add readline zlib curl
+RUN apk update && apk add \
+    openssl \
+    py-setuptools \
+    py-psycopg2 \
+    py-flask
 
-RUN mkdir /docker-entrypoint-initdb.d && \
-    curl -o /usr/local/bin/gosu -sSL "https://github.com/tianon/gosu/releases/download/1.2/gosu-amd64" && \
-    chmod +x /usr/local/bin/gosu
+# the default version of requests
+RUN wget https://github.com/requests/requests/archive/v2.13.0.zip && \
+    unzip ../v2.13.0.zip && mv requests* requests && \
+    cd requests && python setup.py install && \
+    rm -rf master requests
 
-COPY --from=builder $PREFIX $PREFIX
-COPY ../../docker-entrypoint.sh /
+# Add the PostgresRAW-UI
+ADD src/sniff_server /opt/postgresraw-ui
+ADD src/static /opt/static
 
-VOLUME /data
+# Display version in the UI
+RUN sed -i "s,VCS_REF,${VCS_REF},;s,BUILD_DATE,${BUILD_DATE}," /opt/static/pg_raw.html
 
-# Not sure if and how the next two parameters are used
-ENV PG_MAJOR 9.6
-ENV PG_VERSION PostgresRAW-$VCS_REF
+EXPOSE 5555
 
-ENV LANG en_US.utf8
+# These default environment variables can be overwritten when running the
+# container (docker run -e FED_DATA_SOURCE="..." or environment: in docker compose)
+ENV FED_DATA_SOURCE="harmonized_clinical_data"
+ENV LOCAL_DATA_SOURCE="mip_cde_features harmonized_clinical_data"
 
-ENV PATH $PATH:$PREFIX/bin
-ENV PGDATA /data/pgdata
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-EXPOSE 5432
-
-CMD ["postgres"]
+CMD cd /opt/postgresraw-ui; exec /usr/bin/python /opt/postgresraw-ui/server.py \
+    --reload \
+    --pg_raw \
+    --host ${POSTGRES_HOST} \
+    --port ${POSTGRES_PORT} \
+    --user ${POSTGRES_USER} \
+    --password ${POSTGRES_PASSWORD} \
+    --dbname ${POSTGRES_DB} \
+    --fed_data_source ${FED_DATA_SOURCE} \
+    --local_data_source ${LOCAL_DATA_SOURCE} \
+    --folder /datasets \
+    --snoop_conf_folder /data/pgdata

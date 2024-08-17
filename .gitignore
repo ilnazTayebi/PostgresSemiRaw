@@ -5,3 +5,4 @@
 /DataDumping/script/import_data.sh
 /DataDumping/commands.txt
 BuildCommands.txt
+*.git
