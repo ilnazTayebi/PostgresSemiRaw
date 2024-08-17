@@ -65,7 +65,7 @@ RUN mkdir /docker-entrypoint-initdb.d && \
     chmod +x /usr/local/bin/gosu
 
 COPY --from=builder $PREFIX $PREFIX
-COPY docker-entrypoint.sh /
+COPY ../../docker-entrypoint.sh /
 
 VOLUME /data
 

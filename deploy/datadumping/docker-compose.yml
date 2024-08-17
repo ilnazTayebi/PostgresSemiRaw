@@ -10,7 +10,11 @@ services:
       MYSQL_PASSWORD: 'password'
       MYSQL_ROOT_PASSWORD: 'password'
     volumes:
-      - ./script/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql    
+      - ./data/:/data/
+      - ./script/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - ./script/import_data.sh:/import_data.sh
+      # command: ["mysqlsh"]
+      # command: mysqlsh -c "import_data.sh"
     ports:
       - '3305:3306'
     expose:      
