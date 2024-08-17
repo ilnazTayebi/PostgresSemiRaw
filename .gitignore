@@ -1,7 +1,6 @@
 .idea
-/DataDumping/dump
 /DataDumping/data
+/DataDumping/dump
 /DataDumping/HCPH
 /DataDumping/commands.txt
 BuildCommands.txt
-
