@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  db:
+    container_name: mysqldb
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'tpch'     
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    volumes:
+      - ./data/:/data/
+      - ./script/initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
+      - ./script/import_data.sh:/import_data.sh
+      # command: ["mysqlsh"]
+      # command: mysqlsh -c "import_data.sh"
+    ports:
+      - '3305:3306'
+    expose:      
+      - '3306'
