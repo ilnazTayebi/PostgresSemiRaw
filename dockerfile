@@ -55,7 +55,7 @@ RUN chmod +x doallsteps.sh
 # RUN chmod +x prepare_data.sh
 
 
-WORKDIR /home/repro/git-repos/JSONSchemaDiscovery/
+WORKDIR /home/repro/git-repos/PostgresSemiRaw/
 COPY scripts/start_script.sh .
 RUN chmod +x start_script.sh
 CMD ["/bin/bash", "start_script.sh"]
