@@ -1,3 +1,7 @@
+*.pyc
+*~
+._*
+
 .idea
 /DataDumping/data
 /DataDumping/dump
