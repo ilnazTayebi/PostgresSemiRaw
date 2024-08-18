@@ -1,0 +1,236 @@
+/**********************************************************
+ sunburst settings
+**********************************************************/
+#sunburst {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: #fff;
+  margin-top: 10px;
+}
+
+#sequence {
+  height: 70px;
+  float: left;
+}
+
+#sequence text {
+  font-weight: 600;
+  fill: #000;
+}
+
+#chart {
+  position: relative;
+  float: left;
+}
+
+#chart text{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#chart path {
+  stroke: #fff;
+}
+
+#midlabel1{
+    font-size:1.2em;
+}
+
+#midlabel2{
+    font-size:1.5em;
+}
+
+.table-container {
+    overflow: scroll;
+    height: 100%;
+    width: 100%;
+}
+.nested-table {
+	width: auto !important;
+	border: 1px solid #ddd;
+	border-collapse: collapse;
+	overflow: scroll !important;
+}
+
+.nested-table th {
+	text-align: center;
+	vertical-align: top;
+	font-weight: bold;
+	background-color: #ddd;
+	border: 1px solid #ccc;
+}
+
+.nested-table td {
+	text-align: left;
+	vertical-align: top;
+	border: 1px solid #ddd;
+}
+
+.nested-table td, th {
+	padding: 5px;
+	min-width: 64px;
+}
+
+
+/**********************************************************
+ circle packing settings
+**********************************************************/
+#circle_chart text {
+  font-size: 11px;
+  pointer-events: none;
+}
+
+#circle_chart text.parent {
+  fill: #1f77b4;
+}
+
+#circle_chart circle {
+  fill: #ccc;
+  stroke: #999;
+  pointer-events: all;
+}
+
+#circle_chart circle.parent {
+  fill: #1f77b4;
+  fill-opacity: .1;
+  stroke: steelblue;
+}
+
+#circle_chart circle.parent:hover {
+  stroke: #ff7f0e;
+  stroke-width: .5px;
+}
+
+#circle_chart circle.child {
+  pointer-events: none;
+}
+
+
+/******************************************
+TreeMap view settings
+*******************************************/
+
+#treemap_chart body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+#treemap_chart form {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+#treemap_chart .node {
+  border: solid 1px white;
+  font: 10px sans-serif;
+  line-height: 12px;
+  overflow: hidden;
+  position: absolute;
+  text-indent: 2px;
+}
+
+
+#treemap_chart text {
+  font-size: 10px;
+}
+/******************************************
+tree view settings
+*******************************************/
+
+#tree_chart .node {
+	cursor: pointer;
+}
+
+#tree_chart .node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+#tree_chart .node text {
+  font: 12px sans-serif;
+}
+
+#tree_chart .link {
+  fill: none;
+/*  stroke: #ccc;*/
+  stroke: #ccc;
+  stroke-width: 3px;
+}
+
+/******************************************
+Bubble chart settings
+*******************************************/
+
+#bubble_chart text {
+  font-size: 10px;
+}
+
+/******************************************
+Heatmap settings
+*******************************************/
+
+#heatmap svg,
+canvas {
+  position: absolute;
+}
+
+#heatmap .axis text {
+  font: 10px sans-serif;
+}
+
+#heatmap .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#heatmap .axis path {
+  display: none;
+}
+
+/******************************************
+Query errors on JC editor
+*******************************************/
+
+.queryError {
+    position:absolute;
+    /*border: 1px solid rgba(221, 240, 255, 0.30);*/
+    /*background:rgba(200,30,30,0.3);*/
+}
+
+.queryError::before{
+    position:absolute;
+    content: '^^';
+    top: +80%;
+    color : red;
+    font-size: 60%;
+}
+
+.lineError {
+    position:absolute;
+    /*border: 1px solid rgba(221, 240, 255, 0.30);*/
+    /*background:rgba(200,30,30,0.3);*/
+}
+
+.lineError::before{
+    position:absolute;
+    content: '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^';
+    top: +80%;
+    color : red;
+    font-size: 60%;
+}
+
+/*the error highlight options for text do not work somehow*/
+.errorHighlight{
+  position:absolute;
+  z-index:20;
+  background-color:rgba(155,60,60,0.3);
+  border: 1px solid rgba(221, 240, 255, 0.30);
+  text-decoration: underline;
+  color : red;
+}
+

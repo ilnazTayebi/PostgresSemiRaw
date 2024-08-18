@@ -1,0 +1,7 @@
+{
+  "build_number":"$BUILD_NUMBER",
+  "build_tag":"$BUILD_TAG",
+  "build_url":"$BUILD_URL",
+  "git_branch":"$GIT_BRANCH",
+  "git_commit":"$GIT_COMMIT"
+}
