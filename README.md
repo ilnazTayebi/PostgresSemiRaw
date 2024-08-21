@@ -1,39 +1,29 @@
-# Docker container for PostgresRAW
+# Docker container for PostgresSemiRAW
 
-This project creates a lightweight Docker image for running PostgresRAW.
+This project creates a lightweight Docker image for running PostgresSemiRAW.
 
 It has been developed on Ubuntu and not tested on other platforms.
 
 ## Clone this project
 
 ```sh
-$ git clone https://github.com/HBPMedical/PostgresRAW-docker.git
-$ cd PostgresRAW-docker
+$ git clone https://github.com/ilnazTayebi/PostgresSemiRaw.git
+$ cd deploy
 ```
 
-## Clone the PostgresRAW sources
+## Build the PostgresSemiRAW docker image
+
+The image is build and given the name 'semiraw/postgresraw' with the following command:
 
 ```sh
-$ git clone https://github.com/HBPMedical/PostgresRAW.git src
-```
-
-## Build the PostgresRAW docker image
-
-The image is build and given the name 'hbpmip/postgresraw' with the following command:
-
-```sh
-$ docker build -t hbpmip/postgresraw \
-    --build-arg JOBS=8 \
-    --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-    --build-arg VCS_REF=`git -C ./src/ rev-parse --short HEAD` \
-    .
+$ docker-compose up --build
 ```
 
 **Warning:** If you update the sources, add `--no-cache=true` to the command above to take the new version in consideration.
 
 **Note:** Replace the `8` in `JOBS=8` with the number of CPU threads to reduce the build time on your machine.
 
-## Use the PostgresRAW docker image
+## Use the PostgresSemiRAW docker image
 
 To start PostgresRAW, you will need two folders to store the data, one for the PostgreSQL data, and one for the raw CSV files.
 

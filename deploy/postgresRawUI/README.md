@@ -23,8 +23,8 @@ $ git clone https://github.com/HBPMedical/PostgresRAW-UI.git src
 
 ```sh
 $ docker build -t hbpmip/postgresraw-ui \
-    --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-    --build-arg VCS_REF=`git -C ./src/ rev-parse --short HEAD` \
+    --build-arg BUILD_DATE='date -u +"%Y-%m-%dT%H:%M:%SZ"' \
+    --build-arg VCS_REF='git -C ./src/ rev-parse --short HEAD' \
     .
 ```
 
