@@ -4,19 +4,6 @@ This project creates a lightweight Docker image for running PostgresRAW.
 
 It has been developed on Ubuntu and not tested on other platforms.
 
-## Clone this project
-
-```sh
-$ git clone https://github.com/HBPMedical/PostgresRAW-docker.git
-$ cd PostgresRAW-docker
-```
-
-## Clone the PostgresRAW sources
-
-```sh
-$ git clone https://github.com/HBPMedical/PostgresRAW.git src
-```
-
 ## Build the PostgresRAW docker image
 
 The image is build and given the name 'hbpmip/postgresraw' with the following command:
@@ -24,8 +11,8 @@ The image is build and given the name 'hbpmip/postgresraw' with the following co
 ```sh
 $ docker build -t hbpmip/postgresraw \
     --build-arg JOBS=8 \
-    --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
-    --build-arg VCS_REF=`git -C ./src/ rev-parse --short HEAD` \
+    --build-arg BUILD_DATE='date -u +"%Y-%m-%dT%H:%M:%SZ"' \
+    --build-arg VCS_REF='git -C ./postgresRaw/ rev-parse --short HEAD' \
     .
 ```
 
@@ -65,7 +52,7 @@ The only specificity compared to a regular PostgreSQL image, is the extra volume
 
 For more information on how to register manually CSV files, please refer to the [source documentation](https://github.com/HBPMedical/PostgresRAW).
 
-You might want to checkout the web interface, which will also watch the folder and automatically register files: [PostgresRAW-UI](https://github.com/HBPMedical/PostgresRAW-UI-docker).
+You might want to checkout the web interface, which will also watch the folder and automatically register files: [PostgresRAW-UI](https://github.com/ilnazTayebi/PostgresSemiRaw/tree/cfca9d04b75daa550b934fd72d528973d7a04558/postgresRawUI).
 
 Alternatively, you can use `psql` as usual, for example, assuming the container was started as above:
 
