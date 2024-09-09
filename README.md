@@ -17,7 +17,7 @@ The image is build and given the name 'semiraw/postgresraw' with the following c
 
 ```sh
 $ export VCS_REF=$(git -C ../src/ rev-parse --short HEAD)
-$ xport BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+$ export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 $ docker-compose up --build
 ```
 
