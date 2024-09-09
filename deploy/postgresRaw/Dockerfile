@@ -29,6 +29,7 @@ RUN apk update && \
     apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
 
 COPY src/PostgresRAW /PostgresRAW
+
 RUN cd /PostgresRAW && \
     CFLAGS=-O0 ./configure --prefix=$PREFIX && \
     make -j $JOBS && \
@@ -52,6 +53,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.docker.dockerfile="Dockerfile" \
     org.label-schema.schema-version="1.0"
 
+
 # explicitly set user/group IDs
 RUN \
 	delgroup ping && \
@@ -65,7 +67,7 @@ RUN mkdir /docker-entrypoint-initdb.d && \
     chmod +x /usr/local/bin/gosu
 
 COPY --from=builder $PREFIX $PREFIX
-COPY docker-entrypoint.sh /
+COPY deploy/postgresRaw/docker-entrypoint.sh /
 
 VOLUME /data
 
