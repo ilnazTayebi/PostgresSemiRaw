@@ -1,0 +1,23 @@
+services:
+  postgresRaw:
+    container_name: postgresRaw
+    image: semiraw/postgresraw
+    build:
+      context: ../
+      dockerfile: ./deploy/postgresRaw/Dockerfile
+      args:
+        JOBS: 8
+        BUILD_DATE: ${BUILD_DATE}
+        VCS_REF: ${VCS_REF}
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: db
+    #
+    ports:
+      - "5554:5432"
+    volumes:
+      - ../data:/data
+      - ../datasets:/datasets:ro
+
+
