@@ -28,8 +28,7 @@ ENV JOBS=$JOBS
 RUN apk update && \
     apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
 
-COPY postgresRaw/PostgresRAW /PostgresRAW
-
+COPY src/PostgresRAW /PostgresRAW
 
 RUN cd /PostgresRAW && \
     CFLAGS=-O0 ./configure --prefix=$PREFIX && \
@@ -53,6 +52,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vendor="DIAS EPFL" \
     org.label-schema.docker.dockerfile="Dockerfile" \
     org.label-schema.schema-version="1.0"
+
 
 # explicitly set user/group IDs
 RUN \
