@@ -10,3 +10,5 @@
 /DataDumping/commands.txt
 BuildCommands.txt
 *.git
+/datasets
+/data
