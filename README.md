@@ -11,21 +11,7 @@ $ git clone https://github.com/ilnazTayebi/PostgresSemiRaw.git
 $ cd deploy
 ```
 
-## Build the PostgresSemiRAW docker image
-
-The image is build and given the name 'semiraw/postgresraw' with the following command:
-
-```sh
-$ export VCS_REF=$(git -C ../src/ rev-parse --short HEAD)
-$ export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-$ docker-compose up --build
-```
-
-**Warning:** If you update the sources, add `--no-cache=true` to the command above to take the new version in consideration.
-
-**Note:** Replace the `8` in `JOBS=8` with the number of CPU threads to reduce the build time on your machine.
-
-## Use the PostgresSemiRAW docker image
+## Build and Use the PostgresSemiRAW docker image
 
 To start PostgresRAW, you will need two folders to store the data, one for the PostgreSQL data, and one for the raw CSV files.
 
@@ -39,19 +25,19 @@ $ mkdir -p $PWD/../datasets
 $ sudo chown 999 $PWD/../data $PWD/../datasets
 ```
 
-You can then start the container with the following command:
+The image is build and given the name 'semiraw/postgresraw' with the following command:
 
 ```sh
-$ docker run --rm \
-    -e POSTGRES_USER=dbuser \
-    -e POSTGRES_PASSWORD=secret \
-    -e POSTGRES_DB=db \
-    -p 5554:5432 \
-    -v $PWD/../data:/data:rw \
-    -v $PWD/../datasets:/datasets:ro \
-    --name PostgresRAW \
-    hbpmip/postgresraw
+$ export VCS_REF=$(git -C ../src/ rev-parse --short HEAD)
+$ export BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+$ export JOBS=$(8)
+$ docker-compose up --build
 ```
+
+**Warning:** If you update the sources, add `--no-cache=true` to the command above to take the new version in consideration.
+
+**Note:** Replace the `8` in `JOBS=8` with the number of CPU threads to reduce the build time on your machine.
+
 
 The only specificity compared to a regular PostgreSQL image, is the extra volume which is mounted read-only on `datasets`. This volume is the folder which contains the CSV files to register as tables.
 
