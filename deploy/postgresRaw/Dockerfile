@@ -17,7 +17,7 @@
 # USE OF THIS SOFTWARE.
 
 FROM alpine:3.6 as builder
-MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
+MAINTAINER Ilnaz Tayebi <tayebi01@ads.uni-passau.de>
 
 ENV LANG=C.UTF-8
 ENV PREFIX=/opt/PostgresRAW

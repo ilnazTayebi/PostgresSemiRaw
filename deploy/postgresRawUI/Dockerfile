@@ -17,7 +17,7 @@
 # USE OF THIS SOFTWARE.
 
 FROM alpine:3.6
-MAINTAINER Lionel Sambuc <lionel.sambuc@epfl.ch>
+MAINTAINER Ilnaz Tayebi <tayebi01@ads.uni-passau.de>
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -33,11 +33,14 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.schema-version="1.0"
 
 
-RUN apk update && apk add \
+RUN apk update && apk add --no-cache \
+     wget \
+    ca-certificates \
     openssl \
     py-setuptools \
     py-psycopg2 \
     py-flask
+
 
 # the default version of requests
 RUN wget https://github.com/requests/requests/archive/v2.13.0.zip && \
@@ -45,9 +48,11 @@ RUN wget https://github.com/requests/requests/archive/v2.13.0.zip && \
     cd requests && python setup.py install && \
     rm -rf master requests
 
+
+
 # Add the PostgresRAW-UI
-ADD src/sniff_server /opt/postgresraw-ui
-ADD src/static /opt/static
+ADD postgresRawUI/sniff_server /opt/postgresraw-ui
+ADD postgresRawUI/static /opt/static
 
 # Display version in the UI
 RUN sed -i "s,VCS_REF,${VCS_REF},;s,BUILD_DATE,${BUILD_DATE}," /opt/static/pg_raw.html

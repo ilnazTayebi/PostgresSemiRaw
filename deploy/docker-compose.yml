@@ -6,16 +6,39 @@ services:
       context: ../
       dockerfile: ./deploy/postgresRaw/Dockerfile
       args:
-        JOBS: 8
+        JOBS: ${JOBS}
         BUILD_DATE: ${BUILD_DATE}
         VCS_REF: ${VCS_REF}
-    environment:
-      POSTGRES_USER: dbuser
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: db
-    #
+    env_file: .env
     ports:
       - "5554:5432"
     volumes:
       - ../data:/data
       - ../datasets:/datasets:ro
+    networks:
+      - postgresRaw
+  ###################################################
+  postgresRawUI:
+    container_name: postgresRaw-ui
+    image: semiraw/postgresraw-ui
+    build:
+      context: ../
+      dockerfile: ./deploy/postgresRawUI/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE}
+        VCS_REF: ${VCS_REF}
+    env_file: .env
+    ports:
+      - "4445:5555"
+    volumes:
+      - ../data:/data
+      - ../datasets:/datasets:ro
+    restart: on-failure
+    depends_on:
+      - postgresRaw
+    links:
+      - postgresRaw:db
+    networks:
+      - postgresRaw
+networks:
+  postgresRaw:
