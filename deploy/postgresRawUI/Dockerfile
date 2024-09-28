@@ -34,7 +34,7 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 
 RUN apk update && apk add --no-cache \
-     wget \
+    wget \
     ca-certificates \
     openssl \
     py-setuptools \

@@ -1,7 +1,8 @@
+name: postgresSemiRaw
 services:
-  postgresRaw:
-    container_name: postgresRaw
-    image: semiraw/postgresraw
+  postgresSemiRaw:
+    container_name: postgresSemiRaw
+    image: postgressemiraw
     build:
       context: ../
       dockerfile: ./deploy/postgresRaw/Dockerfile
@@ -16,11 +17,11 @@ services:
       - ../data:/data
       - ../datasets:/datasets:ro
     networks:
-      - postgresRaw
+      - postgresSemiRaw
   ###################################################
   postgresRawUI:
-    container_name: postgresRaw-ui
-    image: semiraw/postgresraw-ui
+    container_name: postgresSemiRaw-ui
+    image: postgressemiraw-ui
     build:
       context: ../
       dockerfile: ./deploy/postgresRawUI/Dockerfile
@@ -33,12 +34,11 @@ services:
     volumes:
       - ../data:/data
       - ../datasets:/datasets:ro
-    restart: on-failure
     depends_on:
-      - postgresRaw
+      - postgresSemiRaw
     links:
-      - postgresRaw:db
+      - postgresSemiRaw:db
     networks:
-      - postgresRaw
+      - postgresSemiRaw
 networks:
-  postgresRaw:
+  postgresSemiRaw:

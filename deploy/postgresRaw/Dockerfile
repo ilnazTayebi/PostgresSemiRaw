@@ -28,7 +28,8 @@ ENV JOBS=$JOBS
 RUN apk update && \
     apk add git openssh alpine-sdk bison flex perl readline-dev zlib-dev
 
-COPY src/PostgresRAW /PostgresRAW
+COPY postgresRaw/PostgresRAW /PostgresRAW
+
 
 RUN cd /PostgresRAW && \
     CFLAGS=-O0 ./configure --prefix=$PREFIX && \
@@ -43,13 +44,12 @@ ENV PREFIX=/opt/PostgresRAW
 ARG BUILD_DATE
 ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.name="hbpmip/postgresraw" \
+    org.label-schema.name="PostgresSemiRaw" \
     org.label-schema.description="Docker image for running PostgresRAW" \
-    org.label-schema.url="https://github.com/HBPMedical/PostgresRAW-docker" \
+    org.label-schema.url="https://github.com/ilnazTayebi/PostgresSemiRaw" \
     org.label-schema.vcs-type="git" \
     org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-url="https://github.com/HBPMedical/PostgresRAW" \
-    org.label-schema.vendor="DIAS EPFL" \
+    org.label-schema.vcs-url="https://github.com/ilnazTayebi/PostgresSemiRaw" \
     org.label-schema.docker.dockerfile="Dockerfile" \
     org.label-schema.schema-version="1.0"
 
