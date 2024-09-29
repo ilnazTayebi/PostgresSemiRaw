@@ -1,0 +1,44 @@
+name: postgresSemiRaw
+services:
+  postgresSemiRaw:
+    container_name: postgresSemiRaw
+    image: postgressemiraw
+    build:
+      context: ../
+      dockerfile: ./deploy/postgresRaw/Dockerfile
+      args:
+        JOBS: ${JOBS}
+        BUILD_DATE: ${BUILD_DATE}
+        VCS_REF: ${VCS_REF}
+    env_file: .env
+    ports:
+      - "5554:5432"
+    volumes:
+      - ../data:/data
+      - ../datasets:/datasets:ro
+    networks:
+      - postgresSemiRaw
+  ###################################################
+  postgresRawUI:
+    container_name: postgresSemiRaw-ui
+    image: postgressemiraw-ui
+    build:
+      context: ../
+      dockerfile: ./deploy/postgresRawUI/Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE}
+        VCS_REF: ${VCS_REF}
+    env_file: .env
+    ports:
+      - "4445:5555"
+    volumes:
+      - ../data:/data
+      - ../datasets:/datasets:ro
+    depends_on:
+      - postgresSemiRaw
+    links:
+      - postgresSemiRaw:db
+    networks:
+      - postgresSemiRaw
+networks:
+  postgresSemiRaw:
