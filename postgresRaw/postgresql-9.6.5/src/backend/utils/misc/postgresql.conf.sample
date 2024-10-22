@@ -647,6 +647,7 @@
 #------------------------------------------------------------------------------
 conf_file                     = 'snoop.conf'
 enable_invisible_db           = on
+enable_invisible_metadata     = on
 #enable_tuple_metapointers     = off
 #enable_internal_metapointers  = off
 #enable_caching                = off

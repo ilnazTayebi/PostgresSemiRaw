@@ -6,6 +6,7 @@ import threading
 
 cache = {}
 
+#get the time of last modification of the file path
 def safe_mtime(file):
   try:
     return os.path.getmtime(file)
