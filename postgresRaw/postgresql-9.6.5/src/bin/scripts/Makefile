@@ -16,7 +16,7 @@ subdir = src/bin/scripts
 top_builddir = ../../..
 include $(top_builddir)/src/Makefile.global
 
-PROGRAMS = createdb createlang createuser dropdb droplang dropuser clusterdb vacuumdb reindexdb pg_isready
+PROGRAMS = createsemirawdb createdb createlang createuser dropdb droplang dropuser clusterdb vacuumdb reindexdb pg_isready
 
 override CPPFLAGS := -I$(libpq_srcdir) $(CPPFLAGS)
 override LDFLAGS := -L$(top_builddir)/src/fe_utils -lpgfeutils $(libpq_pgport) $(LDFLAGS)
@@ -27,6 +27,7 @@ all: $(PROGRAMS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) $(LDFLAGS_EX) $(LIBS) -o $@$(X)
 
 createdb: createdb.o common.o | submake-libpq submake-libpgport submake-libpgfeutils
+createsemirawdb: createsemirawdb.o common.o | submake-libpq submake-libpgport submake-libpgfeutils
 createlang: createlang.o common.o | submake-libpq submake-libpgport submake-libpgfeutils
 createuser: createuser.o common.o | submake-libpq submake-libpgport submake-libpgfeutils
 dropdb: dropdb.o common.o | submake-libpq submake-libpgport submake-libpgfeutils
@@ -39,6 +40,7 @@ pg_isready: pg_isready.o common.o | submake-libpq submake-libpgport submake-libp
 
 install: all installdirs
 	$(INSTALL_PROGRAM) createdb$(X)   '$(DESTDIR)$(bindir)'/createdb$(X)
+	$(INSTALL_PROGRAM) createsemirawdb$(X)   '$(DESTDIR)$(bindir)'/createsemirawdb$(X)	
 	$(INSTALL_PROGRAM) dropdb$(X)     '$(DESTDIR)$(bindir)'/dropdb$(X)
 	$(INSTALL_PROGRAM) createlang$(X) '$(DESTDIR)$(bindir)'/createlang$(X)
 	$(INSTALL_PROGRAM) droplang$(X)   '$(DESTDIR)$(bindir)'/droplang$(X)
