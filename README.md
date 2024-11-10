@@ -20,9 +20,10 @@ Those two folders need to be owned by the user `999`, which is the `Postgres` us
 You can create those two folders with the following commands:
 
 ```sh
-$ mkdir -p $PWD/../data
+$ mkdir -p $PWD/../data/pgdata
 $ mkdir -p $PWD/../datasets
-$ sudo chown 999 $PWD/../data $PWD/../datasets
+$ mkdir -p $PWD/../result
+$ sudo chown 999 $PWD/../data/pgdata $PWD/../datasets $PWD/../result
 ```
 
 The image is build and given the name 'semiraw/postgresraw' with the following command:
