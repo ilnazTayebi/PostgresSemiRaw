@@ -1450,7 +1450,7 @@ setup_config(void)
 	free(conflines);
 
 	/* Create empty snoop.conf file */
-	
+
 	snprintf(path, sizeof(path), "%s/snoop.conf", pg_data);
 	FILE *snoopFile = fopen(path, "w");
 	if (snoopFile == NULL)
@@ -3323,8 +3323,51 @@ void initialize_data_directory(void)
 	check_ok();
 }
 
+void submitInitdbTime(char *time_result)
+{
+	char *resultdir = "result";
+	char *result_filename = "initdb.csv";
+	char resultPath[128];
+	char resultFile[128];
+	char filePath[128];
+	char *pg_data;
+	DIR *dir;
+	FILE *outfile;
+
+	pg_data = getenv("PGDATA");
+
+	snprintf(resultPath, 128, "%s/../../%s", pg_data, resultdir);
+	fprintf(stderr, "resultPath:%s\n", resultPath);
+	if ((dir = opendir(resultPath)) == NULL)
+	{
+		fprintf(stderr, "Result directory %s not found...", resultPath);
+		return;
+	}
+
+	snprintf(filePath, 128, "%s/%s", resultPath, result_filename);
+
+	if ((outfile = fopen(filePath, "a")) == NULL)
+	{
+		fprintf(stderr, "File %s not found...", outfile);
+		return false;
+	}
+
+	time_t now = time(NULL);
+	struct tm *local_time = localtime(&now);
+
+	/* DB_Type, Execution_Time, Local_Time */
+	fprintf(outfile, "%s, %s", time_result, asctime(local_time));
+
+	fclose(outfile);
+	closedir(dir);
+}
+
 int main(int argc, char *argv[])
 {
+	double time_diff;
+	double time_start = (double)clock();	  /* get initial time */
+	time_start = time_start / CLOCKS_PER_SEC; /*    in seconds    */
+
 	static struct option long_options[] = {
 		{"pgdata", required_argument, NULL, 'D'},
 		{"encoding", required_argument, NULL, 'E'},
@@ -3600,5 +3643,11 @@ int main(int argc, char *argv[])
 		   QUOTE_PATH, bin_dir, (strlen(bin_dir) > 0) ? DIR_SEP : "", QUOTE_PATH,
 		   QUOTE_PATH, pgdata_native, QUOTE_PATH);
 
+	/* Calculate elapsed time */
+	time_diff = (((double)clock()) / CLOCKS_PER_SEC) - time_start;
+	char *exec_time[50];
+	sprintf(exec_time, "%f", time_diff);
+	submitInitdbTime(exec_time);
+	
 	return 0;
 }
