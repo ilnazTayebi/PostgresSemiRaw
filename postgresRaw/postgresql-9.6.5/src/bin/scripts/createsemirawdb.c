@@ -9,6 +9,17 @@
  *
  *-------------------------------------------------------------------------
  */
+
+/*-------------------------------------------------------------------------
+ *
+ * 						PostgresSemiRaw Project
+ *
+ *          Query Processing On Raw Data Files using PostgresSemiRaw
+ * 			    Ilnaz Tayebi Msc. University of Passau - Germany
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "postgres_fe.h"
 
 #include "common.h"
@@ -31,7 +42,8 @@ static char **readfile(const char *path);
 static void help(const char *progname);
 
 /*
- * get the lines from a text file
+ * PostgresSemiRaw:
+ * Get the lines from a text file
  */
 static char **
 readfile(const char *path)
@@ -86,7 +98,8 @@ readfile(const char *path)
 }
 
 /*
- * set name of given input file variable under data directory
+ * PostgresSemiRaw:
+ * Set name of given input file variable under data directory
  */
 static void
 set_input(char **dest, char *filename)
@@ -95,7 +108,8 @@ set_input(char **dest, char *filename)
 }
 
 /*
- * load init schema and create provided tables
+ * PostgresSemiRaw:
+ * Load init schema and create provided tables
  */
 static void
 setup_schema(PGconn *conn, const char *progname)
@@ -166,6 +180,7 @@ setup_schema(PGconn *conn, const char *progname)
 }
 
 /*
+ * PostgresSemiRaw:
  * Run a query, return the results, exit program on failure.
  */
 static PGresult *
