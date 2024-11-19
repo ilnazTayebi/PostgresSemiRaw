@@ -8,14 +8,14 @@
 #include "postgres_fe.h"
 
 #ifndef WIN32
-#include <sys/types.h>			/* (ditto) */
-#include <unistd.h>				/* for geteuid() */
+#include <sys/types.h> /* (ditto) */
+#include <unistd.h>	   /* for geteuid() */
 #else
 #include <win32.h>
 #endif
 
 #ifndef WIN32
-#include <sys/ioctl.h>			/* for ioctl() */
+#include <sys/ioctl.h> /* for ioctl() */
 #endif
 
 #ifdef HAVE_TERMIOS_H
@@ -29,14 +29,12 @@
 #include "settings.h"
 #include "sql_help.h"
 
-
 /*
  * PLEASE:
  * If you change something in this file, also make the same changes
  * in the DocBook documentation, file ref/psql-ref.sgml. If you don't
  * know how to do it, please find someone who can help you.
  */
-
 
 /*
  * usage
@@ -45,13 +43,12 @@
  */
 #define ON(var) (var ? _("on") : _("off"))
 
-void
-usage(unsigned short int pager)
+void usage(unsigned short int pager)
 {
 	const char *env;
 	const char *user;
-	char	   *errstr;
-	FILE	   *output;
+	char *errstr;
+	FILE *output;
 
 	/* Find default user, in case we need it. */
 	user = getenv("PGUSER");
@@ -85,8 +82,8 @@ usage(unsigned short int pager)
 	fprintf(output, _("  -f, --file=FILENAME      execute commands from file, then exit\n"));
 	fprintf(output, _("  -l, --list               list available databases, then exit\n"));
 	fprintf(output, _("  -v, --set=, --variable=NAME=VALUE\n"
-			   "                           set psql variable NAME to VALUE\n"
-				 "                           (e.g., -v ON_ERROR_STOP=1)\n"));
+					  "                           set psql variable NAME to VALUE\n"
+					  "                           (e.g., -v ON_ERROR_STOP=1)\n"));
 	fprintf(output, _("  -V, --version            output version information, then exit\n"));
 	fprintf(output, _("  -X, --no-psqlrc          do not read startup file (~/.psqlrc)\n"));
 	fprintf(output, _("  -1 (\"one\"), --single-transaction\n"
@@ -149,17 +146,15 @@ usage(unsigned short int pager)
 	ClosePager(output);
 }
 
-
 /*
  * slashUsage
  *
  * print out help for the backslash commands
  */
-void
-slashUsage(unsigned short int pager)
+void slashUsage(unsigned short int pager)
 {
-	FILE	   *output;
-	char	   *currdb;
+	FILE *output;
+	char *currdb;
 
 	currdb = PQdb(pset.db);
 
@@ -269,7 +264,7 @@ slashUsage(unsigned short int pager)
 			ON(pset.popt.topt.tuples_only));
 	fprintf(output, _("  \\T [STRING]            set HTML <table> tag attributes, or unset if none\n"));
 	fprintf(output, _("  \\x [on|off|auto]       toggle expanded output (currently %s)\n"),
-		pset.popt.topt.expanded == 2 ? "auto" : ON(pset.popt.topt.expanded));
+			pset.popt.topt.expanded == 2 ? "auto" : ON(pset.popt.topt.expanded));
 	fprintf(output, "\n");
 
 	fprintf(output, _("Connection\n"));
@@ -304,20 +299,21 @@ slashUsage(unsigned short int pager)
 					  "  \\lo_import FILE [COMMENT]\n"
 					  "  \\lo_list\n"
 					  "  \\lo_unlink LOBOID      large object operations\n"));
+	fprintf(output, _("PostgresSemiRaw\n"));
+	fprintf(output, _("  \\exp [NUMBER] ITTERATION    execute the experiment n time(s)\n"));
+	fprintf(output, _("  \\plan [NUMBER] ITTERATION   execute the experiment n time(s) to generate query plan\n"));
 
 	ClosePager(output);
 }
-
 
 /*
  * helpVariables
  *
  * show list of available variables (options) from command line
  */
-void
-helpVariables(unsigned short int pager)
+void helpVariables(unsigned short int pager)
 {
-	FILE	   *output;
+	FILE *output;
 
 	/*
 	 * Keep this line count in sync with the number of lines printed below!
@@ -335,7 +331,7 @@ helpVariables(unsigned short int pager)
 
 	fprintf(output, _("  AUTOCOMMIT         if set, successful SQL commands are automatically committed\n"));
 	fprintf(output, _("  COMP_KEYWORD_CASE  determines the case used to complete SQL key words\n"
-	"                     [lower, upper, preserve-lower, preserve-upper]\n"));
+					  "                     [lower, upper, preserve-lower, preserve-upper]\n"));
 	fprintf(output, _("  DBNAME             the currently connected database name\n"));
 	fprintf(output, _("  ECHO               controls what input is written to standard output\n"
 					  "                     [all, errors, none, queries]\n"));
@@ -420,36 +416,34 @@ helpVariables(unsigned short int pager)
 	ClosePager(output);
 }
 
-
 /*
  * helpSQL -- help with SQL commands
  *
  * Note: we assume caller removed any trailing spaces in "topic".
  */
-void
-helpSQL(const char *topic, unsigned short int pager)
+void helpSQL(const char *topic, unsigned short int pager)
 {
 #define VALUE_OR_NULL(a) ((a) ? (a) : "")
 
 	if (!topic || strlen(topic) == 0)
 	{
 		/* Print all the available command names */
-		int			screen_width;
-		int			ncolumns;
-		int			nrows;
-		FILE	   *output;
-		int			i;
-		int			j;
+		int screen_width;
+		int ncolumns;
+		int nrows;
+		FILE *output;
+		int i;
+		int j;
 
 #ifdef TIOCGWINSZ
 		struct winsize screen_size;
 
 		if (ioctl(fileno(stdout), TIOCGWINSZ, &screen_size) == -1)
-			screen_width = 80;	/* ioctl failed, assume 80 */
+			screen_width = 80; /* ioctl failed, assume 80 */
 		else
 			screen_width = screen_size.ws_col;
 #else
-		screen_width = 80;		/* default assumption */
+		screen_width = 80; /* default assumption */
 #endif
 
 		ncolumns = (screen_width - 3) / (QL_MAX_CMD_LEN + 1);
@@ -477,14 +471,14 @@ helpSQL(const char *topic, unsigned short int pager)
 	}
 	else
 	{
-		int			i,
-					j,
-					x = 0;
-		bool		help_found = false;
-		FILE	   *output = NULL;
-		size_t		len,
-					wordlen;
-		int			nl_count = 0;
+		int i,
+			j,
+			x = 0;
+		bool help_found = false;
+		FILE *output = NULL;
+		size_t len,
+			wordlen;
+		int nl_count = 0;
 
 		/*
 		 * We first try exact match, then first + second words, then first
@@ -494,8 +488,8 @@ helpSQL(const char *topic, unsigned short int pager)
 
 		for (x = 1; x <= 3; x++)
 		{
-			if (x > 1)			/* Nothing on first pass - try the opening
-								 * word(s) */
+			if (x > 1) /* Nothing on first pass - try the opening
+						* word(s) */
 			{
 				wordlen = j = 1;
 				while (topic[j] != ' ' && j++ < len)
@@ -506,7 +500,7 @@ helpSQL(const char *topic, unsigned short int pager)
 					while (topic[j] != ' ' && j++ <= len)
 						wordlen++;
 				}
-				if (wordlen >= len)		/* Don't try again if the same word */
+				if (wordlen >= len) /* Don't try again if the same word */
 				{
 					if (!output)
 						output = PageOutput(nl_count, pager ? &(pset.popt.topt) : NULL);
@@ -553,7 +547,7 @@ helpSQL(const char *topic, unsigned short int pager)
 						break;
 				}
 			}
-			if (help_found)		/* Don't keep trying if we got a match */
+			if (help_found) /* Don't keep trying if we got a match */
 				break;
 		}
 
@@ -564,29 +558,25 @@ helpSQL(const char *topic, unsigned short int pager)
 	}
 }
 
-
-
-void
-print_copyright(void)
+void print_copyright(void)
 {
 	puts(
-		 "PostgreSQL Database Management System\n"
-		 "(formerly known as Postgres, then as Postgres95)\n\n"
-		 "Portions Copyright (c) 1996-2016, PostgreSQL Global Development Group\n\n"
-		 "Portions Copyright (c) 1994, The Regents of the University of California\n\n"
-	"Permission to use, copy, modify, and distribute this software and its\n"
-		 "documentation for any purpose, without fee, and without a written agreement\n"
-	 "is hereby granted, provided that the above copyright notice and this\n"
-	   "paragraph and the following two paragraphs appear in all copies.\n\n"
-		 "IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR\n"
-		 "DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING\n"
-		 "LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS\n"
-		 "DOCUMENTATION, EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE\n"
-		 "POSSIBILITY OF SUCH DAMAGE.\n\n"
-	  "THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,\n"
-		 "INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY\n"
-		 "AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS\n"
-		 "ON AN \"AS IS\" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO\n"
-	"PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.\n"
-		);
+		"PostgreSQL Database Management System\n"
+		"(formerly known as Postgres, then as Postgres95)\n\n"
+		"Portions Copyright (c) 1996-2016, PostgreSQL Global Development Group\n\n"
+		"Portions Copyright (c) 1994, The Regents of the University of California\n\n"
+		"Permission to use, copy, modify, and distribute this software and its\n"
+		"documentation for any purpose, without fee, and without a written agreement\n"
+		"is hereby granted, provided that the above copyright notice and this\n"
+		"paragraph and the following two paragraphs appear in all copies.\n\n"
+		"IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY PARTY FOR\n"
+		"DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING\n"
+		"LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE AND ITS\n"
+		"DOCUMENTATION, EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF THE\n"
+		"POSSIBILITY OF SUCH DAMAGE.\n\n"
+		"THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,\n"
+		"INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY\n"
+		"AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS\n"
+		"ON AN \"AS IS\" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO\n"
+		"PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.\n");
 }
