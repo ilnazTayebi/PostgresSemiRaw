@@ -301,6 +301,7 @@ void slashUsage(unsigned short int pager)
 					  "  \\lo_unlink LOBOID      large object operations\n"));
 	fprintf(output, _("PostgresSemiRaw\n"));
 	fprintf(output, _("  \\exp [NUMBER] ITTERATION    execute the experiment n time(s)\n"));
+	fprintf(output, _("  \\plan [NUMBER] ITTERATION   execute the experiment n time(s) to generate query plan\n"));
 
 	ClosePager(output);
 }

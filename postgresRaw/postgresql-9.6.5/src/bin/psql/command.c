@@ -1731,7 +1731,7 @@ exec_command(const char *cmd,
 	}
 
 	/* \experiment -- execute experiment's queries and calculate each query execution time */
-	else if (strncmp(cmd, "exp", 3) == 0 || strncmp(cmd, "experiment", 10) == 0)
+	else if (strcmp(cmd, "exp") == 0 || strcmp(cmd, "experiment") == 0)
 	{
 		char *db = PQdb(pset.db);
 		char *pg_data;
@@ -1767,12 +1767,30 @@ exec_command(const char *cmd,
 	{
 		char *db = PQdb(pset.db);
 		char *pg_data;
+		char *arg;
 
-		if (db == NULL)
-			printf(_("You are currently not connected to a database.\n"));
+		/* We don't do SQLID reduction on the pattern yet */
+		arg = psql_scan_slash_option(scan_state,
+									 OT_NORMAL, NULL, true);
+
+		if (arg != NULL)
+		{
+			int iterator = atoi(arg);
+
+			if (db == NULL)
+				printf(_("You are currently not connected to a database.\n"));
+			else
+			{
+
+				for (int i = 0; i < iterator; i++)
+					run_experiment(db, true);
+
+				printf("The experiment will be runned '%s' time(s)\n", arg);
+			}
+		}
 		else
 		{
-			run_experiment(db, true);
+			printf("Invalid input: arg is NULL\n");
 		}
 	}
 
@@ -3806,6 +3824,9 @@ executingQuery(const char *query, const char *progname, bool *generate_plan)
 
 	results = PQexec(pset.db, query);
 
+	/* Calculate elapsed time */
+	time_diff = (((double)clock()) / CLOCKS_PER_SEC) - time_start;
+
 	if (!results ||
 		PQresultStatus(results) != PGRES_TUPLES_OK)
 	{
@@ -3821,16 +3842,16 @@ executingQuery(const char *query, const char *progname, bool *generate_plan)
 	{
 		submitExecutionResult(results, progname, query);
 	}
+	else
+	{
+		char *exec_time[50];
 
-	/* Calculate elapsed time */
-	time_diff = (((double)clock()) / CLOCKS_PER_SEC) - time_start;
-	char *exec_time[50];
+		sprintf(exec_time, "%f", time_diff);
 
-	sprintf(exec_time, "%f", time_diff);
+		printf("exec_time: %f\n", exec_time);
 
-	printf("exec_time: %f\n", exec_time);
-
-	submitExecutionTime(exec_time, progname, query);
+		submitExecutionTime(exec_time, progname, query);
+	}
 
 	PQclear(results);
 	return results;
@@ -3850,7 +3871,7 @@ run_experiment(const char *progname, bool *generate_plan)
 	size_t query_alloc = 1024;
 	char buffer[1024];
 
-	fprintf(stderr, "******Start run_experiment*******\n");
+	fprintf(stderr, "Start run_experiment\n");
 
 	set_data_directory(&data_directory);
 
@@ -3949,6 +3970,8 @@ void submitExecutionTime(char *time_result, char *db_type, char *query)
 		return false;
 	}
 
+	fprintf(outfile, "%s,%s,%s,%s", "DB_Type", "Query", "Execution_Time", "Local_Time");
+
 	time_t now = time(NULL);
 	struct tm *local_time = localtime(&now);
 
@@ -4000,6 +4023,7 @@ void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
 	time_t now = time(NULL);
 	struct tm *local_time = localtime(&now);
 
+	fprintf(outfile, "%s,%s,%s,%s", "DB_Type", "Query", "Local_Time", "Query_result");
 	/* Add DB_Type, Query, Local_Time to the CSV file */
 	fprintf(outfile, "\n%s, %s, %s", db_type, query, asctime(local_time));
 
