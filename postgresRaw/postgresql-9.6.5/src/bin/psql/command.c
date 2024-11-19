@@ -13,6 +13,10 @@
  *          Query Processing On Raw Data Files using PostgresSemiRaw
  * 			    Ilnaz Tayebi Msc. University of Passau - Germany
  *
+ * Added two slash command, \exp and \plan , to calculate and save
+ * the experiment's query plan and query execution time.
+ * Queries store in the test/experiment.sql.
+ *
  *-------------------------------------------------------------------------
  */
 
@@ -3895,7 +3899,6 @@ run_experiment(const char *progname, bool *generate_plan)
 	free(query);
 	free(lines);
 }
-
 
 /*
  * PostgresSemiRaw:
