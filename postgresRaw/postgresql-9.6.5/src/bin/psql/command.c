@@ -1731,16 +1731,34 @@ exec_command(const char *cmd,
 	}
 
 	/* \experiment -- execute experiment's queries and calculate each query execution time */
-	else if (strcmp(cmd, "exp") == 0 || strcmp(cmd, "experiment") == 0)
+	else if (strncmp(cmd, "exp", 3) == 0 || strncmp(cmd, "experiment", 10) == 0)
 	{
 		char *db = PQdb(pset.db);
 		char *pg_data;
+		char *arg;
 
-		if (db == NULL)
-			printf(_("You are currently not connected to a database.\n"));
+		/* We don't do SQLID reduction on the pattern yet */
+		arg = psql_scan_slash_option(scan_state,
+									 OT_NORMAL, NULL, true);
+
+		if (arg != NULL)
+		{
+			int iterator = atoi(arg);
+
+			if (db == NULL)
+				printf(_("You are currently not connected to a database.\n"));
+			else
+			{
+
+				for (int i = 0; i < iterator; i++)
+					run_experiment(db, false);
+
+				printf("The experiment will be runned '%s' time(s)\n", arg);
+			}
+		}
 		else
 		{
-			run_experiment(db, false);
+			printf("Invalid input: arg is NULL\n");
 		}
 	}
 
@@ -3881,10 +3899,7 @@ run_experiment(const char *progname, bool *generate_plan)
 		/* Check if the line ends with a semicolon */
 		if (i > 0 && (*line)[i - 1] == ';')
 		{
-			if (generate_plan)
-			{
-				snprintf(buffer, sizeof(buffer), "EXPLAIN %s", query);
-			}
+			generate_plan ? snprintf(buffer, sizeof(buffer), "EXPLAIN %s", query) : snprintf(buffer, sizeof(buffer), "%s", query);
 
 			executingQuery(buffer, progname, generate_plan);
 
