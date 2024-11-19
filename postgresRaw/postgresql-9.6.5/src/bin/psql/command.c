@@ -13,6 +13,10 @@
  *          Query Processing On Raw Data Files using PostgresSemiRaw
  * 			    Ilnaz Tayebi Msc. University of Passau - Germany
  *
+ * Added two slash command, \exp and \plan , to calculate and save
+ * the experiment's query plan and query execution time.
+ * Queries store in the test/experiment.sql.
+ *
  *-------------------------------------------------------------------------
  */
 
@@ -72,8 +76,8 @@ static char *experiment_path = "test";
 
 #define exit_nicely(code) exit(code)
 
-static PGresult *executingQuery(const char *query, const char *progname);
-static void run_experiment(const char *progname);
+static PGresult *executingQuery(const char *query, const char *progname, bool *generate_plan);
+static void run_experiment(const char *progname, bool *generate_plan);
 static void set_input(char **dest, const char *data_dir, char *filename);
 static char **readfile(const char *path);
 
@@ -1736,7 +1740,21 @@ exec_command(const char *cmd,
 			printf(_("You are currently not connected to a database.\n"));
 		else
 		{
-			run_experiment(db);
+			run_experiment(db, false);
+		}
+	}
+
+	/* \plan -- execute experiment's queries and calculate each query plan */
+	else if (strcmp(cmd, "plan") == 0)
+	{
+		char *db = PQdb(pset.db);
+		char *pg_data;
+
+		if (db == NULL)
+			printf(_("You are currently not connected to a database.\n"));
+		else
+		{
+			run_experiment(db, true);
 		}
 	}
 
@@ -3755,7 +3773,7 @@ set_data_directory(char **data_directory)
  * Run a query, return the results, exit program on failure.
  */
 static PGresult *
-executingQuery(const char *query, const char *progname)
+executingQuery(const char *query, const char *progname, bool *generate_plan)
 {
 	PGresult *results;
 	PQExpBuffer query_buffer = createPQExpBuffer();
@@ -3769,14 +3787,21 @@ executingQuery(const char *query, const char *progname)
 	time_start = time_start / CLOCKS_PER_SEC; /*    in seconds    */
 
 	results = PQexec(pset.db, query);
+
 	if (!results ||
 		PQresultStatus(results) != PGRES_TUPLES_OK)
 	{
-		fprintf(stderr, _("%s: query failed"), progname);
+		fprintf(stderr, _("%s: query failed\n"), progname);
 		fprintf(stderr, _("%s: query was: %s\n"),
 				progname, query);
+		fprintf(stderr, _("result: %s\n"), results);
 
 		exit_nicely(1);
+	}
+
+	if (generate_plan)
+	{
+		submitExecutionResult(results, progname, query);
 	}
 
 	/* Calculate elapsed time */
@@ -3787,7 +3812,7 @@ executingQuery(const char *query, const char *progname)
 
 	printf("exec_time: %f\n", exec_time);
 
-	submitInitdbTime(exec_time, progname, query);
+	submitExecutionTime(exec_time, progname, query);
 
 	PQclear(results);
 	return results;
@@ -3795,16 +3820,17 @@ executingQuery(const char *query, const char *progname)
 
 /*
  * PostgresSemiRaw:
- * load init schema and create provided tables
+ * load experiment.sql and run experiment queries and calculate the query execution time
  */
 static void
-run_experiment(const char *progname)
+run_experiment(const char *progname, bool *generate_plan)
 {
 	char **line;
 	char **lines;
 	char *query = NULL;
 	size_t query_len = 0;
 	size_t query_alloc = 1024;
+	char buffer[1024];
 
 	fprintf(stderr, "******Start run_experiment*******\n");
 
@@ -3855,7 +3881,12 @@ run_experiment(const char *progname)
 		/* Check if the line ends with a semicolon */
 		if (i > 0 && (*line)[i - 1] == ';')
 		{
-			executingQuery(query, progname);
+			if (generate_plan)
+			{
+				snprintf(buffer, sizeof(buffer), "EXPLAIN %s", query);
+			}
+
+			executingQuery(buffer, progname, generate_plan);
 
 			/* Reset query buffer for the next query */
 			query[0] = '\0';
@@ -3876,7 +3907,7 @@ run_experiment(const char *progname)
  * It is supposed that the data_directory is data/pgdata.
  * DB_Type, Query, Execution_Time, Local_Time
  */
-void submitInitdbTime(char *time_result, char *db_type, char *query)
+void submitExecutionTime(char *time_result, char *db_type, char *query)
 {
 	char *resultdir = "result";
 	char *result_filename = "queryExecTime.csv";
@@ -3909,6 +3940,86 @@ void submitInitdbTime(char *time_result, char *db_type, char *query)
 	/* DB_Type, Query, Execution_Time, Local_Time */
 	fprintf(outfile, "\n%s, %s, %s, %s", db_type, query, time_result, asctime(local_time));
 
+	fclose(outfile);
+	closedir(dir);
+}
+
+/*
+ * PostgresSemiRaw:
+ * Save query execution timeresult into the queryPlan.csv located
+ * in folder named result and it is located beside the data folder.
+ * It is supposed that the data_directory is data/pgdata.
+ * DB_Type, Query, Local_Time, Query_result
+ */
+void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
+{
+	char *resultdir = "result";
+	char *result_filename = "queryPlan.csv";
+	char resultPath[MAX_PATH_LENGTH];
+	char resultFile[MAX_FILENAME];
+	char filePath[MAX_PATH_LENGTH];
+	char *res = NULL;
+
+	DIR *dir;
+	FILE *outfile;
+
+	int nrows = PQntuples(query_result);
+	int nfields = PQnfields(query_result);
+
+	snprintf(resultPath, MAX_PATH_LENGTH, "%s/../../%s", data_directory, resultdir);
+
+	if ((dir = opendir(resultPath)) == NULL)
+	{
+		fprintf(stderr, "Result directory %s not found...", resultPath);
+		return;
+	}
+
+	snprintf(filePath, MAX_PATH_LENGTH, "%s/%s", resultPath, result_filename);
+
+	if ((outfile = fopen(filePath, "a")) == NULL)
+	{
+		fprintf(stderr, "File %s not found...", outfile);
+		return false;
+	}
+
+	time_t now = time(NULL);
+	struct tm *local_time = localtime(&now);
+
+	/* Add DB_Type, Query, Local_Time to the CSV file */
+	fprintf(outfile, "\n%s, %s, %s", db_type, query, asctime(local_time));
+
+	/* Iterate over each row of the query result */
+	for (int i = 0; i < nrows; i++)
+	{
+		size_t estimated_size = 0;
+		for (int j = 0; j < nfields; j++)
+		{
+			estimated_size += strlen(PQgetvalue(query_result, i, j)) + 2; // +1 for separators
+		}
+
+		char *res = (char *)malloc(estimated_size * sizeof(char));
+		if (res == NULL)
+		{
+			fprintf(stderr, "Memory allocation failed for result\n");
+			fclose(outfile);
+			closedir(dir);
+			return;
+		}
+
+		res[0] = '\0';
+		/* Concatenate the row's data into a single string for the query result's column */
+		for (int j = 0; j < nfields; j++)
+		{
+			strcat(res, PQgetvalue(query_result, i, j));
+			if (i < nrows - 1)
+				strcat(res, "\n");
+		}
+
+		/* Add Query_result to the CSV file */
+		fprintf(outfile, "%s", res);
+	}
+
+	free(res);
 	fclose(outfile);
 	closedir(dir);
 }
