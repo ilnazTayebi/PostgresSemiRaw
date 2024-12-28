@@ -16,7 +16,7 @@
  * Added two slash command, \exp and \plan , to calculate and save
  * the experiment's query plan and query execution time.
  * Queries store in the test/experiment.sql.
- *
+ * Added slach command, \resetexp , to reset the experiment's result files.
  *-------------------------------------------------------------------------
  */
 
@@ -1749,7 +1749,6 @@ exec_command(const char *cmd,
 				printf(_("You are currently not connected to a database.\n"));
 			else
 			{
-
 				for (int i = 0; i < iterator; i++)
 					run_experiment(db, false);
 
@@ -1781,7 +1780,6 @@ exec_command(const char *cmd,
 				printf(_("You are currently not connected to a database.\n"));
 			else
 			{
-
 				for (int i = 0; i < iterator; i++)
 					run_experiment(db, true);
 
@@ -1791,6 +1789,23 @@ exec_command(const char *cmd,
 		else
 		{
 			printf("Invalid input: arg is NULL\n");
+		}
+	}
+
+	/* \resetexp -- reset experiment's result files */
+	else if (strcmp(cmd, "resetexp") == 0)
+	{
+		char *db = PQdb(pset.db);
+		// char *pg_data;
+
+		if (db == NULL)
+			printf(_("You are currently not connected to a database.\n"));
+		else
+		{
+			set_data_directory(&data_directory);
+
+			resetQueryExecTimeResult();
+			resetQueryPlanResult();
 		}
 	}
 
@@ -3781,8 +3796,7 @@ set_input(char **dest, const char *data_dir, char *filename)
  * PostgresSemiRaw:
  * Get and set the data_directory
  */
-static void
-set_data_directory(char **data_directory)
+void set_data_directory(char **data_directory)
 {
 	PGresult *res;
 	const char *query = "SHOW data_directory;";
@@ -3848,7 +3862,7 @@ executingQuery(const char *query, const char *progname, bool *generate_plan)
 
 		sprintf(exec_time, "%f", time_diff);
 
-		printf("exec_time: %f\n", exec_time);
+		// printf("exec_time: %f\n", exec_time);
 
 		submitExecutionTime(exec_time, progname, query);
 	}
@@ -3871,7 +3885,7 @@ run_experiment(const char *progname, bool *generate_plan)
 	size_t query_alloc = 1024;
 	char buffer[1024];
 
-	fprintf(stderr, "Start run_experiment\n");
+	fprintf(stderr, "run_experiment\n");
 
 	set_data_directory(&data_directory);
 
@@ -3937,6 +3951,20 @@ run_experiment(const char *progname, bool *generate_plan)
 }
 
 /*
+ * Remove trailing newline, carriage return, and spaces
+ */
+void cleanQuery(char *query)
+{
+	if (query == NULL)
+		return;
+	size_t len = strlen(query);
+	while (len > 0 && (query[len - 1] == '\n' || query[len - 1] == '\r' || query[len - 1] == ' '))
+	{
+		query[--len] = '\0';
+	}
+}
+
+/*
  * PostgresSemiRaw:
  * Save query execution time into the queryExecTime.csv located
  * in folder named result and it is located beside the data folder.
@@ -3970,13 +3998,14 @@ void submitExecutionTime(char *time_result, char *db_type, char *query)
 		return false;
 	}
 
-	fprintf(outfile, "%s,%s,%s,%s", "DB_Type", "Query", "Execution_Time", "Local_Time");
+	cleanQuery(query);
 
 	time_t now = time(NULL);
-	struct tm *local_time = localtime(&now);
+	char time_buffer[30];
+	strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
 	/* DB_Type, Query, Execution_Time, Local_Time */
-	fprintf(outfile, "\n%s, %s, %s, %s", db_type, query, time_result, asctime(local_time));
+	fprintf(outfile, "\n%s,'%s',%s,%s", db_type, query, time_result, time_buffer);
 
 	fclose(outfile);
 	closedir(dir);
@@ -4020,12 +4049,14 @@ void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
 		return false;
 	}
 
-	time_t now = time(NULL);
-	struct tm *local_time = localtime(&now);
+	cleanQuery(query);
 
-	fprintf(outfile, "%s,%s,%s,%s", "DB_Type", "Query", "Local_Time", "Query_result");
+	time_t now = time(NULL);
+	char time_buffer[30];
+	strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", localtime(&now));
+
 	/* Add DB_Type, Query, Local_Time to the CSV file */
-	fprintf(outfile, "\n%s, %s, %s", db_type, query, asctime(local_time));
+	fprintf(outfile, "\n%s,'%s',%s,'", db_type, query, time_buffer);
 
 	/* Iterate over each row of the query result */
 	for (int i = 0; i < nrows; i++)
@@ -4058,7 +4089,87 @@ void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
 		fprintf(outfile, "%s", res);
 	}
 
+	fprintf(outfile, "'");
+
 	free(res);
+	fclose(outfile);
+	closedir(dir);
+}
+
+/*
+ * PostgresSemiRaw:
+ * Makes the queryPlan.csv to be empty. It is located
+ * in folder named result and it is located beside the data folder.
+ * It is supposed that the data_directory is data/pgdata.
+ * DB_Type, Query, Local_Time, Query_result
+ */
+void resetQueryPlanResult()
+{
+	char *resultdir = "result";
+	char *result_filename = "queryPlan.csv";
+	char resultPath[MAX_PATH_LENGTH];
+	char resultFile[MAX_FILENAME];
+	char filePath[MAX_PATH_LENGTH];
+
+	DIR *dir;
+	FILE *outfile;
+
+	snprintf(resultPath, MAX_PATH_LENGTH, "%s/../../%s", data_directory, resultdir);
+
+	if ((dir = opendir(resultPath)) == NULL)
+	{
+		fprintf(stderr, "Result directory %s not found...", resultPath);
+		return;
+	}
+
+	snprintf(filePath, MAX_PATH_LENGTH, "%s/%s", resultPath, result_filename);
+
+	if ((outfile = fopen(filePath, "w")) == NULL)
+	{
+		fprintf(stderr, "File %s not found...", outfile);
+		return false;
+	}
+
+	fprintf(outfile, "%s,%s,%s,%s", "DB_Type", "Query", "Local_Time", "Query_result");
+	fclose(outfile);
+	closedir(dir);
+}
+
+/*
+ * PostgresSemiRaw:
+ * Makes the queryExecTime.csv to be empty. It is located
+ * in folder named result and it is located beside the data folder.
+ * It is supposed that the data_directory is data/pgdata.
+ * DB_Type, Query, Execution_Time, Query_result
+ */
+void resetQueryExecTimeResult()
+{
+	char *resultdir = "result";
+	char *result_filename = "queryExecTime.csv";
+	char resultPath[MAX_PATH_LENGTH];
+	char resultFile[MAX_FILENAME];
+	char filePath[MAX_PATH_LENGTH];
+
+	DIR *dir;
+	FILE *outfile;
+
+	snprintf(resultPath, MAX_PATH_LENGTH, "%s/../../%s", data_directory, resultdir);
+
+	if ((dir = opendir(resultPath)) == NULL)
+	{
+		fprintf(stderr, "Result directory %s not found...", resultPath);
+		return;
+	}
+
+	snprintf(filePath, MAX_PATH_LENGTH, "%s/%s", resultPath, result_filename);
+
+	if ((outfile = fopen(filePath, "w")) == NULL)
+	{
+		fprintf(stderr, "File %s not found...", outfile);
+		return false;
+	}
+
+	fprintf(outfile, "%s,%s,%s,%s", "DB_Type", "Query", "Execution_Time", "Local_Time");
 	fclose(outfile);
 	closedir(dir);
 }
