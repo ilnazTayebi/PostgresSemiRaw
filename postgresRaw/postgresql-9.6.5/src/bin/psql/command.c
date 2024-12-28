@@ -4000,7 +4000,7 @@ void submitExecutionTime(char *time_result, char *db_type, char *query)
 
 	cleanQuery(query);
 
-	time_t now = time(NULL);	
+	time_t now = time(NULL);
 	char time_buffer[30];
 	strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
@@ -4049,11 +4049,14 @@ void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
 		return false;
 	}
 
+	cleanQuery(query);
+
 	time_t now = time(NULL);
-	struct tm *local_time = localtime(&now);
+	char time_buffer[30];
+	strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
 	/* Add DB_Type, Query, Local_Time to the CSV file */
-	fprintf(outfile, "\n%s, '%s', %s", db_type, query, asctime(local_time));
+	fprintf(outfile, "\n%s,'%s',%s,'", db_type, query, time_buffer);
 
 	/* Iterate over each row of the query result */
 	for (int i = 0; i < nrows; i++)
@@ -4085,6 +4088,8 @@ void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
 		/* Add Query_result to the CSV file */
 		fprintf(outfile, "%s", res);
 	}
+
+	fprintf(outfile, "'");
 
 	free(res);
 	fclose(outfile);
