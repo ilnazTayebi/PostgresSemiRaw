@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
+import os
+from matplotlib.colors import TABLEAU_COLORS
 
 
 def plot_execution_time_over_time(data):
@@ -32,6 +34,7 @@ def plot_execution_time_over_time(data):
 
     plt.savefig("exetime_Line.png", dpi=300, bbox_inches="tight")
 
+
 def rename_queries(data):
     """Rename queries to Q1, Q2, etc."""
     unique_queries = data['Query'].unique()
@@ -39,6 +42,7 @@ def rename_queries(data):
                      query in enumerate(unique_queries)}
     data['Query_name'] = data['Query'].map(query_mapping)
     return data, query_mapping
+
 
 def plot_execution_time_queries(data):
     """Plot execution time changes for each query."""
@@ -67,6 +71,7 @@ def plot_execution_time_queries(data):
 
     plt.savefig("execution_time_per_query.png",
                 dpi=300, bbox_inches="tight")
+
 
 def plot_query_execution_time_by_db_type(data):
     """
@@ -112,43 +117,72 @@ def plot_query_execution_time_by_db_type(data):
     plt.savefig("query_execution_time_by_db_type.png",
                 dpi=300, bbox_inches="tight")
 
+
 def plot_execution_time_over_query(data):
     """
     Plot execution time over the repeats for each query, grouped by DB_Type.
+    Each DB_Type is represented by a unique color, with markers shown only at the beginning and end of each line.
+    Alongside each plot, generate a LaTeX file that includes the plot.
     """
-    plt.figure(figsize=(12, 8))
 
-    # Define unique line styles for DB_Type
-    db_types = data['DB_Type'].unique()
-    line_styles = ['-', '--', '-.', ':']
-    line_style_map = {db_type: line_styles[i % len(
-        line_styles)] for i, db_type in enumerate(db_types)}
+    image_folder = "charts-eval-exp-time"
 
-    # Define colors for each query
     queries = data['Query_name'].unique()
-    colors = plt.cm.tab10.colors
-    color_map = {query: colors[i % len(colors)]
-                 for i, query in enumerate(queries)}
+
+    colors = list(TABLEAU_COLORS.values())  # Extract the colors
+    num_colors = len(colors)
+
+    db_types = data['DB_Type'].unique()
+    color_map = {db_type: colors[i % num_colors]
+                 for i, db_type in enumerate(db_types)}
+
     for query in queries:
-        for db_type in db_types:
+        plt.figure(figsize=(12, 8))
+
+        actual_query = data[data['Query_name'] == query]['Query'].iloc[0]
+
+        for db_type in data['DB_Type'].unique():
             query_data = data[(data['Query_name'] == query)
                               & (data['DB_Type'] == db_type)]
+
             if not query_data.empty:
+                color = color_map[db_type]
+
                 plt.plot(
                     query_data['Repeat_Count'],
                     query_data['Execution_Time'],
-                    label=f"{query} ({db_type})",
-                    linestyle=line_style_map[db_type],
-                    color=color_map[query],
-                    alpha=0.7
+                    label=f"{db_type}",
+                    color=color,
+                    alpha=0.8,
+                    linestyle='-'
                 )
 
-        plt.title(
-            "Query Execution Time Over the " + str(data['Repeat_Count'].max()) + " times of execution In various Database Types", fontsize=16)
-        plt.xlabel("Number of query execution", fontsize=14)
-        plt.ylabel("Execution Time (s)", fontsize=14)
-        plt.legend(title="Queries (Database)", fontsize=10, title_fontsize=14)
+                # Add markers only at the beginning and end
+                plt.scatter(
+                    [query_data['Repeat_Count'].iloc[0],
+                        query_data['Repeat_Count'].iloc[-1]],
+                    [query_data['Execution_Time'].iloc[0],
+                        query_data['Execution_Time'].iloc[-1]],
+                    color=color,
+                    marker='o',
+                    s=40,  # Marker size
+                    zorder=5  # Place markers on top
+                )
+
+        plt.xlabel("Number of query execution", fontsize=16)
+        plt.ylabel("Execution Time (s)", fontsize=16)
+        plt.legend(title="Database", fontsize=12,
+                   title_fontsize=14,
+                   loc="best")
         plt.grid(True)
+
+        plt.title(
+            f"Query Execution Time Over {data['Repeat_Count'].max()}  times of execution In various Database Types",
+            fontsize=12
+        )
+        # caption = f"{query}: {actual_query}"
+        # plt.figtext(0.01, -0.05, caption, wrap=True,
+        #             horizontalalignment='left', fontsize=12)
 
         # Save and show the plot
         plt.tight_layout()
@@ -159,6 +193,25 @@ def plot_execution_time_over_query(data):
         plt.savefig(filename,
                     dpi=300, bbox_inches="tight")
         plt.clf()
+
+        # Generate LaTeX file for the plot
+        caption_latex = actual_query.replace("_", r"\_")
+
+        full_caption_latex = f"Query Execution Time Over {data['Repeat_Count'].max()} times of execution In various Database Types. " + \
+            f"{query}: {caption_latex}"
+
+        latex_content = (
+            f"\\begin{{figure}}[hbt!]\n"
+            f"\\centering\n"
+            f"\\includegraphics[width=1.0\\linewidth]{{charts-eval-exp-time/{filename}}}\n"
+            f"\\caption[{query}:result]{{{full_caption_latex}}}\n"
+            f"\\label{{fig:{filename.replace('.png', '')}}}\n"
+            f"\\end{{figure}}\n"
+        )
+        latex_filename = f"{filename.replace('.png', '.tex')}"
+
+        with open(latex_filename, "w") as f:
+            f.write(latex_content)
 
 
 def main():

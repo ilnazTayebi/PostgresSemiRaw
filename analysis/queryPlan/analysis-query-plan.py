@@ -11,15 +11,19 @@ def rename_queries(data):
     return data, query_mapping
 
 
-def generate_query_plan_latex_file(data):
+def generate_db_short_names(db_types):
+    """Generate short names (db1, db2, ...) for database types."""
+    return {db_type: f"db{i + 1}" for i, db_type in enumerate(db_types)}
 
-    # Define unique line styles for DB_Type
+
+def generate_query_plan_latex_file_all_db(data):
+
     db_types = data['DB_Type'].unique()
 
-    # Define colors for each query
     queries = data['Query_name'].unique()
 
     for query in queries:
+        latex_content = ""
         for db_type in db_types:
             query_data = data[(data['Query_name'] == query)
                               & (data['DB_Type'] == db_type)]
@@ -28,34 +32,92 @@ def generate_query_plan_latex_file(data):
                 explain_query = f"{query_data['Query'].iloc[0]}"
 
                 # Create LaTeX content
-                latex_content = (
-                    f"\\begin{{figure}}[h]\n"
-                    f"\\centering\n"
+                latex_content += (
+
                     f"    \\begin{{minted}}\n"
                     f"    [\n"
                     f"    framesep=2mm,\n"
                     f"    baselinestretch=1.2,\n"
                     f"    bgcolor=LightGray,\n"
-                    f"    fontsize=\\footnotesize\n"
+                    f"    fontsize=\\footnotesize,\n"
+                    f"    breaklines=true\n"
                     f"    ]{{text}}\n"
-                    f"    {explain_query};\n"
+                    f"    Database: {db_type}\n"
+                    f"    {explain_query}\n"
                     f"                                        QUERY PLAN\n"
                     f"    ----------------------------------------------------------------\n"
                     f"    {query_plan}\n"
                     f"    \\end{{minted}}\n"
-                    f"\\caption{{Example of an EXPLAIN Query. Query over the TPCH dataset with the SF 0.1.}}\n"
+
+                )
+        latex_content = (
+            f"\\begin{{figure}}[h]\n"
+            f"\\centering\n"
+            f"{latex_content}"
+            f"\\caption*{{Query Plan for {query}. Query over the TPCH dataset with the SF 0.1.}}\n"
+            f"\\label{{fig:explain-{query.replace(' ', '-').lower()}}}\n"
+            f"\\end{{figure}}"
+        )
+        filename = f"query_plan_{query.replace(' ', '_').replace('*', 'all')}.tex"
+        filename = "".join(
+            c for c in filename if c.isalnum() or c in ['_', '.', '-'])
+
+        with open(filename, "w") as f:
+            f.write(latex_content)
+
+        print(f"Generated LaTeX file: {filename}")
+
+def generate_query_plan_latex_file(data):
+    
+    db_types = data['DB_Type'].unique()
+    db_short_names = generate_db_short_names(db_types)
+    
+    queries = data['Query_name'].unique()
+
+    for query in queries:
+        for db_type in db_types:
+            query_data = data[(data['Query_name'] == query) & (data['DB_Type'] == db_type)]
+            if not query_data.empty:
+                # Extract query plan and explain query
+                query_plan = query_data['Query_result'].iloc[0].strip()
+                explain_query = query_data['Query'].iloc[0].strip()
+
+                # Create LaTeX content (fragment)
+                latex_content = (
+                    # f"\\section*{{Query Plan for {query}}}\n"
+                    # f"\\subsection*{{Database: {db_type}}}\n"
+                    f"\\begin{{minted}}\n"
+                    f"[\n"
+                    f"framesep=2mm,\n"
+                    f"baselinestretch=1.2,\n"
+                    f"bgcolor=LightGray,\n"
+                    f"fontsize=\\footnotesize,\n"
+                    f"breaklines=true\n"
+                    f"]{{text}}\n"                    
+                    f"{explain_query};\n"
+                    f"                                        QUERY PLAN\n"
+                    f"----------------------------------------------------------------\n"
+                    f"{query_plan}\n"
+                    f"\\end{{minted}}\n"
+                )
+                latex_content = (
+                    f"\\begin{{figure}}[h]\n"
+                    f"\\centering\n"
+                    f"{latex_content}"
+                    f"\\caption*{{Query Plan for Database: {db_type} and {query}. Query over the TPCH dataset with the SF 0.1.}}\n"
                     f"\\label{{fig:explain-{query.replace(' ', '-').lower()}}}\n"
                     f"\\end{{figure}}"
                 )
+                # Generate filename
+                db_short_name = db_short_names[db_type]
+                filename = f"query_plan_{query}_{db_short_name}.tex"
+                filename = "".join(c for c in filename if c.isalnum() or c in ['_', '.', '-'])
 
-                filename = f"query_plan_{query.replace(' ', '_').replace('*', 'all')}.tex"
-                filename = "".join(
-                    c for c in filename if c.isalnum() or c in ['_', '.', '-'])
-
+                # Write LaTeX fragment to file
                 with open(filename, "w") as f:
                     f.write(latex_content)
 
-                print(f"Generated LaTeX file: {filename}")
+                print(f"Generated LaTeX fragment: {filename}")
 
 
 def main():
