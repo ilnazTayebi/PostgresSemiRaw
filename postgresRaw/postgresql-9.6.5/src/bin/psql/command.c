@@ -3825,21 +3825,23 @@ void set_data_directory(char **data_directory)
 static PGresult *
 executingQuery(const char *query, const char *progname, bool *generate_plan)
 {
+	struct timeval start, end;
+	double time_diff;
+
 	PGresult *results;
 	PQExpBuffer query_buffer = createPQExpBuffer();
 
 	appendPQExpBufferStr(query_buffer, query);
 
 	printf("%s\n", query);
-
-	double time_diff;
-	double time_start = (double)clock();	  /* get initial time */
-	time_start = time_start / CLOCKS_PER_SEC; /*    in seconds    */
+	gettimeofday(&start, NULL);
 
 	results = PQexec(pset.db, query);
 
-	/* Calculate elapsed time */
-	time_diff = (((double)clock()) / CLOCKS_PER_SEC) - time_start;
+	/* Calculate elapsed time in seconds */
+	gettimeofday(&end, NULL);
+	time_diff = (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000000.0;
+	printf("Elapsed Time: %f seconds\n", time_diff);
 
 	if (!results ||
 		PQresultStatus(results) != PGRES_TUPLES_OK)
