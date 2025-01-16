@@ -125,19 +125,23 @@ def plot_execution_time_over_query(data):
     Alongside each plot, generate a LaTeX file that includes the plot.
     """
 
-    image_folder = "charts-eval-exp-time"
-
     queries = data['Query_name'].unique()
 
-    colors = list(TABLEAU_COLORS.values())  # Extract the colors
+    colors = list(TABLEAU_COLORS.values())
     num_colors = len(colors)
 
     db_types = data['DB_Type'].unique()
     color_map = {db_type: colors[i % num_colors]
                  for i, db_type in enumerate(db_types)}
 
+    image_paths = []
     for query in queries:
-        plt.figure(figsize=(12, 8))
+        query_data = data[data['Query_name'] == query]
+        if query_data['Execution_Time'].dropna().empty:
+            print(f"Skipping plot for {query} as Execution_Time is empty.")
+            continue
+
+        plt.figure(figsize=(5, 5))
 
         actual_query = data[data['Query_name'] == query]['Query'].iloc[0]
 
@@ -169,20 +173,13 @@ def plot_execution_time_over_query(data):
                     zorder=5  # Place markers on top
                 )
 
-        plt.xlabel("Number of query execution", fontsize=16)
-        plt.ylabel("Execution Time (s)", fontsize=16)
+        plt.xlabel("Number of query execution", fontsize=12)
+        plt.ylabel("Execution Time (s)", fontsize=12)
         plt.legend(title="Database", fontsize=12,
-                   title_fontsize=14,
-                   loc="best")
+                   title_fontsize=12,
+                   loc="lower right",
+                   bbox_to_anchor=(1, 0.13))
         plt.grid(True)
-
-        plt.title(
-            f"Query Execution Time Over {data['Repeat_Count'].max()}  times of execution In various Database Types",
-            fontsize=12
-        )
-        # caption = f"{query}: {actual_query}"
-        # plt.figtext(0.01, -0.05, caption, wrap=True,
-        #             horizontalalignment='left', fontsize=12)
 
         # Save and show the plot
         plt.tight_layout()
@@ -194,11 +191,12 @@ def plot_execution_time_over_query(data):
                     dpi=300, bbox_inches="tight")
         plt.clf()
 
+        ###########################################################################################
         # Generate LaTeX file for the plot
+        ###########################################################################################
         caption_latex = actual_query.replace("_", r"\_")
 
-        full_caption_latex = f"Query Execution Time Over {data['Repeat_Count'].max()} times of execution In various Database Types. " + \
-            f"{query}: {caption_latex}"
+        full_caption_latex = f"Query execution time of {query} over {data['Repeat_Count'].max()} times of execution in various database types. "
 
         latex_content = (
             f"\\begin{{figure}}[hbt!]\n"
@@ -209,9 +207,49 @@ def plot_execution_time_over_query(data):
             f"\\end{{figure}}\n"
         )
         latex_filename = f"{filename.replace('.png', '.tex')}"
-
         with open(latex_filename, "w") as f:
             f.write(latex_content)
+
+        ###########################################################################################
+        # Generate LaTeX files in groups of 4
+        ###########################################################################################
+        image_paths.append((filename, query))
+
+        for i in range(0, len(image_paths), 4):
+            # Get the current group of up to 4 images
+            group = image_paths[i:i+4]
+            latex_filename = f"execution_time_group_{i//4 + 1}.tex"
+
+            # Create main caption with query names
+            group_queries = ", ".join(query for _, query in group)
+            main_caption = (
+                f"Query execution time of {group_queries} over {data['Repeat_Count'].max()} "
+                f"times of execution in various database types."
+            )
+
+            with open(latex_filename, "w") as f:
+                f.write("\\begin{figure}[hbt!]\n")
+                f.write("\\centering\n")
+
+                for j, (img_path, caption_query) in enumerate(group):
+                    if j % 2 == 0 and j != 0:
+                        # Add vertical spacing between rows
+                        f.write("\\vspace{0.5cm}\n")
+
+                    f.write("\\begin{minipage}[b]{0.45\\linewidth}\n")
+                    f.write(f"    \\centering\n")
+                    f.write(
+                        f"    \\includegraphics[width=1.0\\linewidth]{{charts-eval-exp-time/{img_path}}}\n")
+                    f.write(f"    \\caption*{{{caption_query}}}\n")
+                    f.write("\\end{minipage}\n")
+
+                    if j % 2 == 0:  # Add spacing between columns
+                        f.write("\\hfill\n")
+
+                f.write(f"\\caption{{{main_caption}}}\n")
+                f.write("\\label{fig:execution_time_group}\n")
+                f.write("\\end{figure}\n")
+            print(f"Generated LaTeX file: {latex_filename}")
 
 
 def main():
@@ -242,14 +280,14 @@ def main():
 
     data.columns = data.columns.str.strip()
 
-    # Convert Execution_Time to numeric
-    data['Execution_Time'] = pd.to_numeric(
-        data['Execution_Time'], errors='coerce')
-    # Drop invalid rows
-    data = data.dropna(subset=['Execution_Time'])
-
     # Give a name to the queries(Qn)
     data, query_mapping = rename_queries(data)
+    print(data['Query_name'].unique())
+    # # Convert Execution_Time to numeric
+    # data['Execution_Time'] = pd.to_numeric(
+    #     data['Execution_Time'], errors='coerce')
+    # # Drop invalid rows
+    # data = data.dropna(subset=['Execution_Time'])
 
     data['Repeat_Count'] = data.groupby(['Query', 'DB_Type']).cumcount() + 1
 
