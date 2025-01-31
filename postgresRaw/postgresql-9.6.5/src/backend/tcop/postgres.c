@@ -47,6 +47,8 @@ USE OF THIS SOFTWARE.
 #include <signal.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <time.h>
+
 #ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
 #endif
@@ -99,7 +101,7 @@ USE OF THIS SOFTWARE.
 #include "mb/pg_wchar.h"
 
 #include "noDB/NoDBScan.h"
-
+#include "snooping/global.h"
 /* ----------------
  *		global variables
  * ----------------
@@ -3151,14 +3153,14 @@ bool stack_is_too_deep(void)
 		stack_base_ptr != NULL)
 		return true;
 
-		/*
-		 * On IA64 there is a separate "register" stack that requires its own
-		 * independent check.  For this, we have to measure the change in the
-		 * "BSP" pointer from PostgresMain to here.  Logic is just as above,
-		 * except that we know IA64's register stack grows up.
-		 *
-		 * Note we assume that the same max_stack_depth applies to both stacks.
-		 */
+	/*
+	 * On IA64 there is a separate "register" stack that requires its own
+	 * independent check.  For this, we have to measure the change in the
+	 * "BSP" pointer from PostgresMain to here.  Logic is just as above,
+	 * except that we know IA64's register stack grows up.
+	 *
+	 * Note we assume that the same max_stack_depth applies to both stacks.
+	 */
 #if defined(__ia64__) || defined(__ia64)
 	stack_depth = (long)(ia64_get_bsp() - register_stack_base_ptr);
 
@@ -3925,6 +3927,21 @@ void PostgresMain(int argc, char *argv[],
 
 	/* Initialize noDB structures if noDB option is enabled */
 	// TODO: Move that to execMain
+
+	if (enable_invisible_db)
+	{
+		if (enable_invisible_metadata)
+			submitDbType("PostgresSemiRaw");
+		else
+			submitDbType("PostgresRaw");
+	}
+	else
+		submitDbType("PostgresSQL");
+
+	double time_diff;
+	double time_start = (double)clock();	  /* get initial time */
+	time_start = time_start / CLOCKS_PER_SEC; /*    in seconds    */
+
 	if (enable_invisible_db && !isLoaded())
 	{
 		if (configurationExists())
@@ -3944,6 +3961,12 @@ void PostgresMain(int argc, char *argv[],
 			// fprintf(stderr,"PostgresRAW disabled (no configuration file).\n");
 		}
 	}
+
+	/* Calculate elapsed time */
+	time_diff = (((double)clock()) / CLOCKS_PER_SEC) - time_start;
+	char *exec_time[50];
+	sprintf(exec_time, "%f", time_diff);
+	submitTime(exec_time);
 
 	for (;;)
 	{
@@ -4509,4 +4532,76 @@ log_disconnections(int code, Datum arg)
 					hours, minutes, seconds, msecs,
 					port->user_name, port->database_name, port->remote_host,
 					port->remote_port[0] ? " port=" : "", port->remote_port)));
+}
+
+void submitDbType(char *db_type)
+{
+	char *resultdir = "result";
+	char *result_filename = "initdb.csv";
+	char resultPath[MAX_PATH_LENGTH];
+	char resultFile[MAX_FILENAME];
+	char filePath[MAX_PATH_LENGTH];
+	char *pg_data;
+	DIR *dir;
+	FILE *outfile;
+
+	pg_data = getenv("PGDATA");
+
+	snprintf(resultPath, MAX_PATH_LENGTH, "%s/../../%s", pg_data, resultdir);
+
+	if ((dir = opendir(resultPath)) == NULL)
+	{
+		fprintf(stderr, "Result directory %s not found...", resultPath);
+		return;
+	}
+
+	snprintf(filePath, MAX_PATH_LENGTH, "%s/%s", resultPath, result_filename);
+
+	if ((outfile = fopen(filePath, "a")) == NULL)
+	{
+		fprintf(stderr, "File %s not found...", outfile);
+		return false;
+	}
+
+	fprintf(outfile, "\n%s, ", db_type);
+	fclose(outfile);
+	closedir(dir);
+}
+
+void submitTime(char *time_result)
+{
+	char *resultdir = "result";
+	char *result_filename = "initdb.csv";
+	char resultPath[MAX_PATH_LENGTH];
+	char resultFile[MAX_FILENAME];
+	char filePath[MAX_PATH_LENGTH];
+	char *pg_data;
+	DIR *dir;
+	FILE *outfile;
+
+	pg_data = getenv("PGDATA");
+
+	snprintf(resultPath, MAX_PATH_LENGTH, "%s/../../%s", pg_data, resultdir);
+
+	if ((dir = opendir(resultPath)) == NULL)
+	{
+		fprintf(stderr, "Result directory %s not found...", resultPath);
+		return;
+	}
+
+	snprintf(filePath, MAX_PATH_LENGTH, "%s/%s", resultPath, result_filename);
+
+	if ((outfile = fopen(filePath, "a")) == NULL)
+	{
+		fprintf(stderr, "File %s not found...", outfile);
+		return false;
+	}
+
+	time_t now = time(NULL);
+	struct tm *local_time = localtime(&now);
+
+	/* DB_Type, Execution_Time, Local_Time, ,commandType */
+	fprintf(outfile, "%s,%s,%s", time_result, asctime(local_time), "Unknown");
+	fclose(outfile);
+	closedir(dir);
 }
