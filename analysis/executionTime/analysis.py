@@ -118,12 +118,16 @@ def plot_query_execution_time_by_db_type(data):
                 dpi=300, bbox_inches="tight")
 
 
-def plot_execution_time_over_query(data):
+def plot_execution_time_over_query(data, is_stat):
     """
     Plot execution time over the repeats for each query, grouped by DB_Type.
     Each DB_Type is represented by a unique color, with markers shown only at the beginning and end of each line.
     Alongside each plot, generate a LaTeX file that includes the plot.
     """
+    output_folder = "exeTimeStatResult" if is_stat else "exeTimeResult"
+    charts_latex_path = "charts-eval-exp-time-stat" if is_stat else "charts-eval-exp-time"
+
+    os.makedirs(output_folder, exist_ok=True)
 
     queries = data['Query_name'].unique()
 
@@ -181,53 +185,59 @@ def plot_execution_time_over_query(data):
                    bbox_to_anchor=(1, 0.13))
         plt.grid(True)
 
-        # Save and show the plot
+        # Save the plot
+        plot_filename = f"execution_time_db_type_{query}.pdf"
+        full_plot_path = os.path.join(output_folder, plot_filename)
         plt.tight_layout()
-        filename = f"execution_time_db_type_{query}.png"
-        filename = filename.replace(" ", "_")
-        filename = "".join(c for c in filename if c.isalnum()
-                           or c in ['_', '.', '-'])
-        plt.savefig(filename,
+
+        plt.savefig(full_plot_path,
                     dpi=300, bbox_inches="tight")
         plt.clf()
-
+        image_paths.append((plot_filename, query))
         ###########################################################################################
         # Generate LaTeX file for the plot
         ###########################################################################################
         caption_latex = actual_query.replace("_", r"\_")
 
-        full_caption_latex = f"Query execution time of {query} over {data['Repeat_Count'].max()} times of execution in various database types. "
+        full_caption_latex = f"The execution times for query {query} over {data['Repeat_Count'].max()} iterations using various types of PostgresSemiRaw and PostgresRaw. These databases include TPC-H data with the \\acrshort{{sf}} 0.1 alongside different levels of metadata."
 
         latex_content = (
             f"\\begin{{figure}}[hbt!]\n"
             f"\\centering\n"
-            f"\\includegraphics[width=1.0\\linewidth]{{charts-eval-exp-time/{filename}}}\n"
+            f"\\includegraphics[width=1.0\\linewidth]{{{charts_latex_path}/{plot_filename}}}\n"
             f"\\caption[{query}:result]{{{full_caption_latex}}}\n"
-            f"\\label{{fig:{filename.replace('.png', '')}}}\n"
+            f"\\label{{fig:{plot_filename.replace('.pdf', '')}}}\n"
             f"\\end{{figure}}\n"
         )
-        latex_filename = f"{filename.replace('.png', '.tex')}"
-        with open(latex_filename, "w") as f:
+        tex_filename = os.path.join(
+            output_folder, f"execution_time_db_type_{query}.tex")
+        with open(tex_filename, "w") as f:
             f.write(latex_content)
 
         ###########################################################################################
         # Generate LaTeX files in groups of 4
         ###########################################################################################
-        image_paths.append((filename, query))
+        # image_paths.append((filename, query))
 
         for i in range(0, len(image_paths), 4):
             # Get the current group of up to 4 images
             group = image_paths[i:i+4]
-            latex_filename = f"execution_time_group_{i//4 + 1}.tex"
+            group_tex_filename = os.path.join(
+                output_folder, f"execution_time_group_{i//4 + 1}.tex")
 
             # Create main caption with query names
-            group_queries = ", ".join(query for _, query in group)
+            if len(group) > 1:
+                group_queries = ", ".join(
+                    query for _, query in group[:-1]) + f", and {group[-1][1]}"
+            else:
+                group_queries = group[0][1]
+
             main_caption = (
-                f"Query execution time of {group_queries} over {data['Repeat_Count'].max()} "
-                f"times of execution in various database types."
+                f"The execution times for queries {group_queries} over {data['Repeat_Count'].max()} "
+                f"iterations using various types of PostgresSemiRaw and PostgresRaw. These databases include TPC-H data with the \\acrshort{{sf}} 0.1 alongside different levels of metadata."
             )
 
-            with open(latex_filename, "w") as f:
+            with open(group_tex_filename, "w") as f:
                 f.write("\\begin{figure}[hbt!]\n")
                 f.write("\\centering\n")
 
@@ -239,7 +249,7 @@ def plot_execution_time_over_query(data):
                     f.write("\\begin{minipage}[b]{0.45\\linewidth}\n")
                     f.write(f"    \\centering\n")
                     f.write(
-                        f"    \\includegraphics[width=1.0\\linewidth]{{charts-eval-exp-time/{img_path}}}\n")
+                        f"    \\includegraphics[width=1.0\\linewidth]{{{charts_latex_path}/{img_path}}}\n")
                     f.write(f"    \\caption*{{{caption_query}}}\n")
                     f.write("\\end{minipage}\n")
 
@@ -249,14 +259,15 @@ def plot_execution_time_over_query(data):
                 f.write(f"\\caption{{{main_caption}}}\n")
                 f.write("\\label{fig:execution_time_group}\n")
                 f.write("\\end{figure}\n")
-            print(f"Generated LaTeX file: {latex_filename}")
+            print(f"Generated LaTeX file: {group_tex_filename}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Choose a plotting method.")
     parser.add_argument(
         "--method",
-        choices=["over_time", "query_eval", "db_eval", "query_time_eval"],
+        choices=["over_time", "query_eval", "db_eval",
+                 "query_time_eval", "query_time_eval_stat"],
         required=True,
         help="Choose 'over_time' to plot execution time over time\n 'query_eval' to plot execution time changes for each query\n Choose 'db_eval' to plot execution time for each query based on different db type "
         + "\n Choose 'query_time_eval' to plot execution time for each each query based on running query n time.",
@@ -283,11 +294,6 @@ def main():
     # Give a name to the queries(Qn)
     data, query_mapping = rename_queries(data)
     print(data['Query_name'].unique())
-    # # Convert Execution_Time to numeric
-    # data['Execution_Time'] = pd.to_numeric(
-    #     data['Execution_Time'], errors='coerce')
-    # # Drop invalid rows
-    # data = data.dropna(subset=['Execution_Time'])
 
     data['Repeat_Count'] = data.groupby(['Query', 'DB_Type']).cumcount() + 1
 
@@ -298,7 +304,9 @@ def main():
     elif args.method == "db_eval":
         plot_query_execution_time_by_db_type(data)
     elif args.method == "query_time_eval":
-        plot_execution_time_over_query(data)
+        plot_execution_time_over_query(data, False)
+    elif args.method == "query_time_eval_stat":
+        plot_execution_time_over_query(data, True)
 
 
 if __name__ == "__main__":
