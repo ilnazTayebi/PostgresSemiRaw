@@ -185,7 +185,6 @@ void printConfiguration(void)
 			fflush(stdout);
 		}
 	}
-	fprintf(stdout, "\n\n");
 }
 
 int checkConfiguration(void)
@@ -475,7 +474,7 @@ char getRelationName(char *filename)
  */
 void writeConfig()
 {
-	/* TODO: make the relation to the lowercase to not have .scv or .CSV */
+	/* TODO: make the relation to the lowercase to not have .csv or .CSV */
 	char datasetPath[MAX_PATH_LENGTH];
 	char conf_file[MAX_FILENAME];
 	char filePath[MAX_PATH_LENGTH];
@@ -528,7 +527,6 @@ void writeConfig()
 			fprintf(conffile, "header-%d = 'True'\n", fileIndex);
 		}
 	}
-	// fprintf(conffile, "\n", fileIndex, filePath);
 
 	fclose(conffile);
 	closedir(dir);
