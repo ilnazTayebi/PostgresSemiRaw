@@ -54,7 +54,7 @@ def generate_query_plan_latex_file_all_db(data):
             f"\\begin{{figure}}[h]\n"
             f"\\centering\n"
             f"{latex_content}"
-            f"\\caption*{{Query Plan for {query}. Query over the TPCH dataset with the SF 0.1.}}\n"
+            f"\\caption*{{Query Plan for {query}. Query over the TPC-H dataset with the \\acrshort{{sf}} 0.1.}}\n"
             f"\\label{{fig:explain-{query.replace(' ', '-').lower()}}}\n"
             f"\\end{{figure}}"
         )
@@ -102,20 +102,19 @@ def generate_query_plan_latex_file(data):
                     f"\\end{{minted}}\n"
                 )
                 latex_content = (
-                    f"\\begin{{figure}}[h]\n"
+                    f"\\begin{{figure}}[h!]\n"
                     f"\\centering\n"
                     f"{latex_content}"
-                    f"\\caption*{{Query Plan for Database: {db_type} and {query}. Query over the TPCH dataset with the SF 0.1.}}\n"
+                    f"\\caption[Query Plan for Database: {db_type} and {query}.]"
+                    f"{{Query Plan for Database: {db_type} and {query}. Query over the TPC-H dataset with the \\acrshort{{sf}} 0.1.}}\n"
                     f"\\label{{fig:explain-{query.replace(' ', '-').lower()}-{db_short_name}}}\n"
                     f"\\end{{figure}}"
                 )
 
-                # Generate filename
                 filename = f"query_plan_{query}_{db_short_name}.tex"
                 filename = "".join(
                     c for c in filename if c.isalnum() or c in ['_', '.', '-'])
 
-                # Write LaTeX fragment to file
                 with open(filename, "w") as f:
                     f.write(latex_content)
 
@@ -140,7 +139,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Load data
     data = pd.read_csv(args.file, quotechar="'", skipinitialspace=True)
 
     # Clean data
