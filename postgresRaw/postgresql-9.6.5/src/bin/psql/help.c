@@ -302,6 +302,7 @@ void slashUsage(unsigned short int pager)
 	fprintf(output, _("PostgresSemiRaw\n"));
 	fprintf(output, _("  \\exp [NUMBER] ITTERATION    execute the experiment n time(s)\n"));
 	fprintf(output, _("  \\plan [NUMBER] ITTERATION   execute the experiment n time(s) to generate query plan\n"));
+	fprintf(output, _("  \\resetexp reset the experiment's result files\n"));
 
 	ClosePager(output);
 }
