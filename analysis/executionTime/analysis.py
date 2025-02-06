@@ -221,9 +221,10 @@ def plot_execution_time_over_query(data, is_stat):
 
         for i in range(0, len(image_paths), 4):
             # Get the current group of up to 4 images
-            group = image_paths[i:i+4]
-            group_tex_filename = os.path.join(
-                output_folder, f"execution_time_group_{i//4 + 1}.tex")
+            group = image_paths[i:i+4]                 
+            group_number = (i // 4) + 1
+            group_tex_filename = os.path.join(output_folder, f"execution_time_group_{group_number}.tex")
+
 
             # Create main caption with query names
             if len(group) > 1:
@@ -258,6 +259,7 @@ def plot_execution_time_over_query(data, is_stat):
 
                 f.write(f"\\caption{{{main_caption}}}\n")
                 f.write("\\label{fig:execution_time_group}\n")
+                f.write(f"\\label{{fig:execution_time_group_{group_number}}}\n")
                 f.write("\\end{figure}\n")
             print(f"Generated LaTeX file: {group_tex_filename}")
 
