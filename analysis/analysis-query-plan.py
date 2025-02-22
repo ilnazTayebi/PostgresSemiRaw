@@ -1,9 +1,13 @@
-import pandas as pd
 import argparse
+
+import pandas as pd
+import requests
 
 
 def rename_queries(data):
-    """Rename queries to Q1, Q2, etc."""
+    """
+    Function to rename queries to Q1, Q2, etc.
+    """
     unique_queries = data['Query'].unique()
     query_mapping = {query: f"Q{i + 1}" for i,
                      query in enumerate(unique_queries)}
@@ -12,12 +16,16 @@ def rename_queries(data):
 
 
 def generate_db_short_names(db_types):
-    """Generate short names (db1, db2, ...) for database types."""
+    """
+    Function to generate short names (db1, db2, ...) for database types.
+    """
     return {db_type: f"db{i + 1}" for i, db_type in enumerate(db_types)}
 
 
 def generate_query_plan_latex_file_all_db(data):
-
+    """
+    Function to generate the latex file of query plans for all database types.
+    """
     db_types = data['DB_Type'].unique()
 
     queries = data['Query_name'].unique()
@@ -69,7 +77,9 @@ def generate_query_plan_latex_file_all_db(data):
 
 
 def generate_query_plan_latex_file(data):
-
+    """
+    Function to generate the latex file of query plans.
+    """
     db_types = data['DB_Type'].unique()
     db_short_names = generate_db_short_names(db_types)
 
@@ -121,10 +131,39 @@ def generate_query_plan_latex_file(data):
                 print(f"Generated LaTeX fragment: {filename}")
 
 
-def main():
+def main(args):
+    """
+     Main function to run the analysis and generate the latex file.
+     """
+    try:
+        data = pd.read_csv(args.file, quotechar="'", skipinitialspace=True)
+
+        # Clean data
+        data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+        data['DB_Type'] = data['DB_Type'].str.split(' ').str[0]
+
+        data.columns = data.columns.str.strip()
+
+        # Give a name to the queries(Qn)
+        data, query_mapping = rename_queries(data)
+
+        data['Repeat_Count'] = data.groupby(['Query', 'DB_Type']).cumcount() + 1
+
+        if args.method == "query_plan":
+            generate_query_plan_latex_file(data)
+
+    except requests.exceptions.ConnectionError as co:
+        print("Connection failed:", co)
+    except Exception as ex:
+        print("Error occurred:", ex)
+
+def setup():
+    """
+    Function to evaluate flags from the commandline arguments.
+    """
     parser = argparse.ArgumentParser(description="Choose a plotting method.")
     parser.add_argument(
-        "--method",
+        '-m', "--method",
         choices=["query_plan"],
         required=True,
         help="Choose 'query_plan' to plot execution time over time.",
@@ -132,29 +171,17 @@ def main():
 
     # file_path = "../../result/queryPlan.csv"
     parser.add_argument(
-        "--file",
-        required=True,
+        '-f', "--file",
+        required=True, default='../result/queryPlan.csv', type=str,
         help="Path to the CSV file containing the data.",
     )
 
-    args = parser.parse_args()
+    parser.add_argument(
+        '-o', '--output', default='../report/charts-eval-plan', type=str,
+        required=True, help="Path to the output files directory.",
+    )
 
-    data = pd.read_csv(args.file, quotechar="'", skipinitialspace=True)
-
-    # Clean data
-    data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    data['DB_Type'] = data['DB_Type'].str.split(' ').str[0]
-
-    data.columns = data.columns.str.strip()
-
-    # Give a name to the queries(Qn)
-    data, query_mapping = rename_queries(data)
-
-    data['Repeat_Count'] = data.groupby(['Query', 'DB_Type']).cumcount() + 1
-
-    if args.method == "query_plan":
-        generate_query_plan_latex_file(data)
-
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    main()
+    main(setup())

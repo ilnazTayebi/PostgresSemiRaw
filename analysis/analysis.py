@@ -1,12 +1,16 @@
-import pandas as pd
-import matplotlib.pyplot as plt
 import argparse
 import os
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import requests
 from matplotlib.colors import TABLEAU_COLORS
 
 
 def plot_execution_time_over_time(data):
-    """Plot execution time over time for each query."""
+    """
+    Function to plot execution time over time for each query.
+    """
 
     data['Local_Time'] = pd.to_datetime(data['Local_Time'], errors='coerce')
     # Drop rows with invalid Execution_Time or Local_Time
@@ -36,18 +40,20 @@ def plot_execution_time_over_time(data):
 
 
 def rename_queries(data):
-    """Rename queries to Q1, Q2, etc."""
+    """
+    Function to rename queries to Q1, Q2, etc.
+    """
     unique_queries = data['Query'].unique()
     query_mapping = {query: f"Q{i + 1}" for i,
-                     query in enumerate(unique_queries)}
+    query in enumerate(unique_queries)}
     data['Query_name'] = data['Query'].map(query_mapping)
     return data, query_mapping
 
 
 def plot_execution_time_queries(data):
-    """Plot execution time changes for each query."""
-
-    # data = data.sort_values(by='Execution_Time')
+    """
+    Function to plot execution time changes for each query.
+    """
 
     # Plot Execution Time for each Query
     plt.figure(figsize=(10, 8))
@@ -75,7 +81,7 @@ def plot_execution_time_queries(data):
 
 def plot_query_execution_time_by_db_type(data):
     """
-    Plot execution time for each query with DB_Type as line style and different colors for queries.
+    Function to plot execution time for each query with DB_Type as line style and different colors for queries.
     """
 
     if not {'Query', 'DB_Type', 'Execution_Time'}.issubset(data.columns):
@@ -118,13 +124,13 @@ def plot_query_execution_time_by_db_type(data):
                 dpi=300, bbox_inches="tight")
 
 
-def plot_execution_time_over_query(data, is_stat):
+def plot_execution_time_over_query(data, is_stat, output_folder):
     """
-    Plot execution time over the repeats for each query, grouped by DB_Type.
+    Function to plot execution time over the repeats for each query, grouped by DB_Type.
     Each DB_Type is represented by a unique color, with markers shown only at the beginning and end of each line.
     Alongside each plot, generate a LaTeX file that includes the plot.
     """
-    output_folder = "exeTimeStatResult" if is_stat else "exeTimeResult"
+
     charts_latex_path = "charts-eval-exp-time-stat" if is_stat else "charts-eval-exp-time"
 
     os.makedirs(output_folder, exist_ok=True)
@@ -168,9 +174,9 @@ def plot_execution_time_over_query(data, is_stat):
                 # Add markers only at the beginning and end
                 plt.scatter(
                     [query_data['Repeat_Count'].iloc[0],
-                        query_data['Repeat_Count'].iloc[-1]],
+                     query_data['Repeat_Count'].iloc[-1]],
                     [query_data['Execution_Time'].iloc[0],
-                        query_data['Execution_Time'].iloc[-1]],
+                     query_data['Execution_Time'].iloc[-1]],
                     color=color,
                     marker='o',
                     s=40,  # Marker size
@@ -221,10 +227,9 @@ def plot_execution_time_over_query(data, is_stat):
 
         for i in range(0, len(image_paths), 4):
             # Get the current group of up to 4 images
-            group = image_paths[i:i+4]                 
+            group = image_paths[i:i + 4]
             group_number = (i // 4) + 1
             group_tex_filename = os.path.join(output_folder, f"execution_time_group_{group_number}.tex")
-
 
             # Create main caption with query names
             if len(group) > 1:
@@ -264,52 +269,68 @@ def plot_execution_time_over_query(data, is_stat):
             print(f"Generated LaTeX file: {group_tex_filename}")
 
 
-def main():
+def main(args):
+    """
+    Main function to run the analysis and generate the latex file.
+    """
+    try:
+
+        # Load data
+        data = pd.read_csv(args.file, quotechar="'", skipinitialspace=True)
+
+        # Clean data
+        data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+        data['DB_Type'] = data['DB_Type'].str.split(' ').str[0]
+
+        data.columns = data.columns.str.strip()
+
+        # Give a name to the queries(Qn)
+        data, query_mapping = rename_queries(data)
+        print(data['Query_name'].unique())
+
+        data['Repeat_Count'] = data.groupby(['Query', 'DB_Type']).cumcount() + 1
+
+        if args.method == "over_time":
+            plot_execution_time_over_time(data)
+        elif args.method == "query_eval":
+            plot_execution_time_queries(data)
+        elif args.method == "db_eval":
+            plot_query_execution_time_by_db_type(data)
+        elif args.method == "query_time_eval":
+            plot_execution_time_over_query(data, False, args.output)
+        elif args.method == "query_time_eval_stat":
+            plot_execution_time_over_query(data, True, args.output)
+
+    except requests.exceptions.ConnectionError as co:
+        print("Connection failed:", co)
+    except Exception as ex:
+        print("Error occurred:", ex)
+
+
+def setup():
+    """
+    Function to evaluate flags from the commandline arguments.
+    """
     parser = argparse.ArgumentParser(description="Choose a plotting method.")
     parser.add_argument(
-        "--method",
+        '-m', '--method',
         choices=["over_time", "query_eval", "db_eval",
                  "query_time_eval", "query_time_eval_stat"],
         required=True,
         help="Choose 'over_time' to plot execution time over time\n 'query_eval' to plot execution time changes for each query\n Choose 'db_eval' to plot execution time for each query based on different db type "
-        + "\n Choose 'query_time_eval' to plot execution time for each each query based on running query n time.",
+             + "\n Choose 'query_time_eval' to plot execution time for each each query based on running query n time.",
     )
-
-    # file_path = "../result/queryExecTime.csv"
     parser.add_argument(
-        "--file",
-        required=True,
-        help="Path to the CSV file containing the data.",
+        '-f', '--file', default='../result/queryExecTime.csv', type=str,
+        required=True, help="Path to the CSV file containing the data.",
     )
-
-    args = parser.parse_args()
-
-    # Load data
-    data = pd.read_csv(args.file, quotechar="'", skipinitialspace=True)
-
-    # Clean data
-    data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    data['DB_Type'] = data['DB_Type'].str.split(' ').str[0]
-
-    data.columns = data.columns.str.strip()
-
-    # Give a name to the queries(Qn)
-    data, query_mapping = rename_queries(data)
-    print(data['Query_name'].unique())
-
-    data['Repeat_Count'] = data.groupby(['Query', 'DB_Type']).cumcount() + 1
-
-    if args.method == "over_time":
-        plot_execution_time_over_time(data)
-    elif args.method == "query_eval":
-        plot_execution_time_queries(data)
-    elif args.method == "db_eval":
-        plot_query_execution_time_by_db_type(data)
-    elif args.method == "query_time_eval":
-        plot_execution_time_over_query(data, False)
-    elif args.method == "query_time_eval_stat":
-        plot_execution_time_over_query(data, True)
+    # output_folder = "../report/charts-eval-exp-time-stat" if is_stat else "../report/charts-eval-exp-time"
+    parser.add_argument(
+        '-o', '--output', default='../report/charts-eval-exp-time', type=str,
+        required=True, help="Path to the output files directory.",
+    )
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
-    main()
+    main(setup())

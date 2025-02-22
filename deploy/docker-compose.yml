@@ -1,5 +1,6 @@
 name: postgresSemiRaw
 services:
+  # create container to run the postgresSemiRaw
   postgresSemiRaw:
     container_name: postgresSemiRaw
     image: postgressemiraw
@@ -16,29 +17,17 @@ services:
     volumes:
       - ../data:/data
       - ../datasets:/datasets:ro
-    networks:
-      - postgresSemiRaw
-  ###################################################
-  postgresRawUI:
-    container_name: postgresSemiRaw-ui
-    image: postgressemiraw-ui
+      - ../result:/result
+
+  # create container to run the analysis
+  analysis:
+    container_name: analysis
     build:
       context: ../
-      dockerfile: ./deploy/postgresRawUI/Dockerfile
-      args:
-        BUILD_DATE: ${BUILD_DATE}
-        VCS_REF: ${VCS_REF}
-    env_file: .env
-    ports:
-      - "4445:5555"
+      dockerfile: ./deploy/Analysis/Dockerfile
+    stdin_open: true
+    tty: true
     volumes:
-      - ../data:/data
-      - ../datasets:/datasets:ro
+      - ../result:/result
     depends_on:
       - postgresSemiRaw
-    links:
-      - postgresSemiRaw:db
-    networks:
-      - postgresSemiRaw
-networks:
-  postgresSemiRaw:
