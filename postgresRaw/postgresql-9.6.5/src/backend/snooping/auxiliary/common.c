@@ -21,6 +21,20 @@ DISCLAIM ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 USE OF THIS SOFTWARE.
 */
 
+/*-------------------------------------------------------------------------
+ *
+ * 						PostgresSemiRaw Project
+ *
+ *          Query Processing On Raw Data Files using PostgresSemiRaw
+ * 			    Ilnaz Tayebi Msc. University of Passau - Germany
+ *
+ * Added the function writeConfig to update the snoop.conf configuration
+ * file automatically.
+ *
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "postgres.h"
 
 #include <ctype.h>

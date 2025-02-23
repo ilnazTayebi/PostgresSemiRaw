@@ -7,6 +7,19 @@ import requests
 from matplotlib.colors import TABLEAU_COLORS
 
 
+#-------------------------------------------------------------------------
+#
+# 						PostgresSemiRaw Project
+#
+#          Query Processing On Raw Data Files using PostgresSemiRaw
+# 			    Ilnaz Tayebi Msc. University of Passau - Germany
+#
+# Analyse the generated results from the experiment execution
+# and create plots to display in the report.
+#
+#
+#-------------------------------------------------------------------------
+
 def plot_execution_time_over_time(data):
     """
     Function to plot execution time over time for each query.

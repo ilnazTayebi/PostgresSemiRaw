@@ -4,6 +4,19 @@ import pandas as pd
 import requests
 
 
+#-------------------------------------------------------------------------
+#
+# 						PostgresSemiRaw Project
+#
+#          Query Processing On Raw Data Files using PostgresSemiRaw
+# 			    Ilnaz Tayebi Msc. University of Passau - Germany
+#
+# Analyse the generated results from the experiment execution
+# and create latex files of query plans to display in the report.
+#
+#
+#-------------------------------------------------------------------------
+
 def rename_queries(data):
     """
     Function to rename queries to Q1, Q2, etc.

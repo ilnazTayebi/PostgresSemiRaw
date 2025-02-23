@@ -40,6 +40,20 @@ USE OF THIS SOFTWARE.
  *-------------------------------------------------------------------------
  */
 
+  /*-------------------------------------------------------------------------
+ *
+ * 						PostgresSemiRaw Project
+ *
+ *          Query Processing On Raw Data Files using PostgresSemiRaw
+ * 			    Ilnaz Tayebi Msc. University of Passau - Germany
+ *
+ * The function call to writeConfig has been added to automatically update 
+ * the snoop.conf file when the raw data files in the datasets folder change.
+ *
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "postgres.h"
 
 #include <fcntl.h>
@@ -3946,6 +3960,7 @@ void PostgresMain(int argc, char *argv[],
 	{
 		if (configurationExists())
 		{
+			/* Update the snoop.conf file, if postgresSemiRaw configuration is on. */
 			if (enable_invisible_metadata)
 			{
 				writeConfig();
@@ -3957,8 +3972,7 @@ void PostgresMain(int argc, char *argv[],
 		else
 		{
 			fprintf(stderr, "Trying to use PostgresRAW without PostgresRAW configuration file.\n");
-			enable_invisible_db = false;
-			// fprintf(stderr,"PostgresRAW disabled (no configuration file).\n");
+			enable_invisible_db = false;			
 		}
 	}
 

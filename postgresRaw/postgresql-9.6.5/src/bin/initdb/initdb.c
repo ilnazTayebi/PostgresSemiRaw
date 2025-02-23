@@ -46,6 +46,20 @@
  *-------------------------------------------------------------------------
  */
 
+ /*-------------------------------------------------------------------------
+ *
+ * 						PostgresSemiRaw Project
+ *
+ *          Query Processing On Raw Data Files using PostgresSemiRaw
+ * 			    Ilnaz Tayebi Msc. University of Passau - Germany
+ *
+ * Added the function create_snoop_file to create the snoop.conf configuration
+ * file automatically during the creating the database cluster.
+ *
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "postgres_fe.h"
 
 #include <dirent.h>
