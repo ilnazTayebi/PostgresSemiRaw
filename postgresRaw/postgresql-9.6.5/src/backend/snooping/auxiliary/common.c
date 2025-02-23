@@ -459,7 +459,7 @@ int getFirstFreeFromMap(int *map, int size)
 /* SemiRaw:
  * Function to get the relation name from the file name
  */
-char getRelationName(char *filename)
+void getRelationName(char *filename)
 {
 	char *pos = strstr(filename, ".csv");
 
@@ -486,6 +486,11 @@ void writeConfig()
 	FILE *conffile;
 
 	pg_data = getenv("PGDATA");
+	if (pg_data == NULL)
+	{
+		fprintf(stderr, "Error: PGDATA environment variable is not set!\n");
+		return false;
+	}
 	snprintf(conf_file, MAX_PATH_LENGTH, "%s/%s", pg_data, configuration_filename);
 
 	if ((conffile = fopen(conf_file, "w")) == NULL)
@@ -531,5 +536,5 @@ void writeConfig()
 	fclose(conffile);
 	closedir(dir);
 
-	fprintf("Configuration written to %s\n", configuration_filename);
+	printf("Configuration written to %s\n", configuration_filename);
 }
