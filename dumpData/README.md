@@ -1,11 +1,11 @@
-# Dumping TPCH dataset using postgresSQL
+# Dumping TPC-H Dataset Using PostgresSQL
 
-## Download and install
+## Download And Install
 
-Install [TPCH](https://www.tpc.org/tpch/) data version 3.0.1 data using the DBGEN tool.
+Install [TPC-H](https://www.tpc.org/tpch/) data version 3.0.1 data using the DBGEN tool.
 In the first step download the 
 
-1- Download the TPCH DBGEN tool and unzipped the tar file:
+1- Download the TPC-H DBGEN tool and unzipped the tar file:
   
 ```sh
  $ unzip 05bc7108-2175-4a4b-8e50-b9443ab82e22-tpc-h-tool.zip
@@ -50,12 +50,12 @@ Open the makefile and change it as follows. you should change the cc to gcc and 
  $ make makefile.suite
  ```
 
-4- Invoked the DBGEN executable file in the current working directory to load TPCH data.
+4- Invoked the DBGEN executable file in the current working directory to load TPC-H data.
 
 ```sh
  $ ./dbgen -s  <n> -- set Scale Factor (SF) to  <n> (default: 1)
 ```
-## Data cleaning
+## Data Cleaning
 
 When using the **\copy** command in PostgreSQL, if your data file contains an extra trailing delimiter 
 (such as a | at the end of each row), PostgreSQL might interpret it as an additional column. 
@@ -65,15 +65,15 @@ removing  the ending | from each line and save the cleaned data file in the new 
 ```sh
  $ ./datacleaning.sh <folder_path>
 ```
-## Import data into the PostgreSQL
+## Import Data Into The PostgreSQL
 
-### 1- Set up Postgres using docker
+1. Set up Postgres using docker
 ```sh
  $ docker pull postgres
  $ docker volume create postgres_data
  $ docker run --name postgres_container -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres
 ```
-### 2- Run the \copy command in the postgres terminal to import data into the tables.
+2. Run the \copy command in the postgres terminal to import data into the tables.
 note: If we use Postgres using docker, then first we need to copy the .tbl files to the container.
 ```sh
  $ \copy "region"     from '/tpch/region.tbl'        DELIMITER '|' CSV;
