@@ -1464,24 +1464,6 @@ setup_config(void)
 
 	free(conflines);
 
-	/* Create empty snoop.conf file */
-
-	// snprintf(path, sizeof(path), "%s/snoop.conf", pg_data);
-
-	// FILE *snoopFile = fopen(path, "w");
-	// if (snoopFile == NULL)
-	// {
-	// 	fprintf(stderr, _("%s: could not create file \"%s\": %s\n"), progname, path, strerror(errno));
-	// 	exit_nicely();
-	// }
-	// fclose(snoopFile);
-
-	// if (chmod(path, S_IRUSR | S_IWUSR) != 0)
-	// {
-	// 	fprintf(stderr, _("%s: could not change permissions of \"%s\": %s\n"), progname, path, strerror(errno));
-	// 	exit_nicely();
-	// }
-
 	check_ok();
 }
 
