@@ -21,6 +21,20 @@ DISCLAIM ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER RESULTING FROM THE
 USE OF THIS SOFTWARE.
 */
 
+/*-------------------------------------------------------------------------
+ *
+ * 						PostgresSemiRaw Project
+ *
+ *          Query Processing On Raw Data Files using PostgresSemiRaw
+ * 			    Ilnaz Tayebi Msc. University of Passau - Germany
+ *
+ * Added the function writeConfig to update the snoop.conf configuration
+ * file automatically.
+ *
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "postgres.h"
 
 #include <ctype.h>
@@ -185,7 +199,6 @@ void printConfiguration(void)
 			fflush(stdout);
 		}
 	}
-	fprintf(stdout, "\n\n");
 }
 
 int checkConfiguration(void)
@@ -460,7 +473,7 @@ int getFirstFreeFromMap(int *map, int size)
 /* SemiRaw:
  * Function to get the relation name from the file name
  */
-char getRelationName(char *filename)
+void getRelationName(char *filename)
 {
 	char *pos = strstr(filename, ".csv");
 
@@ -475,7 +488,7 @@ char getRelationName(char *filename)
  */
 void writeConfig()
 {
-	/* TODO: make the relation to the lowercase to not have .scv or .CSV */
+	/* TODO: make the relation to the lowercase to not have .csv or .CSV */
 	char datasetPath[MAX_PATH_LENGTH];
 	char conf_file[MAX_FILENAME];
 	char filePath[MAX_PATH_LENGTH];
@@ -487,6 +500,11 @@ void writeConfig()
 	FILE *conffile;
 
 	pg_data = getenv("PGDATA");
+	if (pg_data == NULL)
+	{
+		fprintf(stderr, "Error: PGDATA environment variable is not set!\n");
+		return false;
+	}
 	snprintf(conf_file, MAX_PATH_LENGTH, "%s/%s", pg_data, configuration_filename);
 
 	if ((conffile = fopen(conf_file, "w")) == NULL)
@@ -528,10 +546,9 @@ void writeConfig()
 			fprintf(conffile, "header-%d = 'True'\n", fileIndex);
 		}
 	}
-	// fprintf(conffile, "\n", fileIndex, filePath);
 
 	fclose(conffile);
 	closedir(dir);
 
-	fprintf("Configuration written to %s\n", configuration_filename);
+	printf("Configuration written to %s\n", configuration_filename);
 }

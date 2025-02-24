@@ -14,6 +14,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
+#define copy_file_range my_copy_file_range
 #include <string.h>
 
 #include "datapagemap.h"
@@ -26,7 +27,7 @@
 #include "catalog/catalog.h"
 
 static void recurse_dir(const char *datadir, const char *path,
-			process_file_callback_t callback);
+						process_file_callback_t callback);
 
 static void execute_pagemap(datapagemap_t *pagemap, const char *path);
 
@@ -34,8 +35,7 @@ static void execute_pagemap(datapagemap_t *pagemap, const char *path);
  * Traverse through all files in a data directory, calling 'callback'
  * for each file.
  */
-void
-traverse_datadir(const char *datadir, process_file_callback_t callback)
+void traverse_datadir(const char *datadir, process_file_callback_t callback)
 {
 	recurse_dir(datadir, NULL, callback);
 }
@@ -50,9 +50,9 @@ static void
 recurse_dir(const char *datadir, const char *parentpath,
 			process_file_callback_t callback)
 {
-	DIR		   *xldir;
+	DIR *xldir;
 	struct dirent *xlde;
-	char		fullparentpath[MAXPGPATH];
+	char fullparentpath[MAXPGPATH];
 
 	if (parentpath)
 		snprintf(fullparentpath, MAXPGPATH, "%s/%s", datadir, parentpath);
@@ -67,8 +67,8 @@ recurse_dir(const char *datadir, const char *parentpath,
 	while (errno = 0, (xlde = readdir(xldir)) != NULL)
 	{
 		struct stat fst;
-		char		fullpath[MAXPGPATH * 2];
-		char		path[MAXPGPATH * 2];
+		char fullpath[MAXPGPATH * 2];
+		char path[MAXPGPATH * 2];
 
 		if (strcmp(xlde->d_name, ".") == 0 ||
 			strcmp(xlde->d_name, "..") == 0)
@@ -114,8 +114,8 @@ recurse_dir(const char *datadir, const char *parentpath,
 #endif
 		{
 #if defined(HAVE_READLINK) || defined(WIN32)
-			char		link_target[MAXPGPATH];
-			int			len;
+			char link_target[MAXPGPATH];
+			int len;
 
 			len = readlink(fullpath, link_target, sizeof(link_target));
 			if (len < 0)
@@ -139,7 +139,7 @@ recurse_dir(const char *datadir, const char *parentpath,
 #else
 			pg_fatal("\"%s\" is a symbolic link, but symbolic links are not supported on this platform\n",
 					 fullpath);
-#endif   /* HAVE_READLINK */
+#endif /* HAVE_READLINK */
 		}
 	}
 
@@ -157,12 +157,13 @@ recurse_dir(const char *datadir, const char *parentpath,
  *
  * If 'trunc' is true, any existing file with the same name is truncated.
  */
+
 static void
-copy_file_range(const char *path, off_t begin, off_t end, bool trunc)
+my_copy_file_range(const char *path, off_t begin, off_t end, bool trunc)
 {
-	char		buf[BLCKSZ];
-	char		srcpath[MAXPGPATH];
-	int			srcfd;
+	char buf[BLCKSZ];
+	char srcpath[MAXPGPATH];
+	int srcfd;
 
 	snprintf(srcpath, sizeof(srcpath), "%s/%s", datadir_source, path);
 
@@ -178,8 +179,8 @@ copy_file_range(const char *path, off_t begin, off_t end, bool trunc)
 
 	while (end - begin > 0)
 	{
-		int			readlen;
-		int			len;
+		int readlen;
+		int len;
 
 		if (end - begin > sizeof(buf))
 			len = sizeof(buf);
@@ -206,11 +207,10 @@ copy_file_range(const char *path, off_t begin, off_t end, bool trunc)
  * Copy all relation data files from datadir_source to datadir_target, which
  * are marked in the given data page map.
  */
-void
-copy_executeFileMap(filemap_t *map)
+void copy_executeFileMap(filemap_t *map)
 {
 	file_entry_t *entry;
-	int			i;
+	int i;
 
 	for (i = 0; i < map->narray; i++)
 	{
@@ -219,29 +219,29 @@ copy_executeFileMap(filemap_t *map)
 
 		switch (entry->action)
 		{
-			case FILE_ACTION_NONE:
-				/* ok, do nothing.. */
-				break;
+		case FILE_ACTION_NONE:
+			/* ok, do nothing.. */
+			break;
 
-			case FILE_ACTION_COPY:
-				copy_file_range(entry->path, 0, entry->newsize, true);
-				break;
+		case FILE_ACTION_COPY:
+			copy_file_range(entry->path, 0, entry->newsize, true);
+			break;
 
-			case FILE_ACTION_TRUNCATE:
-				truncate_target_file(entry->path, entry->newsize);
-				break;
+		case FILE_ACTION_TRUNCATE:
+			truncate_target_file(entry->path, entry->newsize);
+			break;
 
-			case FILE_ACTION_COPY_TAIL:
-				copy_file_range(entry->path, entry->oldsize, entry->newsize, false);
-				break;
+		case FILE_ACTION_COPY_TAIL:
+			copy_file_range(entry->path, entry->oldsize, entry->newsize, false);
+			break;
 
-			case FILE_ACTION_CREATE:
-				create_target(entry);
-				break;
+		case FILE_ACTION_CREATE:
+			create_target(entry);
+			break;
 
-			case FILE_ACTION_REMOVE:
-				remove_target(entry);
-				break;
+		case FILE_ACTION_REMOVE:
+			remove_target(entry);
+			break;
 		}
 	}
 
@@ -253,7 +253,7 @@ execute_pagemap(datapagemap_t *pagemap, const char *path)
 {
 	datapagemap_iterator_t *iter;
 	BlockNumber blkno;
-	off_t		offset;
+	off_t offset;
 
 	iter = datapagemap_iterate(pagemap);
 	while (datapagemap_next(iter, &blkno))

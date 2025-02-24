@@ -46,6 +46,20 @@
  *-------------------------------------------------------------------------
  */
 
+ /*-------------------------------------------------------------------------
+ *
+ * 						PostgresSemiRaw Project
+ *
+ *          Query Processing On Raw Data Files using PostgresSemiRaw
+ * 			    Ilnaz Tayebi Msc. University of Passau - Germany
+ *
+ * Added the function create_snoop_file to create the snoop.conf configuration
+ * file automatically during the creating the database cluster.
+ *
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "postgres_fe.h"
 
 #include <dirent.h>
@@ -230,6 +244,7 @@ static char **filter_lines_with_token(char **lines, const char *token);
 #endif
 static char **readfile(const char *path);
 static void writefile(char *path, char **lines);
+static void createfile(char *path);
 static void walkdir(const char *path,
 					void (*action)(const char *fname, bool isdir),
 					bool process_symlinks);
@@ -1449,23 +1464,6 @@ setup_config(void)
 
 	free(conflines);
 
-	/* Create empty snoop.conf file */
-
-	snprintf(path, sizeof(path), "%s/snoop.conf", pg_data);
-	FILE *snoopFile = fopen(path, "w");
-	if (snoopFile == NULL)
-	{
-		fprintf(stderr, _("%s: could not create file \"%s\": %s\n"), progname, path, strerror(errno));
-		exit_nicely();
-	}
-	fclose(snoopFile);
-
-	if (chmod(path, S_IRUSR | S_IWUSR) != 0)
-	{
-		fprintf(stderr, _("%s: could not change permissions of \"%s\": %s\n"), progname, path, strerror(errno));
-		exit_nicely();
-	}
-
 	check_ok();
 }
 
@@ -1996,6 +1994,7 @@ setup_conversion(FILE *cmdfd)
 	char **conv_lines;
 
 	conv_lines = readfile(conversion_file);
+
 	for (line = conv_lines; *line != NULL; line++)
 	{
 		if (strstr(*line, "DROP CONVERSION") != *line)
@@ -3323,50 +3322,35 @@ void initialize_data_directory(void)
 	check_ok();
 }
 
-void submitInitdbTime(char *time_result)
+/* SemiRaw:
+ * Function to create empty snoop.conf file
+ */
+void create_snoop_file()
 {
-	char *resultdir = "result";
-	char *result_filename = "initdb.csv";
-	char resultPath[128];
-	char resultFile[128];
-	char filePath[128];
-	char *pg_data;
-	DIR *dir;
-	FILE *outfile;
+	/* Create empty snoop.conf file */
+	char path[MAXPGPATH];
+	snprintf(path, sizeof(path), "%s/snoop.conf", pg_data);
 
-	pg_data = getenv("PGDATA");
-
-	snprintf(resultPath, 128, "%s/../../%s", pg_data, resultdir);
-	fprintf(stderr, "resultPath:%s\n", resultPath);
-	if ((dir = opendir(resultPath)) == NULL)
+	FILE *snoopFile = fopen(path, "w");
+	if (snoopFile == NULL)
 	{
-		fprintf(stderr, "Result directory %s not found...", resultPath);
-		return;
+		fprintf(stderr, _("%s: could not create file \"%s\": %s\n"), progname, path, strerror(errno));
+		exit_nicely();
+	}
+	fclose(snoopFile);
+
+	if (chmod(path, S_IRUSR | S_IWUSR) != 0)
+	{
+		fprintf(stderr, _("%s: could not change permissions of \"%s\": %s\n"), progname, path, strerror(errno));
+		exit_nicely();
 	}
 
-	snprintf(filePath, 128, "%s/%s", resultPath, result_filename);
-
-	if ((outfile = fopen(filePath, "a")) == NULL)
-	{
-		fprintf(stderr, "File %s not found...", outfile);
-		return false;
-	}
-
-	time_t now = time(NULL);
-	struct tm *local_time = localtime(&now);
-
-	/* DB_Type, Execution_Time, Local_Time */
-	fprintf(outfile, "%s, %s", time_result, asctime(local_time));
-
-	fclose(outfile);
-	closedir(dir);
+	printf(_("creating empty snoop.conf ... "));
+	fflush(stdout);
 }
 
 int main(int argc, char *argv[])
 {
-	double time_diff;
-	double time_start = (double)clock();	  /* get initial time */
-	time_start = time_start / CLOCKS_PER_SEC; /*    in seconds    */
 
 	static struct option long_options[] = {
 		{"pgdata", required_argument, NULL, 'D'},
@@ -3625,7 +3609,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 
 	initialize_data_directory();
-
+	printf(_("Initialize directory done ... "));
 	if (do_sync)
 		fsync_pgdata();
 	else
@@ -3638,16 +3622,12 @@ int main(int argc, char *argv[])
 	strlcpy(bin_dir, argv[0], sizeof(bin_dir));
 	get_parent_directory(bin_dir);
 
+	create_snoop_file();
+
 	printf(_("\nSuccess. You can now start the database server using:\n\n"
 			 "    %s%s%spg_ctl%s -D %s%s%s -l logfile start\n\n"),
 		   QUOTE_PATH, bin_dir, (strlen(bin_dir) > 0) ? DIR_SEP : "", QUOTE_PATH,
 		   QUOTE_PATH, pgdata_native, QUOTE_PATH);
 
-	/* Calculate elapsed time */
-	time_diff = (((double)clock()) / CLOCKS_PER_SEC) - time_start;
-	char *exec_time[50];
-	sprintf(exec_time, "%f", time_diff);
-	submitInitdbTime(exec_time);
-	
 	return 0;
 }

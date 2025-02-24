@@ -1,3 +1,4 @@
+--- PK and Null value
 CREATE TABLE IF NOT EXISTS nation  ( N_NATIONKEY INTEGER primary key,
     N_NAME       CHAR(25) NOT NULL,
     N_REGIONKEY  INTEGER NOT NULL,
