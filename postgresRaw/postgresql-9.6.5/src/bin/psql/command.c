@@ -3996,7 +3996,7 @@ void submitExecutionTime(char *time_result, char *db_type, char *query)
 
 	if ((outfile = fopen(filePath, "a")) == NULL)
 	{
-		fprintf(stderr, "File %s not found...", outfile);
+		fprintf(stderr, "\nFile %s not found! The file queryExecTime.csv does not have a right permission.\n", outfile);
 		return false;
 	}
 
@@ -4047,7 +4047,7 @@ void submitExecutionResult(PGresult *query_result, char *db_type, char *query)
 
 	if ((outfile = fopen(filePath, "a")) == NULL)
 	{
-		fprintf(stderr, "File %s not found...", outfile);
+		fprintf(stderr, "\nFile %s not found! The file queryPlan.csv does not have a right permission\n", outfile);
 		return false;
 	}
 
@@ -4128,7 +4128,7 @@ void resetQueryPlanResult()
 
 	if ((outfile = fopen(filePath, "w")) == NULL)
 	{
-		fprintf(stderr, "File %s not found...", outfile);
+		fprintf(stderr, "\nFile %s not found...\n", outfile);
 		return false;
 	}
 
@@ -4167,7 +4167,7 @@ void resetQueryExecTimeResult()
 
 	if ((outfile = fopen(filePath, "w")) == NULL)
 	{
-		fprintf(stderr, "File %s not found...", outfile);
+		fprintf(stderr, "\nFile %s not found...\n", outfile);
 		return false;
 	}
 
