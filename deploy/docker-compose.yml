@@ -15,9 +15,11 @@ services:
     ports:
       - "5554:5432"
     volumes:
-      - ../data:/data
+      - ../data:/data:rw
       - ../datasets:/datasets:ro
-      - ../result:/result
+      - ../result:/result:rw
+      - ../test:/test:rw
+      - ../schema:/schema:rw
 
   # create container to run the analysis
   analysis:
