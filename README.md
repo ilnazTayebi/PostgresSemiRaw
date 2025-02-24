@@ -30,6 +30,7 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
 │     ├── 📂 postgresql-9.0.0  # Source code of postgresql-9.6.5.
 │     │── 📂 postgresql-9.6.5  # Source code of postgresSemiRaw based on the postgresql-9.6.5.
 │     └── 📂 test              # Testing PostgresRAW over PostgreSQL 9.6.5.
+│── 📂 PostgresRawUI           # Source code of postgresRawUI.
 │── 📂 result                  # Results csv files.
 │── 📂 schema                  # Script for database initialization.
 │── 📂 test                    # Script for run the experiment.
