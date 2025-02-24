@@ -1,0 +1,369 @@
+DB_Type,Query,Local_Time,Query_result
+pgRaw,'EXPLAIN SELECT S_NAME, S_ADDRESS FROM Supplier WHERE S_NATIONKEY IN (SELECT N_NATIONKEY FROM Nation WHERE N_REGIONKEY = 1);',2025-01-12 13:29:05,'Nested Loop Semi Join  (cost=0.00..17.01 rows=1 width=64)
+  Join Filter: (supplier.s_nationkey = nation.n_nationkey)
+  ->  Seq Scan on supplier  (cost=0.00..17.00 rows=1 width=68)
+  ->  Seq Scan on nation  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 1)'
+pgRaw,'EXPLAIN SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;',2025-01-12 13:29:57,'Seq Scan on orders  (cost=0.00..2171.00 rows=1 width=22)
+  Filter: (o_totalprice > '100000'::numeric)'
+pgRaw,'EXPLAIN SELECT C.C_NAME, C.C_ADDRESS, O.O_ORDERKEY, O.O_TOTALPRICE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY WHERE C.C_NATIONKEY = 10;',2025-01-12 13:31:20,'Nested Loop  (cost=0.00..8490.01 rows=1 width=86)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Seq Scan on customer c  (cost=0.00..6319.00 rows=1 width=68)
+        Filter: (c_nationkey = 10)
+  ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=26)'
+pgRaw,'EXPLAIN SELECT P.P_NAME, S.S_NAME, PS.PS_SUPPLYCOST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY JOIN Supplier S ON PS.PS_SUPPKEY = S.S_SUPPKEY JOIN Nation N ON S.S_NATIONKEY = N.N_NATIONKEY WHERE N.N_REGIONKEY = 2;',2025-01-12 13:38:07,'Nested Loop  (cost=0.00..1773.04 rows=1 width=82)
+  Join Filter: (s.s_nationkey = n.n_nationkey)
+  ->  Nested Loop  (cost=0.00..1773.03 rows=1 width=86)
+        Join Filter: (ps.ps_suppkey = s.s_suppkey)
+        ->  Nested Loop  (cost=0.00..1756.01 rows=1 width=54)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Seq Scan on part p  (cost=0.00..327.00 rows=1 width=36)
+              ->  Seq Scan on partsupp ps  (cost=0.00..1429.00 rows=1 width=26)
+        ->  Seq Scan on supplier s  (cost=0.00..17.00 rows=1 width=40)
+  ->  Seq Scan on nation n  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 2)'
+pgRaw,'EXPLAIN SELECT P.P_PARTKEY, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY GROUP BY P.P_PARTKEY;',2025-01-12 13:47:25,'GroupAggregate  (cost=1756.02..1756.05 rows=1 width=36)
+  Group Key: p.p_partkey
+  ->  Sort  (cost=1756.02..1756.03 rows=1 width=22)
+        Sort Key: p.p_partkey
+        ->  Nested Loop  (cost=0.00..1756.01 rows=1 width=22)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Seq Scan on part p  (cost=0.00..327.00 rows=1 width=4)
+              ->  Seq Scan on partsupp ps  (cost=0.00..1429.00 rows=1 width=22)'
+pgRaw,'EXPLAIN SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;',2025-01-12 13:55:29,'GroupAggregate  (cost=2171.01..2171.03 rows=1 width=36)
+  Group Key: o_custkey
+  ->  Sort  (cost=2171.01..2171.02 rows=1 width=22)
+        Sort Key: o_custkey
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgRaw,'EXPLAIN SELECT P.P_NAME FROM Part P WHERE NOT EXISTS (SELECT 1 FROM Partsupp PS WHERE PS.PS_PARTKEY = P.P_PARTKEY);',2025-01-12 13:56:14,'Nested Loop Anti Join  (cost=0.00..1756.02 rows=1 width=32)
+  Join Filter: (ps.ps_partkey = p.p_partkey)
+  ->  Seq Scan on part p  (cost=0.00..327.00 rows=1 width=36)
+  ->  Materialize  (cost=0.00..1429.01 rows=1 width=4)
+        ->  Seq Scan on partsupp ps  (cost=0.00..1429.00 rows=1 width=4)'
+pgRaw,'EXPLAIN SELECT C.C_NAME FROM Customer C WHERE EXISTS (SELECT 1 FROM Orders O WHERE O.O_CUSTKEY = C.C_CUSTKEY AND O.O_TOTALPRICE > 50000);',2025-01-12 14:01:54,'Nested Loop Semi Join  (cost=0.00..8490.02 rows=1 width=32)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Seq Scan on customer c  (cost=0.00..6319.00 rows=1 width=36)
+  ->  Materialize  (cost=0.00..2171.01 rows=1 width=4)
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=4)
+              Filter: (o_totalprice > '50000'::numeric)'
+pgRaw,'EXPLAIN SELECT S.S_NAME, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST, RANK() OVER (ORDER BY SUM(PS.PS_SUPPLYCOST) DESC) AS RANK FROM Supplier S JOIN Partsupp PS ON S.S_SUPPKEY = PS.PS_SUPPKEY GROUP BY S.S_NAME;',2025-01-12 16:05:30,'WindowAgg  (cost=1446.06..1446.08 rows=1 width=72)
+  ->  Sort  (cost=1446.06..1446.06 rows=1 width=64)
+        Sort Key: (sum(ps.ps_supplycost)) DESC
+        ->  GroupAggregate  (cost=1446.02..1446.05 rows=1 width=64)
+              Group Key: s.s_name
+              ->  Sort  (cost=1446.02..1446.03 rows=1 width=50)
+                    Sort Key: s.s_name
+                    ->  Nested Loop  (cost=0.00..1446.01 rows=1 width=50)
+                          Join Filter: (s.s_suppkey = ps.ps_suppkey)
+                          ->  Seq Scan on supplier s  (cost=0.00..17.00 rows=1 width=36)
+                          ->  Seq Scan on partsupp ps  (cost=0.00..1429.00 rows=1 width=22)'
+pgRaw,'EXPLAIN SELECT C.C_NAME, SUM(O.O_TOTALPRICE) AS TOTAL_ORDER_VALUE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY GROUP BY C.C_NAME ORDER BY TOTAL_ORDER_VALUE DESC LIMIT 5;',2025-01-12 16:08:12,'Limit  (cost=8490.06..8490.06 rows=1 width=64)
+  ->  Sort  (cost=8490.06..8490.06 rows=1 width=64)
+        Sort Key: (sum(o.o_totalprice)) DESC
+        ->  GroupAggregate  (cost=8490.02..8490.05 rows=1 width=64)
+              Group Key: c.c_name
+              ->  Sort  (cost=8490.02..8490.03 rows=1 width=50)
+                    Sort Key: c.c_name
+                    ->  Nested Loop  (cost=0.00..8490.01 rows=1 width=50)
+                          Join Filter: (c.c_custkey = o.o_custkey)
+                          ->  Seq Scan on customer c  (cost=0.00..6319.00 rows=1 width=36)
+                          ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawPk,'EXPLAIN SELECT S_NAME, S_ADDRESS FROM Supplier WHERE S_NATIONKEY IN (SELECT N_NATIONKEY FROM Nation WHERE N_REGIONKEY = 1);',2025-01-12 18:34:28,'Nested Loop Semi Join  (cost=0.00..17.01 rows=1 width=202)
+  Join Filter: (supplier.s_nationkey = nation.n_nationkey)
+  ->  Seq Scan on supplier  (cost=0.00..17.00 rows=1 width=206)
+  ->  Seq Scan on nation  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 1)'
+pgSemiRawPk,'EXPLAIN SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;',2025-01-12 18:42:32,'Seq Scan on orders  (cost=0.00..2171.00 rows=1 width=22)
+  Filter: (o_totalprice > '100000'::numeric)'
+pgSemiRawPk,'EXPLAIN SELECT C.C_NAME, C.C_ADDRESS, O.O_ORDERKEY, O.O_TOTALPRICE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY WHERE C.C_NATIONKEY = 10;',2025-01-12 18:43:52,'Nested Loop  (cost=0.12..2179.15 rows=1 width=188)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=170)
+        Filter: (c_nationkey = 10)
+  ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=26)'
+pgSemiRawPk,'EXPLAIN SELECT P.P_NAME, S.S_NAME, PS.PS_SUPPLYCOST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY JOIN Supplier S ON PS.PS_SUPPKEY = S.S_SUPPKEY JOIN Nation N ON S.S_NATIONKEY = N.N_NATIONKEY WHERE N.N_REGIONKEY = 2;',2025-01-12 18:57:08,'Nested Loop  (cost=0.38..24.46 rows=1 width=250)
+  Join Filter: (s.s_nationkey = n.n_nationkey)
+  ->  Nested Loop  (cost=0.38..24.44 rows=1 width=254)
+        Join Filter: (ps.ps_suppkey = s.s_suppkey)
+        ->  Nested Loop  (cost=0.25..16.29 rows=1 width=150)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+              ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=26)
+        ->  Index Scan using supplier_pkey on supplier s  (cost=0.12..8.14 rows=1 width=112)
+  ->  Seq Scan on nation n  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 2)'
+pgSemiRawPk,'EXPLAIN SELECT P.P_PARTKEY, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY GROUP BY P.P_PARTKEY;',2025-01-12 19:08:46,'GroupAggregate  (cost=0.25..16.31 rows=1 width=36)
+  Group Key: p.p_partkey
+  ->  Nested Loop  (cost=0.25..16.29 rows=1 width=22)
+        Join Filter: (p.p_partkey = ps.ps_partkey)
+        ->  Index Only Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=4)
+        ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)'
+pgSemiRawPk,'EXPLAIN SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;',2025-01-12 19:09:56,'GroupAggregate  (cost=2171.01..2171.03 rows=1 width=36)
+  Group Key: o_custkey
+  ->  Sort  (cost=2171.01..2171.02 rows=1 width=22)
+        Sort Key: o_custkey
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawPk,'EXPLAIN SELECT P.P_NAME FROM Part P WHERE NOT EXISTS (SELECT 1 FROM Partsupp PS WHERE PS.PS_PARTKEY = P.P_PARTKEY);',2025-01-12 19:10:36,'Merge Anti Join  (cost=0.25..16.29 rows=1 width=128)
+  Merge Cond: (p.p_partkey = ps.ps_partkey)
+  ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+  ->  Index Only Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=4)'
+pgSemiRawPk,'EXPLAIN SELECT C.C_NAME FROM Customer C WHERE EXISTS (SELECT 1 FROM Orders O WHERE O.O_CUSTKEY = C.C_CUSTKEY AND O.O_TOTALPRICE > 50000);',2025-01-12 19:11:39,'Nested Loop Semi Join  (cost=0.12..2179.16 rows=1 width=68)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+  ->  Materialize  (cost=0.00..2171.01 rows=1 width=4)
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=4)
+              Filter: (o_totalprice > '50000'::numeric)'
+pgSemiRawPk,'EXPLAIN SELECT S.S_NAME, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST, RANK() OVER (ORDER BY SUM(PS.PS_SUPPLYCOST) DESC) AS RANK FROM Supplier S JOIN Partsupp PS ON S.S_SUPPKEY = PS.PS_SUPPKEY GROUP BY S.S_NAME;',2025-01-12 20:21:10,'WindowAgg  (cost=16.34..16.36 rows=1 width=144)
+  ->  Sort  (cost=16.34..16.34 rows=1 width=136)
+        Sort Key: (sum(ps.ps_supplycost)) DESC
+        ->  GroupAggregate  (cost=16.30..16.33 rows=1 width=136)
+              Group Key: s.s_name
+              ->  Sort  (cost=16.30..16.31 rows=1 width=122)
+                    Sort Key: s.s_name
+                    ->  Nested Loop  (cost=0.25..16.29 rows=1 width=122)
+                          ->  Index Scan using supplier_pkey on supplier s  (cost=0.12..8.14 rows=1 width=108)
+                          ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)
+                                Index Cond: (ps_suppkey = s.s_suppkey)'
+pgSemiRawPk,'EXPLAIN SELECT C.C_NAME, SUM(O.O_TOTALPRICE) AS TOTAL_ORDER_VALUE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY GROUP BY C.C_NAME ORDER BY TOTAL_ORDER_VALUE DESC LIMIT 5;',2025-01-12 20:23:48,'Limit  (cost=2179.20..2179.20 rows=1 width=100)
+  ->  Sort  (cost=2179.20..2179.20 rows=1 width=100)
+        Sort Key: (sum(o.o_totalprice)) DESC
+        ->  GroupAggregate  (cost=2179.16..2179.19 rows=1 width=100)
+              Group Key: c.c_name
+              ->  Sort  (cost=2179.16..2179.17 rows=1 width=86)
+                    Sort Key: c.c_name
+                    ->  Nested Loop  (cost=0.12..2179.15 rows=1 width=86)
+                          Join Filter: (c.c_custkey = o.o_custkey)
+                          ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+                          ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawNullValue,'EXPLAIN SELECT S_NAME, S_ADDRESS FROM Supplier WHERE S_NATIONKEY IN (SELECT N_NATIONKEY FROM Nation WHERE N_REGIONKEY = 1);',2025-01-12 20:32:20,'Nested Loop Semi Join  (cost=0.00..17.01 rows=1 width=202)
+  Join Filter: (supplier.s_nationkey = nation.n_nationkey)
+  ->  Seq Scan on supplier  (cost=0.00..17.00 rows=1 width=206)
+  ->  Seq Scan on nation  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 1)'
+pgSemiRawNullValue,'EXPLAIN SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;',2025-01-12 20:37:18,'Seq Scan on orders  (cost=0.00..2171.00 rows=1 width=22)
+  Filter: (o_totalprice > '100000'::numeric)'
+pgSemiRawNullValue,'EXPLAIN SELECT C.C_NAME, C.C_ADDRESS, O.O_ORDERKEY, O.O_TOTALPRICE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY WHERE C.C_NATIONKEY = 10;',2025-01-12 20:38:23,'Nested Loop  (cost=0.12..2179.15 rows=1 width=188)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=170)
+        Filter: (c_nationkey = 10)
+  ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=26)'
+pgSemiRawNullValue,'EXPLAIN SELECT P.P_NAME, S.S_NAME, PS.PS_SUPPLYCOST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY JOIN Supplier S ON PS.PS_SUPPKEY = S.S_SUPPKEY JOIN Nation N ON S.S_NATIONKEY = N.N_NATIONKEY WHERE N.N_REGIONKEY = 2;',2025-01-12 20:44:17,'Nested Loop  (cost=0.38..24.46 rows=1 width=250)
+  Join Filter: (s.s_nationkey = n.n_nationkey)
+  ->  Nested Loop  (cost=0.38..24.44 rows=1 width=254)
+        Join Filter: (ps.ps_suppkey = s.s_suppkey)
+        ->  Nested Loop  (cost=0.25..16.29 rows=1 width=150)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+              ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=26)
+        ->  Index Scan using supplier_pkey on supplier s  (cost=0.12..8.14 rows=1 width=112)
+  ->  Seq Scan on nation n  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 2)'
+pgSemiRawNullValue,'EXPLAIN SELECT P.P_PARTKEY, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY GROUP BY P.P_PARTKEY;',2025-01-12 21:00:19,'GroupAggregate  (cost=0.25..16.31 rows=1 width=36)
+  Group Key: p.p_partkey
+  ->  Nested Loop  (cost=0.25..16.29 rows=1 width=22)
+        Join Filter: (p.p_partkey = ps.ps_partkey)
+        ->  Index Only Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=4)
+        ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)'
+pgSemiRawNullValue,'EXPLAIN SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;',2025-01-12 21:01:53,'GroupAggregate  (cost=2171.01..2171.03 rows=1 width=36)
+  Group Key: o_custkey
+  ->  Sort  (cost=2171.01..2171.02 rows=1 width=22)
+        Sort Key: o_custkey
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawNullValue,'EXPLAIN SELECT P.P_NAME FROM Part P WHERE NOT EXISTS (SELECT 1 FROM Partsupp PS WHERE PS.PS_PARTKEY = P.P_PARTKEY);',2025-01-12 21:04:33,'Merge Anti Join  (cost=0.25..16.29 rows=1 width=128)
+  Merge Cond: (p.p_partkey = ps.ps_partkey)
+  ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+  ->  Index Only Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=4)'
+pgSemiRawNullValue,'EXPLAIN SELECT C.C_NAME FROM Customer C WHERE EXISTS (SELECT 1 FROM Orders O WHERE O.O_CUSTKEY = C.C_CUSTKEY AND O.O_TOTALPRICE > 50000);',2025-01-12 21:05:30,'Nested Loop Semi Join  (cost=0.12..2179.16 rows=1 width=68)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+  ->  Materialize  (cost=0.00..2171.01 rows=1 width=4)
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=4)
+              Filter: (o_totalprice > '50000'::numeric)'
+pgSemiRawNullValue,'EXPLAIN SELECT C.C_NAME FROM Customer C WHERE EXISTS (SELECT 1 FROM Orders O WHERE O.O_CUSTKEY = C.C_CUSTKEY AND O.O_TOTALPRICE > 50000);',2025-01-12 21:05:32,'Nested Loop Semi Join  (cost=0.12..2179.16 rows=1 width=68)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+  ->  Materialize  (cost=0.00..2171.01 rows=1 width=4)
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=4)
+              Filter: (o_totalprice > '50000'::numeric)'
+pgSemiRawNullValue,'EXPLAIN SELECT S.S_NAME, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST, RANK() OVER (ORDER BY SUM(PS.PS_SUPPLYCOST) DESC) AS RANK FROM Supplier S JOIN Partsupp PS ON S.S_SUPPKEY = PS.PS_SUPPKEY GROUP BY S.S_NAME;',2025-01-12 21:12:59,'WindowAgg  (cost=16.34..16.36 rows=1 width=144)
+  ->  Sort  (cost=16.34..16.34 rows=1 width=136)
+        Sort Key: (sum(ps.ps_supplycost)) DESC
+        ->  GroupAggregate  (cost=16.30..16.33 rows=1 width=136)
+              Group Key: s.s_name
+              ->  Sort  (cost=16.30..16.31 rows=1 width=122)
+                    Sort Key: s.s_name
+                    ->  Nested Loop  (cost=0.25..16.29 rows=1 width=122)
+                          ->  Index Scan using supplier_pkey on supplier s  (cost=0.12..8.14 rows=1 width=108)
+                          ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)
+                                Index Cond: (ps_suppkey = s.s_suppkey)'
+pgSemiRawNullValue,'EXPLAIN SELECT C.C_NAME, SUM(O.O_TOTALPRICE) AS TOTAL_ORDER_VALUE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY GROUP BY C.C_NAME ORDER BY TOTAL_ORDER_VALUE DESC LIMIT 5;',2025-01-12 21:14:14,'Limit  (cost=2179.20..2179.20 rows=1 width=100)
+  ->  Sort  (cost=2179.20..2179.20 rows=1 width=100)
+        Sort Key: (sum(o.o_totalprice)) DESC
+        ->  GroupAggregate  (cost=2179.16..2179.19 rows=1 width=100)
+              Group Key: c.c_name
+              ->  Sort  (cost=2179.16..2179.17 rows=1 width=86)
+                    Sort Key: c.c_name
+                    ->  Nested Loop  (cost=0.12..2179.15 rows=1 width=86)
+                          Join Filter: (c.c_custkey = o.o_custkey)
+                          ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+                          ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawStatistics,'EXPLAIN SELECT S_NAME, S_ADDRESS FROM Supplier WHERE S_NATIONKEY IN (SELECT N_NATIONKEY FROM Nation WHERE N_REGIONKEY = 1);',2025-01-12 21:19:04,'Nested Loop Semi Join  (cost=0.00..0.01 rows=1 width=202)
+  Join Filter: (supplier.s_nationkey = nation.n_nationkey)
+  ->  Seq Scan on supplier  (cost=0.00..0.00 rows=1 width=206)
+  ->  Seq Scan on nation  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 1)'
+pgSemiRawStatistics,'EXPLAIN SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;',2025-01-12 21:21:26,'Seq Scan on orders  (cost=0.00..0.00 rows=1 width=22)
+  Filter: (o_totalprice > '100000'::numeric)'
+pgSemiRawStatistics,'EXPLAIN SELECT C.C_NAME, C.C_ADDRESS, O.O_ORDERKEY, O.O_TOTALPRICE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY WHERE C.C_NATIONKEY = 10;',2025-01-12 21:22:21,'Nested Loop  (cost=0.00..0.01 rows=1 width=188)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Seq Scan on customer c  (cost=0.00..0.00 rows=1 width=170)
+        Filter: (c_nationkey = 10)
+  ->  Seq Scan on orders o  (cost=0.00..0.00 rows=1 width=26)'
+pgSemiRawStatistics,'EXPLAIN SELECT P.P_NAME, S.S_NAME, PS.PS_SUPPLYCOST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY JOIN Supplier S ON PS.PS_SUPPKEY = S.S_SUPPKEY JOIN Nation N ON S.S_NATIONKEY = N.N_NATIONKEY WHERE N.N_REGIONKEY = 2;',2025-01-12 23:28:23,'Nested Loop  (cost=0.00..0.04 rows=1 width=250)
+  Join Filter: (s.s_nationkey = n.n_nationkey)
+  ->  Nested Loop  (cost=0.00..0.03 rows=1 width=254)
+        Join Filter: (ps.ps_suppkey = s.s_suppkey)
+        ->  Nested Loop  (cost=0.00..0.01 rows=1 width=150)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Seq Scan on part p  (cost=0.00..0.00 rows=1 width=132)
+              ->  Seq Scan on partsupp ps  (cost=0.00..0.00 rows=1 width=26)
+        ->  Seq Scan on supplier s  (cost=0.00..0.00 rows=1 width=112)
+  ->  Seq Scan on nation n  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 2)'
+pgSemiRawStatistics,'EXPLAIN SELECT P.P_PARTKEY, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY GROUP BY P.P_PARTKEY;',2025-01-12 23:38:46,'GroupAggregate  (cost=0.25..16.31 rows=1 width=36)
+  Group Key: p.p_partkey
+  ->  Nested Loop  (cost=0.25..16.29 rows=1 width=22)
+        Join Filter: (p.p_partkey = ps.ps_partkey)
+        ->  Index Only Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=4)
+        ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)'
+pgSemiRawStatistics,'EXPLAIN SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;',2025-01-12 23:40:20,'GroupAggregate  (cost=2171.01..2171.03 rows=1 width=36)
+  Group Key: o_custkey
+  ->  Sort  (cost=2171.01..2171.02 rows=1 width=22)
+        Sort Key: o_custkey
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawStatistics,'EXPLAIN SELECT P.P_NAME FROM Part P WHERE NOT EXISTS (SELECT 1 FROM Partsupp PS WHERE PS.PS_PARTKEY = P.P_PARTKEY);',2025-01-12 23:41:12,'Merge Anti Join  (cost=0.25..16.29 rows=1 width=128)
+  Merge Cond: (p.p_partkey = ps.ps_partkey)
+  ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+  ->  Index Only Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=4)'
+pgSemiRawStatistics,'EXPLAIN SELECT C.C_NAME FROM Customer C WHERE EXISTS (SELECT 1 FROM Orders O WHERE O.O_CUSTKEY = C.C_CUSTKEY AND O.O_TOTALPRICE > 50000);',2025-01-12 23:50:51,'Nested Loop Semi Join  (cost=0.12..2179.16 rows=1 width=68)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+  ->  Materialize  (cost=0.00..2171.01 rows=1 width=4)
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=4)
+              Filter: (o_totalprice > '50000'::numeric)'
+pgSemiRawStatistics,'EXPLAIN SELECT C.C_NAME, SUM(O.O_TOTALPRICE) AS TOTAL_ORDER_VALUE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY GROUP BY C.C_NAME ORDER BY TOTAL_ORDER_VALUE DESC LIMIT 5;',2025-01-13 00:42:21,'Limit  (cost=2179.20..2179.20 rows=1 width=100)
+  ->  Sort  (cost=2179.20..2179.20 rows=1 width=100)
+        Sort Key: (sum(o.o_totalprice)) DESC
+        ->  GroupAggregate  (cost=2179.16..2179.19 rows=1 width=100)
+              Group Key: c.c_name
+              ->  Sort  (cost=2179.16..2179.17 rows=1 width=86)
+                    Sort Key: c.c_name
+                    ->  Nested Loop  (cost=0.12..2179.15 rows=1 width=86)
+                          Join Filter: (c.c_custkey = o.o_custkey)
+                          ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+                          ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawFk,'EXPLAIN SELECT S_NAME, S_ADDRESS FROM Supplier WHERE S_NATIONKEY IN (SELECT N_NATIONKEY FROM Nation WHERE N_REGIONKEY = 1);',2025-01-13 12:01:30,'Nested Loop Semi Join  (cost=0.00..0.01 rows=1 width=166)
+  Join Filter: (supplier.s_nationkey = nation.n_nationkey)
+  ->  Seq Scan on supplier  (cost=0.00..0.00 rows=1 width=170)
+  ->  Seq Scan on nation  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 1)'
+pgSemiRawFk,'EXPLAIN SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;',2025-01-13 12:01:55,'Seq Scan on orders  (cost=0.00..0.00 rows=1 width=22)
+  Filter: (o_totalprice > '100000'::numeric)'
+pgSemiRawFk,'EXPLAIN SELECT C.C_NAME, C.C_ADDRESS, O.O_ORDERKEY, O.O_TOTALPRICE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY WHERE C.C_NATIONKEY = 10;',2025-01-13 12:03:54,'Nested Loop  (cost=0.00..0.01 rows=1 width=188)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Seq Scan on customer c  (cost=0.00..0.00 rows=1 width=170)
+        Filter: (c_nationkey = 10)
+  ->  Seq Scan on orders o  (cost=0.00..0.00 rows=1 width=26)'
+pgSemiRawFk,'EXPLAIN SELECT P.P_NAME, S.S_NAME, PS.PS_SUPPLYCOST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY JOIN Supplier S ON PS.PS_SUPPKEY = S.S_SUPPKEY JOIN Nation N ON S.S_NATIONKEY = N.N_NATIONKEY WHERE N.N_REGIONKEY = 2;',2025-01-13 14:21:12,'Nested Loop  (cost=0.00..0.04 rows=1 width=214)
+  Join Filter: (s.s_nationkey = n.n_nationkey)
+  ->  Nested Loop  (cost=0.00..0.03 rows=1 width=218)
+        Join Filter: (ps.ps_suppkey = s.s_suppkey)
+        ->  Nested Loop  (cost=0.00..0.01 rows=1 width=150)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Seq Scan on part p  (cost=0.00..0.00 rows=1 width=132)
+              ->  Seq Scan on partsupp ps  (cost=0.00..0.00 rows=1 width=26)
+        ->  Seq Scan on supplier s  (cost=0.00..0.00 rows=1 width=76)
+  ->  Seq Scan on nation n  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 2)'
+pgSemiRawFk,'EXPLAIN SELECT P.P_PARTKEY, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY GROUP BY P.P_PARTKEY;',2025-01-13 20:46:47,'HashAggregate  (cost=0.02..0.03 rows=1 width=36)
+  Group Key: p.p_partkey
+  ->  Nested Loop  (cost=0.00..0.01 rows=1 width=22)
+        Join Filter: (p.p_partkey = ps.ps_partkey)
+        ->  Seq Scan on part p  (cost=0.00..0.00 rows=1 width=4)
+        ->  Seq Scan on partsupp ps  (cost=0.00..0.00 rows=1 width=22)'
+pgSemiRawFkPk,'EXPLAIN SELECT S_NAME, S_ADDRESS FROM Supplier WHERE S_NATIONKEY IN (SELECT N_NATIONKEY FROM Nation WHERE N_REGIONKEY = 1);',2025-01-13 20:56:48,'Nested Loop Semi Join  (cost=0.00..17.01 rows=1 width=166)
+  Join Filter: (supplier.s_nationkey = nation.n_nationkey)
+  ->  Seq Scan on supplier  (cost=0.00..17.00 rows=1 width=170)
+  ->  Seq Scan on nation  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 1)'
+pgSemiRawFkPk,'EXPLAIN SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;',2025-01-13 21:00:36,'Seq Scan on orders  (cost=0.00..2171.00 rows=1 width=22)
+  Filter: (o_totalprice > '100000'::numeric)'
+pgSemiRawFkPk,'EXPLAIN SELECT C.C_NAME, C.C_ADDRESS, O.O_ORDERKEY, O.O_TOTALPRICE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY WHERE C.C_NATIONKEY = 10;',2025-01-13 21:03:25,'Nested Loop  (cost=0.12..2179.15 rows=1 width=188)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=170)
+        Filter: (c_nationkey = 10)
+  ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=26)'
+pgSemiRawFkPk,'EXPLAIN SELECT P.P_NAME, S.S_NAME, PS.PS_SUPPLYCOST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY JOIN Supplier S ON PS.PS_SUPPKEY = S.S_SUPPKEY JOIN Nation N ON S.S_NATIONKEY = N.N_NATIONKEY WHERE N.N_REGIONKEY = 2;',2025-01-13 21:10:04,'Nested Loop  (cost=0.38..24.46 rows=1 width=214)
+  Join Filter: (s.s_nationkey = n.n_nationkey)
+  ->  Nested Loop  (cost=0.38..24.44 rows=1 width=218)
+        Join Filter: (ps.ps_suppkey = s.s_suppkey)
+        ->  Nested Loop  (cost=0.25..16.29 rows=1 width=150)
+              Join Filter: (p.p_partkey = ps.ps_partkey)
+              ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+              ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=26)
+        ->  Index Scan using supplier_pkey on supplier s  (cost=0.12..8.14 rows=1 width=76)
+  ->  Seq Scan on nation n  (cost=0.00..0.00 rows=1 width=4)
+        Filter: (n_regionkey = 2)'
+pgSemiRawFkPk,'EXPLAIN SELECT P.P_PARTKEY, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST FROM Part P JOIN Partsupp PS ON P.P_PARTKEY = PS.PS_PARTKEY GROUP BY P.P_PARTKEY;',2025-01-13 21:19:19,'GroupAggregate  (cost=0.25..16.31 rows=1 width=36)
+  Group Key: p.p_partkey
+  ->  Nested Loop  (cost=0.25..16.29 rows=1 width=22)
+        Join Filter: (p.p_partkey = ps.ps_partkey)
+        ->  Index Only Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=4)
+        ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)'
+pgSemiRawFkPk,'EXPLAIN SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;',2025-01-13 21:20:14,'GroupAggregate  (cost=2171.01..2171.03 rows=1 width=36)
+  Group Key: o_custkey
+  ->  Sort  (cost=2171.01..2171.02 rows=1 width=22)
+        Sort Key: o_custkey
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawFkPk,'EXPLAIN SELECT P.P_NAME FROM Part P WHERE NOT EXISTS (SELECT 1 FROM Partsupp PS WHERE PS.PS_PARTKEY = P.P_PARTKEY);',2025-01-13 21:23:24,'Merge Anti Join  (cost=0.25..16.29 rows=1 width=128)
+  Merge Cond: (p.p_partkey = ps.ps_partkey)
+  ->  Index Scan using part_pkey on part p  (cost=0.12..8.14 rows=1 width=132)
+  ->  Index Only Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=4)'
+pgSemiRawFkPk,'EXPLAIN SELECT C.C_NAME FROM Customer C WHERE EXISTS (SELECT 1 FROM Orders O WHERE O.O_CUSTKEY = C.C_CUSTKEY AND O.O_TOTALPRICE > 50000);',2025-01-13 21:25:04,'Nested Loop Semi Join  (cost=0.12..2179.16 rows=1 width=68)
+  Join Filter: (c.c_custkey = o.o_custkey)
+  ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+  ->  Materialize  (cost=0.00..2171.01 rows=1 width=4)
+        ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=4)
+              Filter: (o_totalprice > '50000'::numeric)'
+pgSemiRawFkPk,'EXPLAIN SELECT S.S_NAME, SUM(PS.PS_SUPPLYCOST) AS TOTAL_SUPPLY_COST, RANK() OVER (ORDER BY SUM(PS.PS_SUPPLYCOST) DESC) AS RANK FROM Supplier S JOIN Partsupp PS ON S.S_SUPPKEY = PS.PS_SUPPKEY GROUP BY S.S_NAME;',2025-01-13 21:56:12,'WindowAgg  (cost=16.34..16.36 rows=1 width=108)
+  ->  Sort  (cost=16.34..16.34 rows=1 width=100)
+        Sort Key: (sum(ps.ps_supplycost)) DESC
+        ->  GroupAggregate  (cost=16.30..16.33 rows=1 width=100)
+              Group Key: s.s_name
+              ->  Sort  (cost=16.30..16.31 rows=1 width=86)
+                    Sort Key: s.s_name
+                    ->  Nested Loop  (cost=0.25..16.29 rows=1 width=86)
+                          ->  Index Scan using supplier_pkey on supplier s  (cost=0.12..8.14 rows=1 width=72)
+                          ->  Index Scan using partsupp_pkey on partsupp ps  (cost=0.12..8.14 rows=1 width=22)
+                                Index Cond: (ps_suppkey = s.s_suppkey)'
+pgSemiRawFkPk,'EXPLAIN SELECT C.C_NAME, SUM(O.O_TOTALPRICE) AS TOTAL_ORDER_VALUE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY GROUP BY C.C_NAME ORDER BY TOTAL_ORDER_VALUE DESC LIMIT 5;',2025-01-13 21:57:25,'Limit  (cost=2179.20..2179.20 rows=1 width=100)
+  ->  Sort  (cost=2179.20..2179.20 rows=1 width=100)
+        Sort Key: (sum(o.o_totalprice)) DESC
+        ->  GroupAggregate  (cost=2179.16..2179.19 rows=1 width=100)
+              Group Key: c.c_name
+              ->  Sort  (cost=2179.16..2179.17 rows=1 width=86)
+                    Sort Key: c.c_name
+                    ->  Nested Loop  (cost=0.12..2179.15 rows=1 width=86)
+                          Join Filter: (c.c_custkey = o.o_custkey)
+                          ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+                          ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'
+pgSemiRawFkPk,'EXPLAIN SELECT C.C_NAME, SUM(O.O_TOTALPRICE) AS TOTAL_ORDER_VALUE FROM Customer C JOIN Orders O ON C.C_CUSTKEY = O.O_CUSTKEY GROUP BY C.C_NAME ORDER BY TOTAL_ORDER_VALUE DESC LIMIT 5;',2025-01-13 21:59:26,'Limit  (cost=2179.20..2179.20 rows=1 width=100)
+  ->  Sort  (cost=2179.20..2179.20 rows=1 width=100)
+        Sort Key: (sum(o.o_totalprice)) DESC
+        ->  GroupAggregate  (cost=2179.16..2179.19 rows=1 width=100)
+              Group Key: c.c_name
+              ->  Sort  (cost=2179.16..2179.17 rows=1 width=86)
+                    Sort Key: c.c_name
+                    ->  Nested Loop  (cost=0.12..2179.15 rows=1 width=86)
+                          Join Filter: (c.c_custkey = o.o_custkey)
+                          ->  Index Scan using customer_pkey on customer c  (cost=0.12..8.14 rows=1 width=72)
+                          ->  Seq Scan on orders o  (cost=0.00..2171.00 rows=1 width=22)'

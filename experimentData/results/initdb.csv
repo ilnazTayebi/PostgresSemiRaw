@@ -1,0 +1,533 @@
+DB_Type,Execution_Time,Local_Time,commandType
+PostgresSemiRaw, 0.005601,Sat Jan 11 19:38:06 2025
+,Unknown
+PostgresSemiRaw, 0.002031,Sat Jan 11 19:38:13 2025
+,Unknown
+PostgresSemiRaw, 0.002304,Sat Jan 11 19:38:24 2025
+,Unknown
+PostgresSemiRaw, 0.000004,Sat Jan 11 19:38:24 2025
+,Unknown
+PostgresSemiRaw, 0.001869,Sat Jan 11 19:58:32 2025
+,Unknown
+PostgresSemiRaw, 0.002189,Sat Jan 11 19:59:05 2025
+,Unknown
+PostgresSemiRaw, 0.002389,Sat Jan 11 19:59:40 2025
+,Unknown
+PostgresSemiRaw, 0.002716,Sat Jan 11 19:59:48 2025
+,Unknown
+PostgresSemiRaw, 0.001843,Sat Jan 11 20:04:18 2025
+,Unknown
+PostgresSemiRaw, 0.002923,Sat Jan 11 20:04:25 2025
+,Unknown
+PostgresSemiRaw, 0.002681,Sat Jan 11 20:14:01 2025
+,Unknown
+PostgresSemiRaw, 0.002133,Sat Jan 11 20:14:07 2025
+,Unknown
+PostgresSemiRaw, 0.003062,Sat Jan 11 20:37:14 2025
+,Unknown
+PostgresSemiRaw, 0.002008,Sat Jan 11 20:37:21 2025
+,Unknown
+PostgresSemiRaw, 0.002281,Sun Jan 12 11:41:19 2025
+,Unknown
+PostgresSemiRaw, 0.001784,Sun Jan 12 11:41:30 2025
+,Unknown
+PostgresSemiRaw, 0.001529,Sun Jan 12 11:55:10 2025
+,Unknown
+PostgresSemiRaw, 0.001041,Sun Jan 12 11:58:22 2025
+,Unknown
+PostgresSemiRaw, 0.001405,Sun Jan 12 12:00:35 2025
+,Unknown
+PostgresSemiRaw, 0.001394,Sun Jan 12 12:02:11 2025
+,Unknown
+PostgresSemiRaw, 0.001641,Sun Jan 12 12:03:51 2025
+,Unknown
+PostgresSemiRaw, 0.001308,Sun Jan 12 12:05:14 2025
+,Unknown
+PostgresSemiRaw, 0.001781,Sun Jan 12 12:13:53 2025
+,Unknown
+PostgresSemiRaw, 0.001776,Sun Jan 12 12:13:58 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 12:14:01 2025
+,Unknown
+PostgresSemiRaw, 0.001472,Sun Jan 12 12:20:39 2025
+,Unknown
+PostgresSemiRaw, 0.001294,Sun Jan 12 12:21:02 2025
+,Unknown
+PostgresSemiRaw, 0.002149,Sun Jan 12 12:33:21 2025
+,Unknown
+PostgresSemiRaw, 0.000001,Sun Jan 12 12:34:27 2025
+,Unknown
+PostgresSemiRaw, 0.001472,Sun Jan 12 12:35:41 2025
+,Unknown
+PostgresSemiRaw, 0.001723,Sun Jan 12 12:36:00 2025
+,Unknown
+PostgresSemiRaw, 0.001238,Sun Jan 12 12:46:43 2025
+,Unknown
+PostgresSemiRaw, 0.001365,Sun Jan 12 12:48:15 2025
+,Unknown
+PostgresSemiRaw, 0.001407,Sun Jan 12 12:50:49 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 12:52:12 2025
+,Unknown
+PostgresSemiRaw, 0.001476,Sun Jan 12 12:53:53 2025
+,Unknown
+PostgresSemiRaw, 0.001305,Sun Jan 12 12:54:07 2025
+,Unknown
+PostgresSemiRaw, 0.001644,Sun Jan 12 13:11:59 2025
+,Unknown
+PostgresSemiRaw, 0.001421,Sun Jan 12 13:28:47 2025
+,Unknown
+PostgresSemiRaw, 0.002026,Sun Jan 12 13:29:11 2025
+,Unknown
+PostgresSemiRaw, 0.001628,Sun Jan 12 13:29:53 2025
+,Unknown
+PostgresSemiRaw, 0.001772,Sun Jan 12 13:30:22 2025
+,Unknown
+PostgresSemiRaw, 0.001265,Sun Jan 12 13:31:17 2025
+,Unknown
+PostgresSemiRaw, 0.001584,Sun Jan 12 13:31:36 2025
+,Unknown
+PostgresSemiRaw, 0.001642,Sun Jan 12 13:38:04 2025
+,Unknown
+PostgresSemiRaw, 0.001555,Sun Jan 12 13:38:15 2025
+,Unknown
+PostgresSemiRaw, 0.001718,Sun Jan 12 13:46:32 2025
+,Unknown
+PostgresSemiRaw, 0.001411,Sun Jan 12 13:47:34 2025
+,Unknown
+PostgresSemiRaw, 0.001457,Sun Jan 12 13:53:28 2025
+,Unknown
+PostgresSemiRaw, 0.001392,Sun Jan 12 13:55:38 2025
+,Unknown
+PostgresSemiRaw, 0.001792,Sun Jan 12 13:56:11 2025
+,Unknown
+PostgresSemiRaw, 0.002158,Sun Jan 12 13:56:20 2025
+,Unknown
+PostgresSemiRaw, 0.001515,Sun Jan 12 14:01:51 2025
+,Unknown
+PostgresSemiRaw, 0.001954,Sun Jan 12 14:02:03 2025
+,Unknown
+PostgresSemiRaw, 0.002505,Sun Jan 12 16:04:34 2025
+,Unknown
+PostgresSemiRaw, 0.002458,Sun Jan 12 16:06:37 2025
+,Unknown
+PostgresSemiRaw, 0.001524,Sun Jan 12 16:08:08 2025
+,Unknown
+PostgresSemiRaw, 0.001735,Sun Jan 12 16:09:12 2025
+,Unknown
+PostgresSemiRaw, 0.002407,Sun Jan 12 17:22:58 2025
+,Unknown
+PostgresSemiRaw, 0.001669,Sun Jan 12 17:25:11 2025
+,Unknown
+PostgresSemiRaw, 0.001222,Sun Jan 12 17:25:25 2025
+,Unknown
+PostgresSemiRaw, 0.001504,Sun Jan 12 17:25:30 2025
+,Unknown
+PostgresSemiRaw, 0.001415,Sun Jan 12 17:25:51 2025
+,Unknown
+PostgresSemiRaw, 0.001862,Sun Jan 12 18:36:28 2025
+,Unknown
+PostgresSemiRaw, 0.002292,Sun Jan 12 18:42:04 2025
+,Unknown
+PostgresSemiRaw, 0.001923,Sun Jan 12 18:42:27 2025
+,Unknown
+PostgresSemiRaw, 0.001298,Sun Jan 12 18:42:43 2025
+,Unknown
+PostgresSemiRaw, 0.002216,Sun Jan 12 18:43:49 2025
+,Unknown
+PostgresSemiRaw, 0.001414,Sun Jan 12 18:44:02 2025
+,Unknown
+PostgresSemiRaw, 0.002216,Sun Jan 12 18:57:05 2025
+,Unknown
+PostgresSemiRaw, 0.001619,Sun Jan 12 18:57:19 2025
+,Unknown
+PostgresSemiRaw, 0.002006,Sun Jan 12 19:08:42 2025
+,Unknown
+PostgresSemiRaw, 0.001654,Sun Jan 12 19:08:57 2025
+,Unknown
+PostgresSemiRaw, 0.001714,Sun Jan 12 19:09:53 2025
+,Unknown
+PostgresSemiRaw, 0.001381,Sun Jan 12 19:10:01 2025
+,Unknown
+PostgresSemiRaw, 0.001462,Sun Jan 12 19:10:33 2025
+,Unknown
+PostgresSemiRaw, 0.001647,Sun Jan 12 19:10:42 2025
+,Unknown
+PostgresSemiRaw, 0.002575,Sun Jan 12 19:11:35 2025
+,Unknown
+PostgresSemiRaw, 0.001545,Sun Jan 12 19:11:49 2025
+,Unknown
+PostgresSemiRaw, 0.001655,Sun Jan 12 20:20:23 2025
+,Unknown
+PostgresSemiRaw, 0.001937,Sun Jan 12 20:22:31 2025
+,Unknown
+PostgresSemiRaw, 0.001541,Sun Jan 12 20:23:04 2025
+,Unknown
+PostgresSemiRaw, 0.001402,Sun Jan 12 20:23:29 2025
+,Unknown
+PostgresSemiRaw, 0.001598,Sun Jan 12 20:26:03 2025
+,Unknown
+PostgresSemiRaw, 0.001878,Sun Jan 12 20:32:09 2025
+,Unknown
+PostgresSemiRaw, 0.001402,Sun Jan 12 20:32:34 2025
+,Unknown
+PostgresSemiRaw, 0.001802,Sun Jan 12 20:37:13 2025
+,Unknown
+PostgresSemiRaw, 0.001144,Sun Jan 12 20:37:32 2025
+,Unknown
+PostgresSemiRaw, 0.001546,Sun Jan 12 20:38:20 2025
+,Unknown
+PostgresSemiRaw, 0.001174,Sun Jan 12 20:39:14 2025
+,Unknown
+PostgresSemiRaw, 0.001146,Sun Jan 12 20:44:10 2025
+,Unknown
+PostgresSemiRaw, 0.001021,Sun Jan 12 20:44:29 2025
+,Unknown
+PostgresSemiRaw, 0.001290,Sun Jan 12 21:00:15 2025
+,Unknown
+PostgresSemiRaw, 0.001426,Sun Jan 12 21:01:19 2025
+,Unknown
+PostgresSemiRaw, 0.001628,Sun Jan 12 21:01:50 2025
+,Unknown
+PostgresSemiRaw, 0.001678,Sun Jan 12 21:02:03 2025
+,Unknown
+PostgresSemiRaw, 0.001807,Sun Jan 12 21:04:27 2025
+,Unknown
+PostgresSemiRaw, 0.002079,Sun Jan 12 21:04:41 2025
+,Unknown
+PostgresSemiRaw, 0.001770,Sun Jan 12 21:05:23 2025
+,Unknown
+PostgresSemiRaw, 0.002168,Sun Jan 12 21:06:06 2025
+,Unknown
+PostgresSemiRaw, 0.001426,Sun Jan 12 21:12:41 2025
+,Unknown
+PostgresSemiRaw, 0.001576,Sun Jan 12 21:13:22 2025
+,Unknown
+PostgresSemiRaw, 0.001638,Sun Jan 12 21:14:07 2025
+,Unknown
+PostgresSemiRaw, 0.001313,Sun Jan 12 21:14:30 2025
+,Unknown
+PostgresSemiRaw, 0.001667,Sun Jan 12 21:18:42 2025
+,Unknown
+PostgresSemiRaw, 0.002182,Sun Jan 12 21:19:12 2025
+,Unknown
+PostgresSemiRaw, 0.001386,Sun Jan 12 21:19:19 2025
+,Unknown
+PostgresSemiRaw, 0.001460,Sun Jan 12 21:21:21 2025
+,Unknown
+PostgresSemiRaw, 0.001758,Sun Jan 12 21:21:37 2025
+,Unknown
+PostgresSemiRaw, 0.001738,Sun Jan 12 21:22:17 2025
+,Unknown
+PostgresSemiRaw, 0.001690,Sun Jan 12 21:22:28 2025
+,Unknown
+PostgresSemiRaw, 0.002720,Sun Jan 12 23:28:01 2025
+,Unknown
+PostgresSemiRaw, 0.002524,Sun Jan 12 23:28:38 2025
+,Unknown
+PostgresSemiRaw, 0.001274,Sun Jan 12 23:36:06 2025
+,Unknown
+PostgresSemiRaw, 0.001903,Sun Jan 12 23:36:17 2025
+,Unknown
+PostgresSemiRaw, 0.001958,Sun Jan 12 23:36:38 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 23:36:38 2025
+,Unknown
+PostgresSemiRaw, 0.000001,Sun Jan 12 23:36:39 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 23:36:39 2025
+,Unknown
+PostgresSemiRaw, 0.000003,Sun Jan 12 23:36:39 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 23:36:39 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 23:36:39 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 23:36:41 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 12 23:36:41 2025
+,Unknown
+PostgresSemiRaw, 0.001651,Sun Jan 12 23:38:41 2025
+,Unknown
+PostgresSemiRaw, 0.001718,Sun Jan 12 23:39:03 2025
+,Unknown
+PostgresSemiRaw, 0.001448,Sun Jan 12 23:40:16 2025
+,Unknown
+PostgresSemiRaw, 0.001368,Sun Jan 12 23:40:27 2025
+,Unknown
+PostgresSemiRaw, 0.001296,Sun Jan 12 23:41:00 2025
+,Unknown
+PostgresSemiRaw, 0.001650,Sun Jan 12 23:41:09 2025
+,Unknown
+PostgresSemiRaw, 0.001629,Sun Jan 12 23:41:18 2025
+,Unknown
+PostgresSemiRaw, 0.001471,Sun Jan 12 23:50:39 2025
+,Unknown
+PostgresSemiRaw, 0.001565,Sun Jan 12 23:51:29 2025
+,Unknown
+PostgresSemiRaw, 0.002020,Mon Jan 13 00:42:18 2025
+,Unknown
+PostgresSemiRaw, 0.001923,Mon Jan 13 00:42:31 2025
+,Unknown
+PostgresSemiRaw, 0.002220,Mon Jan 13 11:26:42 2025
+,Unknown
+PostgresSemiRaw, 0.002649,Mon Jan 13 11:27:29 2025
+,Unknown
+PostgresSemiRaw, 0.002227,Mon Jan 13 11:29:27 2025
+,Unknown
+PostgresSemiRaw, 0.001494,Mon Jan 13 11:29:41 2025
+,Unknown
+PostgresSemiRaw, 0.001379,Mon Jan 13 11:30:43 2025
+,Unknown
+PostgresSemiRaw, 0.002459,Mon Jan 13 11:30:54 2025
+,Unknown
+PostgresSemiRaw, 0.001382,Mon Jan 13 11:31:24 2025
+,Unknown
+PostgresSemiRaw, 0.001579,Mon Jan 13 11:46:13 2025
+,Unknown
+PostgresSemiRaw, 0.001745,Mon Jan 13 11:46:14 2025
+,Unknown
+PostgresSemiRaw, 0.001881,Mon Jan 13 11:46:17 2025
+,Unknown
+PostgresSemiRaw, 0.002011,Mon Jan 13 11:48:23 2025
+,Unknown
+PostgresSemiRaw, 0.002141,Mon Jan 13 11:48:25 2025
+,Unknown
+PostgresSemiRaw, 0.001795,Mon Jan 13 11:50:30 2025
+,Unknown
+PostgresSemiRaw, 0.001687,Mon Jan 13 11:52:30 2025
+,Unknown
+PostgresSemiRaw, 0.000003,Mon Jan 13 11:52:35 2025
+,Unknown
+PostgresSemiRaw, 0.002203,Mon Jan 13 11:53:09 2025
+,Unknown
+PostgresSemiRaw, 0.001759,Mon Jan 13 11:53:23 2025
+,Unknown
+PostgresSemiRaw, 0.002642,Mon Jan 13 11:53:28 2025
+,Unknown
+PostgresSemiRaw, 0.001967,Mon Jan 13 11:55:45 2025
+,Unknown
+PostgresSemiRaw, 0.001373,Mon Jan 13 12:01:24 2025
+,Unknown
+PostgresSemiRaw, 0.001187,Mon Jan 13 12:01:53 2025
+,Unknown
+PostgresSemiRaw, 0.001723,Mon Jan 13 12:02:03 2025
+,Unknown
+PostgresSemiRaw, 0.002006,Mon Jan 13 12:02:08 2025
+,Unknown
+PostgresSemiRaw, 0.001931,Mon Jan 13 12:03:47 2025
+,Unknown
+PostgresSemiRaw, 0.001852,Mon Jan 13 12:04:02 2025
+,Unknown
+PostgresSemiRaw, 0.001523,Mon Jan 13 14:11:29 2025
+,Unknown
+PostgresSemiRaw, 0.002222,Mon Jan 13 14:21:09 2025
+,Unknown
+PostgresSemiRaw, 0.002285,Mon Jan 13 14:21:33 2025
+,Unknown
+PostgresSemiRaw, 0.003669,Mon Jan 13 20:46:26 2025
+,Unknown
+PostgresSemiRaw, 0.002778,Mon Jan 13 20:46:56 2025
+,Unknown
+PostgresSemiRaw, 0.001958,Mon Jan 13 20:52:56 2025
+,Unknown
+PostgresSemiRaw, 0.002287,Mon Jan 13 20:55:15 2025
+,Unknown
+PostgresSemiRaw, 0.002302,Mon Jan 13 20:55:19 2025
+,Unknown
+PostgresSemiRaw, 0.001875,Mon Jan 13 20:55:49 2025
+,Unknown
+PostgresSemiRaw, 0.001722,Mon Jan 13 20:56:39 2025
+,Unknown
+PostgresSemiRaw, 0.002300,Mon Jan 13 20:56:46 2025
+,Unknown
+PostgresSemiRaw, 0.001570,Mon Jan 13 20:56:57 2025
+,Unknown
+PostgresSemiRaw, 0.001374,Mon Jan 13 21:00:30 2025
+,Unknown
+PostgresSemiRaw, 0.002267,Mon Jan 13 21:00:46 2025
+,Unknown
+PostgresSemiRaw, 0.001895,Mon Jan 13 21:02:10 2025
+,Unknown
+PostgresSemiRaw, 0.002274,Mon Jan 13 21:03:42 2025
+,Unknown
+PostgresSemiRaw, 0.001574,Mon Jan 13 21:09:52 2025
+,Unknown
+PostgresSemiRaw, 0.001682,Mon Jan 13 21:10:15 2025
+,Unknown
+PostgresSemiRaw, 0.001657,Mon Jan 13 21:19:12 2025
+,Unknown
+PostgresSemiRaw, 0.002546,Mon Jan 13 21:19:36 2025
+,Unknown
+PostgresSemiRaw, 0.001394,Mon Jan 13 21:20:11 2025
+,Unknown
+PostgresSemiRaw, 0.001682,Mon Jan 13 21:20:27 2025
+,Unknown
+PostgresSemiRaw, 0.001742,Mon Jan 13 21:23:20 2025
+,Unknown
+PostgresSemiRaw, 0.001892,Mon Jan 13 21:23:42 2025
+,Unknown
+PostgresSemiRaw, 0.001420,Mon Jan 13 21:24:59 2025
+,Unknown
+PostgresSemiRaw, 0.001786,Mon Jan 13 21:25:16 2025
+,Unknown
+PostgresSemiRaw, 0.002799,Mon Jan 13 21:56:05 2025
+,Unknown
+PostgresSemiRaw, 0.001897,Mon Jan 13 21:56:20 2025
+,Unknown
+PostgresSemiRaw, 0.001824,Mon Jan 13 21:57:21 2025
+,Unknown
+PostgresSemiRaw, 0.001215,Mon Jan 13 21:58:57 2025
+,Unknown
+PostgresSemiRaw, 0.001470,Mon Jan 13 21:59:47 2025
+,Unknown
+PostgresSemiRaw, 0.005761,Tue Jan 14 17:10:12 2025
+,Unknown
+PostgresSemiRaw, 0.008084,Thu Jan 16 22:27:14 2025
+,Unknown
+PostgresSemiRaw, 0.001335,Sat Jan 18 17:14:35 2025
+,Unknown
+PostgresSemiRaw, 0.001144,Sat Jan 18 17:15:00 2025
+,Unknown
+PostgresSemiRaw, 0.001973,Sat Jan 18 19:28:31 2025
+,Unknown
+PostgresSemiRaw, 0.001244,Sat Jan 18 19:28:34 2025
+,Unknown
+PostgresSemiRaw, 0.001896,Sat Jan 18 19:29:29 2025
+,Unknown
+PostgresSemiRaw, 0.001309,Sat Jan 18 19:31:14 2025
+,Unknown
+PostgresSemiRaw, 0.001554,Sat Jan 18 19:31:40 2025
+,Unknown
+PostgresSemiRaw, 0.001479,Sat Jan 18 19:47:00 2025
+,Unknown
+PostgresSemiRaw, 0.001835,Sat Jan 18 19:47:03 2025
+,Unknown
+PostgresSemiRaw, 0.001962,Sat Jan 18 19:47:21 2025
+,Unknown
+PostgresSemiRaw, 0.001164,Sat Jan 18 19:47:56 2025
+,Unknown
+PostgresSemiRaw, 0.001815,Sat Jan 18 19:48:18 2025
+,Unknown
+PostgresSemiRaw, 0.001489,Sat Jan 18 19:52:40 2025
+,Unknown
+PostgresSemiRaw, 0.001463,Sat Jan 18 20:05:14 2025
+,Unknown
+PostgresSemiRaw, 0.001890,Sat Jan 18 20:05:36 2025
+,Unknown
+PostgresSemiRaw, 0.001680,Sat Jan 18 20:06:00 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sat Jan 18 20:06:00 2025
+,Unknown
+PostgresSemiRaw, 0.001208,Sat Jan 18 20:06:04 2025
+,Unknown
+PostgresSemiRaw, 0.001178,Sat Jan 18 20:06:23 2025
+,Unknown
+PostgresSemiRaw, 0.001525,Sat Jan 18 20:17:56 2025
+,Unknown
+PostgresSemiRaw, 0.001526,Sat Jan 18 20:18:49 2025
+,Unknown
+PostgresSemiRaw, 0.004029,Sat Jan 18 23:31:48 2025
+,Unknown
+PostgresSemiRaw, 0.002776,Sat Jan 18 23:31:58 2025
+,Unknown
+PostgresSemiRaw, 0.003150,Sat Jan 18 23:32:01 2025
+,Unknown
+PostgresSemiRaw, 0.009155,Sun Jan 19 18:34:00 2025
+,Unknown
+PostgresSemiRaw, 0.001490,Sun Jan 19 18:34:06 2025
+,Unknown
+PostgresSemiRaw, 0.002484,Sun Jan 19 18:34:48 2025
+,Unknown
+PostgresSemiRaw, 0.002056,Sun Jan 19 18:34:51 2025
+,Unknown
+PostgresSemiRaw, 0.001355,Sun Jan 19 18:36:14 2025
+,Unknown
+PostgresSemiRaw, 0.001727,Sun Jan 19 18:36:15 2025
+,Unknown
+PostgresSemiRaw, 0.001602,Sun Jan 19 18:36:17 2025
+,Unknown
+PostgresSemiRaw, 0.001358,Sun Jan 19 18:37:17 2025
+,Unknown
+PostgresSemiRaw, 0.001627,Sun Jan 19 18:37:18 2025
+,Unknown
+PostgresSemiRaw, 0.002356,Sun Jan 19 18:37:20 2025
+,Unknown
+PostgresSemiRaw, 0.001535,Sun Jan 19 18:37:41 2025
+,Unknown
+PostgresSemiRaw, 0.001750,Sun Jan 19 18:37:43 2025
+,Unknown
+PostgresSemiRaw, 0.001341,Sun Jan 19 18:38:52 2025
+,Unknown
+PostgresSemiRaw, 0.001154,Sun Jan 19 18:38:53 2025
+,Unknown
+PostgresSemiRaw, 0.002398,Sun Jan 19 18:38:54 2025
+,Unknown
+PostgresSemiRaw, 0.000003,Sun Jan 19 18:38:54 2025
+,Unknown
+PostgresSemiRaw, 0.001686,Sun Jan 19 18:44:10 2025
+,Unknown
+PostgresSemiRaw, 0.001239,Sun Jan 19 18:44:10 2025
+,Unknown
+PostgresSemiRaw, 0.001374,Sun Jan 19 18:44:13 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 19 18:44:13 2025
+,Unknown
+PostgresSemiRaw, 0.000002,Sun Jan 19 18:44:27 2025
+,Unknown
+PostgresSemiRaw, 0.000309,Sun Feb  9 15:06:45 2025
+,Unknown
+PostgresSemiRaw, 0.000141,Sun Feb  9 15:33:47 2025
+,Unknown
+PostgresSemiRaw, 0.000178,Sun Feb  9 15:34:05 2025
+,Unknown
+PostgresSemiRaw, 0.000093,Sun Feb  9 15:34:09 2025
+,Unknown
+PostgresSemiRaw, 0.000119,Sun Feb  9 15:34:10 2025
+,Unknown
+PostgresSemiRaw, 0.000181,Sun Feb  9 16:57:27 2025
+,Unknown
+PostgresSemiRaw, 0.000088,Sun Feb  9 16:57:46 2025
+,Unknown
+PostgresSemiRaw, 0.000083,Sun Feb  9 16:57:50 2025
+,Unknown
+PostgresSemiRaw, 0.000099,Sun Feb  9 16:57:51 2025
+,Unknown
+PostgresSemiRaw, 0.000131,Sun Feb  9 17:41:11 2025
+,Unknown
+PostgresSemiRaw, 0.000128,Sun Feb  9 17:41:31 2025
+,Unknown
+PostgresSemiRaw, 0.000141,Sun Feb  9 17:41:35 2025
+,Unknown
+PostgresSemiRaw, 0.000155,Sun Feb  9 17:41:37 2025
+,Unknown
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 0.000086,Sun Feb  9 18:35:10 2025
+,Unknown
+PostgresSemiRaw, 0.000126,Sun Feb  9 18:36:02 2025
+,Unknown
+PostgresSemiRaw, 0.000085,Sun Feb  9 18:36:08 2025
+,Unknown
+PostgresSemiRaw, 0.000109,Sun Feb  9 20:01:11 2025
+,Unknown
+PostgresSemiRaw, 0.000074,Sun Feb  9 20:01:30 2025
+,Unknown
+PostgresSemiRaw, 0.000100,Sun Feb  9 20:02:59 2025
+,Unknown
+PostgresSemiRaw, 0.000101,Sun Feb  9 20:03:02 2025
+,Unknown
+PostgresSemiRaw, 0.000157,Sun Feb  9 20:03:52 2025
+,Unknown
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
+PostgresSemiRaw, 
