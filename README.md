@@ -43,6 +43,7 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
 ## Data Preparation
 If you intend to use the TPC-H benchmark, refer to the [README](dumpData/README.md) file for guidance on dumping the TPCH dataset using PostgreSQL.
 
+You can find the sample raw data files from TPC-H benchmark (SF 0.1) in the datasetsSample folder.
 ## Setup PostgresSemiRAW
 Use your favorite IDEA such as Visual Studio Code to set up and run the PostgresSemiRaw.
 1. Clone the project:
@@ -77,6 +78,8 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
     $ sudo chown 999 $PWD/../data $PWD/../datasets $PWD/../result $PWD/../schema
     ```
 3. Upload raw data files into **datasets** folder.
+   
+   You can find the sample raw data files from TPC-H benchmark (SF 0.1) in the datasetsSample folder.
 
 4. Create and upload the file `init_schema.sql` into **schema**:
    
