@@ -49,7 +49,7 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
 1. Clone the project:
 
     ```sh
-    $ git clone https://github.com/sdbs-uni-p/postgres-semi-raw.git    
+    $ git clone https://github.com/ilnazTayebi/PostgresSemiRaw.git    
     ```
 
 2. Create the folders if they do not exist:
