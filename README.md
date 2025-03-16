@@ -17,6 +17,8 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
 📂 PostgresSemiRaw
 │── 📂 analysis                # Python scripts for analysis the experiment's results.
 │── 📂 data                    # Postgres configuration files.
+│── 📂 datasets                # Raw data files.
+│── 📂 datasetsSample          # Raw data files sample from the TPC-H dataset (scale factor 0.1).
 │── 📂 deploy                  # DockerFile and docker compose.
 │   ├── 📂 Analysis            # DockerFile for the analysis container.
 │   │── 📂 PostgresRaw         # DockerFile for the postgresSemiRAW container.
@@ -29,10 +31,11 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
 │── 📂 PostgresRaw             # Source code of postgresSemiRaw.
 │     ├── 📂 postgresql-9.0.0  # Source code of postgresql-9.6.5.
 │     │── 📂 postgresql-9.6.5  # Source code of postgresSemiRaw based on the postgresql-9.6.5.
-│     └── 📂 test              # Testing PostgresRAW over PostgreSQL 9.6.5.
+│     └── 📂 tests              # Testing PostgresRAW over PostgreSQL 9.6.5.
 │── 📂 PostgresRawUI           # Source code of postgresRawUI.
 │── 📂 result                  # Results csv files.
 │── 📂 schema                  # Script for database initialization.
+│── 📂 static                  # 
 │── 📂 test                    # Script for run the experiment.
 │── LISENSE
 │── README.md
@@ -45,7 +48,7 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
 1. Clone the project:
 
     ```sh
-    $ git clone https://github.com/ilnazTayebi/PostgresSemiRaw.git    
+    $ git clone https://github.com/sdbs-uni-p/postgres-semi-raw.git    
     ```
 
 2. Create the folders if they do not exist:
@@ -75,7 +78,7 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
     ```
 3. Upload raw data files into **datasets** folder.
 
-4. Upload the file `init_schema.sql` into **schema**:
+4. Create and upload the file `init_schema.sql` into **schema**:
    
    This file holds the schema and metadata necessary for initialising the database.
    For raw files, PostgresSemiraRAW assumes:
@@ -84,7 +87,7 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
     - the exposed table will be used in read-only mode, no updates, insert nor delete operations.
     - that modifications of the data are done directly in the file, in which case PostgresSemiRAW will invalidate its caches as required. If the CSV layout changes, the table needs to be recreated to map to the new layout.
 
-5. Upload the file `experiment.sql` into **test**. This file holds the lists of queries for evaluate the database. Note that each query should be in one line.
+5. Create and upload the file `experiment.sql` into **test**. This file holds the lists of queries for evaluate the database. Note that each query should be in one line.
 
    ```sh
    $ SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;
