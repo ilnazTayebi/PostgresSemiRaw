@@ -14,7 +14,7 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
 
 ## Project Folder Structure
 ```sh
-📂 PostgresSemiRaw
+📂 Postgres-semi-raw
 │── 📂 analysis                # Python scripts for analysis the experiment's results.
 │── 📂 data                    # Postgres configuration files.
 │── 📂 datasets                # Raw data files.
@@ -49,9 +49,9 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
 1. Clone the project:
 
     ```sh
-    $ git clone https://github.com/ilnazTayebi/PostgresSemiRaw.git    
-    ```
-
+    $ git clone https://github.com/sdbs-uni-p/postgres-semi-raw.git
+    $ cd postgres-semi-raw   
+    ``` 
 2. Create the folders if they do not exist:
 
    To start PostgresRAW, we will need the following folders:
@@ -69,19 +69,19 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
    You can create those folders with the following commands:
 
     ```sh
-    $ mkdir -p $PWD/../data
-    $ mkdir -p $PWD/../datasets
-    $ mkdir -p $PWD/../result
-    $ mkdir -p $PWD/../schema
-    $ mkdir -p $PWD/../test
+    $ mkdir -p $PWD/data
+    $ mkdir -p $PWD/datasets
+    $ mkdir -p $PWD/result
+    $ mkdir -p $PWD/schema
+    $ mkdir -p $PWD/test
     
-    $ sudo chown 999 $PWD/../data $PWD/../datasets $PWD/../result $PWD/../schema
+    $ sudo chown 999 $PWD/data $PWD/datasets $PWD/result $PWD/schema
     ```
 3. Upload raw data files into **datasets** folder.
    
    You can find the sample raw data files from TPC-H benchmark (SF 0.1) in the datasetsSample folder.
 
-4. Create and upload the file `init_schema.sql` into **schema**:
+4. Create and upload the file `init_schema.sql` into **schema** if it does not exist:
    
    This file holds the schema and metadata necessary for initialising the database.
    For raw files, PostgresSemiraRAW assumes:
@@ -90,19 +90,22 @@ Use your favorite IDEA such as Visual Studio Code to set up and run the Postgres
     - the exposed table will be used in read-only mode, no updates, insert nor delete operations.
     - that modifications of the data are done directly in the file, in which case PostgresSemiRAW will invalidate its caches as required. If the CSV layout changes, the table needs to be recreated to map to the new layout.
 
-5. Create and upload the file `experiment.sql` into **test**. This file holds the lists of queries for evaluate the database. Note that each query should be in one line.
+5. Create and upload the file `experiment.sql` into **test** if it does not exist. This file holds the lists of queries for evaluate the database. Note that each query should be in one line.
 
    ```sh
    $ SELECT O.O_CUSTKEY, AVG(O.O_TOTALPRICE) AS AVG_TOTAL_PRICE FROM Orders O GROUP BY O.O_CUSTKEY;
    $ SELECT O_ORDERKEY, O_TOTALPRICE FROM Orders WHERE O_TOTALPRICE > 100000;
    ```
+   
+   You can find the sample queries used in the experiments in the file named experimentSample.sql located in the experimentData folder.
+ 
 6. Set the permission of `queryPlan.csv` and `queryExecTime.csv` to be owned by the user `999`, which is the `Postgres` user id inside the PostgresRAW container. The results of the experiments will be saved into these two files. 
    ```sh   
    $ sudo chown 999 result/queryPlan.csv
    $ sudo chown 999 result/queryExecTime.csv
    ```
 ### Setup PostgresSemiRaw On Local
-Follow the following steps to set up the postgresSemiRaw on your local machin.
+Follow the following steps to set up the postgresSemiRaw on your local machine.
 1. Compile PostgresRaw and install the compiled PostgresRaw binaries with the following commands:
 
    ```sh
