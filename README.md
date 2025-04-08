@@ -15,28 +15,32 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
 ## Project Folder Structure
 ```sh
 📂 Postgres-semi-raw
-│── 📂 analysis                # Python scripts for analysis the experiment's results.
-│── 📂 data                    # Postgres configuration files.
-│── 📂 datasets                # Raw data files.
-│── 📂 datasetsSample          # Raw data files sample from the TPC-H dataset (scale factor 0.1).
-│── 📂 deploy                  # DockerFile and docker compose.
-│   ├── 📂 Analysis            # DockerFile for the analysis container.
-│   │── 📂 PostgresRaw         # DockerFile for the postgresSemiRAW container.
-│   └── 📂 PostgresRawUI       # DockerFile for the PostgresRawUI container.
-│── 📂 dumpData                # Script and readme files for data cleaning of the TPC-H dataset.
-│   └── 📂 script              # Script for data cleaning of the TPC-H dataset.
-│── 📂 experimentData          # Schema, scripts and results of our run experiments as sample results.
-│     ├── 📂 initSchema        # Sample of schema of our experiments.
-│     └── 📂 results           # Sample of results of our experiments.
-│── 📂 PostgresRaw             # Source code of postgresSemiRaw.
-│     ├── 📂 postgresql-9.0.0  # Source code of postgresql-9.6.5.
-│     │── 📂 postgresql-9.6.5  # Source code of postgresSemiRaw based on the postgresql-9.6.5.
-│     └── 📂 tests              # Testing PostgresRAW over PostgreSQL 9.6.5.
-│── 📂 PostgresRawUI           # Source code of postgresRawUI.
-│── 📂 result                  # Results csv files.
-│── 📂 schema                  # Script for database initialization.
-│── 📂 static                  # 
-│── 📂 test                    # Script for run the experiment.
+│── 📂 analysis                    # Python scripts for analysis the experiment's results.
+│── 📂 data                        # Postgres configuration files.
+│── 📂 datasets                    # Raw data files.
+│── 📂 datasetsSample              # Raw data files sample from the TPC-H dataset (scale factor 0.1).
+│── 📂 deploy                      # DockerFile and docker compose.
+│   ├── 📂 Analysis                # DockerFile for the analysis container.
+│   │── 📂 PostgresRaw             # DockerFile for the postgresSemiRAW container.
+│   └── 📂 PostgresRawUI           # DockerFile for the PostgresRawUI container.
+│── 📂 dumpData                    # Script and readme files for data cleaning of the TPC-H dataset.
+│   └── 📂 script                  # Script for data cleaning of the TPC-H dataset.
+│── 📂 experimentData              # Schema, scripts and results of our run experiments as sample results.
+│     ├── 📂 initSchema            # Sample of schema of our experiments.
+│     ├── 📂 results               # Sample of results of our experiments.
+│     └── 📄 experimentSample.sql  # Sample queries for conducting the experiment.
+│── 📂 PostgresRaw                 # Source code of postgresSemiRaw.
+│     ├── 📂 postgresql-9.0.0      # Source code of postgresql-9.6.5.
+│     │── 📂 postgresql-9.6.5      # Source code of postgresSemiRaw based on the postgresql-9.6.5.
+│     └── 📂 tests                 # Testing PostgresRAW over PostgreSQL 9.6.5.
+│── 📂 PostgresRawUI               # Source code of postgresRawUI.
+│── 📂 result                      # CSV files containing the results of the experiment.
+│   │── 📑 initdb.csv              # CSV file containing database initialization time.
+│   │── 📑 queryExecTime           # CSV file containing query execution time.
+│   └── 📑 queryPlan.csv           # CSV file containing query plan.
+│── 📂 schema                      # Script for database initialization.
+│── 📂 static                      # 
+│── 📂 test                        # Script for run the experiment.
 │── LISENSE
 │── README.md
 ```
@@ -202,7 +206,13 @@ Once you created the database, run the following commands to run the experiments
    $ \resetexp
    ```
 
+**Note 1:** To conduct the same experiment as our work, use the queries provided in `experimentSample.sql` located in the `experimentData` folder.
+
+**Note 2:** Due to the PostgreSQL caching system, the execution time for each query will be impacted by the preceding queries. Therefore, it is recommended to run the queries one by one and restart the PostgreSQL service after each time you execute a single query.
+
 ## Build The Report Automatically
+Once you conduct the experiment, you can create the report file. This report serves as a sample and includes only the chapter titled Evaluation and Discussion.
+
 1. Access a running Docker container named analysis and open a shell:
    ```sh
    $ docker exec -it analysis sh
