@@ -11,6 +11,7 @@ PostgresRAW allows to access data in csv files through empty dummy tables define
   - [Setup PostgresSemiRaw Using Docker](#setup-postgressemiraw-using-docker) 
 -  [Run The Experiment](#run-the-experiment)
 - [Build The Report Automatically](#build-the-report-automatically)
+- [Reset The Experiment](#reset-the-experiment)
 
 ## Project Folder Structure
 ```sh
@@ -192,7 +193,7 @@ Follow the following steps to set up the postgresSemiRaw on your local machine.
    ```
 
 ## Run The Experiment
-Once you created the database, run the following commands to run the experiments
+Once the database created , run the following commands to run the experiments
 1. \exp: To run the experiments n times and save the execution time of the queries in the `experiment.sql` file.
    ```sh
    $ \exp <ITTERATION>
@@ -201,14 +202,15 @@ Once you created the database, run the following commands to run the experiments
    ```sh
    $ \plan <ITTERATION>
    ```
-3. \resetexp: reset the queryExecTime.csv and `queryPlan.csv` files.
-   ```sh
-   $ \resetexp
-   ```
 
 **Note 1:** To conduct the same experiment as our work, use the queries provided in `experimentSample.sql` located in the `experimentData` folder.
 
-**Note 2:** Due to the PostgreSQL caching system, the execution time for each query will be impacted by the preceding queries. Therefore, it is recommended to run the queries one by one and restart the PostgreSQL service after each time you execute a single query.
+**Note 2:** Due to the PostgreSQL caching system, the execution time for each query will be impacted by the preceding queries. Therefore, it is recommended to run the queries one by one and restart the PostgreSQL server after each time you execute a single query.
+
+**Note 3:** In order to restart the PostgreSQL server use the `restart` command.
+   ```sh
+   $ pg_ctl restart
+   ```
 
 ## Build The Report Automatically
 Once you conduct the experiment, you can create the report file. This report serves as a sample and includes only the chapter titled Evaluation and Discussion.
@@ -225,3 +227,11 @@ Once you conduct the experiment, you can create the report file. This report ser
    ```sh
    $ docker cp  analysis:../report/thesis.pdf <destination_path>
    ``` 
+## Reset The Experiment
+
+   To clear all the results of the run experiment, use `\resetexp`. 
+   Executing `\resetexp` will result in the `queryExecTime.csv` and `queryPlan.csv` files being empty.
+
+   ```sh
+   $ \resetexp
+   ```
