@@ -211,6 +211,8 @@ Once the database created , run the following commands to run the experiments
    ```sh
    $ pg_ctl restart
    ```
+**Note 4:** The result of execution of `\exp` or `\plan` will be added to the respective experiment result file, and the files will not be overwritten.
+To empty the results file use the [\resetexp](#reset-the-experiment) command.
 
 ## Build The Report Automatically
 Once you conduct the experiment, you can create the report file. This report serves as a sample and includes only the chapter titled Evaluation and Discussion.
